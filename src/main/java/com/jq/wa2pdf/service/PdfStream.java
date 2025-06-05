@@ -14,13 +14,13 @@ public class PdfStream {
 	private PdfService pdfService;
 
 	@Transactional(readOnly = true)
-	public String writeToOutputStream(final MultipartFile file) {
+	public String conversion(final MultipartFile file) {
 		try {
 			final String id = "" + System.currentTimeMillis() + Math.random();
 			pdfService.createPdf(extractService.unzip(file, id));
 			return id;
 		} catch (Exception e) {
-			throw new RuntimeException("Error writing to output stream", e);
+			throw new RuntimeException("Error converting file", e);
 		}
 	}
 }

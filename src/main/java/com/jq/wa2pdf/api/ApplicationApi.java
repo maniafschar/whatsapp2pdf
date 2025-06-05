@@ -27,10 +27,9 @@ public class ApplicationApi {
 	@Autowired
 	private PdfService pdfService;
 
-	@PostMapping("convert")
-	public String convert(@RequestParam("file") final MultipartFile file)
-			throws Exception {
-		return pdfStream.writeToOutputStream(file);
+	@PostMapping("conversion")
+	public String conversion(@RequestParam("file") final MultipartFile file) throws Exception {
+		return pdfStream.conversion(file);
 	}
 
 	@GetMapping("pdf/{id}/{name}")

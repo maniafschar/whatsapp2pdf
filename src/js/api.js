@@ -9,7 +9,7 @@ class api {
 			var formData = new FormData();
 			formData.append('file', file.files[0]);
 			api.ajax({
-				url: api.url + '/rest/api/convert',
+				url: api.url + '/rest/api/conversion',
 				method: 'POST',
 				body: formData,
 				success: function (response) {
