@@ -1,0 +1,19 @@
+<html>
+
+<head>
+    <title>WhatsApp to PDF Converter</title>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src * file: https:; child-src * file: https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; script-src * 'unsafe-inline' 'unsafe-eval' file: https:" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+    <script defer type="text/javascript" src="js/main.js"></script>
+</head>
+
+<body>
+    <h1>WhatsApp to PDF Converter</h1>
+    <label for="chatFile">Upload WhatsApp Export Chat ZIP-File</label>
+    <input type="file" id="chatFile" accept=".zip" required />
+    <button onclick="api.convert()">Upload</button>
+</body>
+
+</html>
