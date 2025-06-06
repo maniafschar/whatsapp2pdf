@@ -42,7 +42,7 @@ class api {
 				error: (xhr) => {
 					if (++api.count > 600 || xhr.status < 500) {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
-						document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Download failed after 10 minutes. Please try again later.';
+						document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Download timed out after 10 minutes. Please try again later.';
 						return;
 					}
 					setTimeout(download, 1000);
