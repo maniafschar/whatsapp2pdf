@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.itextpdf.text.Anchor;
@@ -31,6 +32,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class PdfService {
 	static final String filename = "wa";
 
+	@Async
 	void create(Path dir) throws IOException, DocumentException {
 		new PDF(dir).create();
 	}
