@@ -9,17 +9,19 @@ import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ExtractService {
-	static Path getTempDir(final String id) {
+	public static Path getTempDir(final String id) {
 		return Paths.get(System.getProperty("java.io.tmpdir")).resolve("whatsapp2pdf_" + id);
 	}
 
 	@SuppressWarnings("null")
-	Path unzip(final MultipartFile file, final String id) throws IOException {
+	public void unzip(final MultipartFile file, final String id) throws IOException {
 		final Path targetDir = getTempDir(id).toAbsolutePath();
 		Files.createDirectories(targetDir);
 		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
@@ -42,6 +44,11 @@ public class ExtractService {
 			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
 					.getBytes(StandardCharsets.UTF_8));
 		}
-		return targetDir;
+	}
+
+	@Async
+	public void cleanUp(final String id) throws InterruptedException, IOException {
+		Thread.sleep(1000);
+		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 }

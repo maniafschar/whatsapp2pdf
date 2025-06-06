@@ -39,6 +39,49 @@ error {
     color: rgb(255, 100, 50);
 }
 
+attributes {
+    display: none;
+    position: relative;
+}
+
+attributes id {
+    display: none;
+}
+
+attributes month,
+attributes user {
+    display: block;
+    position: relative;
+}
+
+attributes div {
+    padding: 2em 0 0.3em 0;
+    font-weight: bold;
+}
+
+table {
+    display: inline-block;
+    border-spacing: 0;
+}
+
+table th,
+table td {
+    text-align: right;
+    padding: 0.1em 1em;
+}
+
+table td {
+    cursor: pointer;
+}
+
+table th {
+    font-weight: bold;
+}
+
+table tr.selected {
+    background-color: rgba(255, 100, 50, 0.6);
+}
+
 progressbar {
     position: absolute;
     left: 0;

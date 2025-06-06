@@ -4,6 +4,11 @@ export { sha256 };
 
 window.api = api;
 
+document.getElementById('chatFile').onchange = () => {
+    document.getElementsByTagName('attributes')[0].style.display = 'none';
+    api.analyse();
+};
+
 class sha256 {
     static hash(s) {
         return sha256.rstr2hex(sha256.rstr_sha256(sha256.str2rstr_utf8(s)));

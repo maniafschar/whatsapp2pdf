@@ -11,10 +11,17 @@
 
 <body>
     <h1>WhatsApp to PDF Converter</h1>
-    <label>Upload WhatsApp Export Chat ZIP-File</label>
+    <div style="margin-bottom:0.5em;">Upload WhatsApp Chat Exported ZIP-File</div>
     <input type="file" id="chatFile" accept=".zip" required />
-    <button onclick="api.convert()">Upload</button>
-    <error></error>
+    <error style="margin-top:0.3em;"></error>
+    <attributes>
+        <id></id>
+        <div>Choose the month to export as PDF</div>
+        <month></month>
+        <div>Choose the viewers perspective</div>
+        <user></user>
+        <button onclick="api.convert()" style="margin-top:3em;">Create PDF</button>
+    </attributes>
     <progressbar>
         <loader>
             <div class="one"></div>
