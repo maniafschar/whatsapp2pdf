@@ -1,6 +1,8 @@
 package com.jq.wa2pdf.service;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,10 +18,13 @@ public class ExtractService {
 		return Paths.get(System.getProperty("java.io.tmpdir")).resolve("whatsapp2pdf_" + id);
 	}
 
+	@SuppressWarnings("null")
 	Path unzip(final MultipartFile file, final String id) throws IOException {
 		final Path targetDir = getTempDir(id).toAbsolutePath();
-		System.out.println(targetDir.toAbsolutePath());
-		try (ZipInputStream zipIn = new ZipInputStream(file.getInputStream())) {
+		Files.createDirectories(targetDir);
+		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
+				final FileOutputStream filename = new FileOutputStream(
+						targetDir.resolve(PdfService.filename + "Filename").toFile())) {
 			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
 				final Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
 				if (!resolvedPath.startsWith(targetDir)) {
@@ -34,6 +39,8 @@ public class ExtractService {
 					Files.copy(zipIn, resolvedPath);
 				}
 			}
+			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
+					.getBytes(StandardCharsets.UTF_8));
 		}
 		return targetDir;
 	}

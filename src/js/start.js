@@ -1,12 +1,8 @@
 import { api } from "./api";
 
-export { sha256, start };
-
-class start {
-}
+export { sha256 };
 
 window.api = api;
-window.start = start
 
 class sha256 {
     static hash(s) {

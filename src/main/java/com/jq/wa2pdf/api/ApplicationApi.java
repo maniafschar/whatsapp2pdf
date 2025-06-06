@@ -32,11 +32,15 @@ public class ApplicationApi {
 		return pdfStream.conversion(file);
 	}
 
-	@GetMapping("pdf/{id}/{name}")
-	public void pdf(@PathVariable final String id, @PathVariable final String name, final HttpServletResponse response)
-			throws IOException {
-		response.setHeader("Content-Disposition", "attachment; filename=\"" + name + ".pdf\"");
-		IOUtils.copy(new FileInputStream(pdfService.getPdf(id).toAbsolutePath().toFile()), response.getOutputStream());
+	@GetMapping("pdf/{id}")
+	public void pdf(@PathVariable final String id, final HttpServletResponse response)
+			throws IOException, InterruptedException {
+		String name = pdfService.getFilename(id);
+		if (name.contains("."))
+			name = name.substring(0, name.lastIndexOf('.'));
+		response.setHeader("Content-Disposition",
+				"attachment; filename=\"" + name.replaceAll("[^a-zA-Z0-9.\\-_]", "") + ".pdf\"");
+		IOUtils.copy(new FileInputStream(pdfService.get(id).toAbsolutePath().toFile()), response.getOutputStream());
 		response.flushBuffer();
 	}
 }

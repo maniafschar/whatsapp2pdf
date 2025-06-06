@@ -17,7 +17,7 @@ public class PdfStream {
 	public String conversion(final MultipartFile file) {
 		try {
 			final String id = "" + System.currentTimeMillis() + Math.random();
-			pdfService.createPdf(extractService.unzip(file, id));
+			pdfService.create(extractService.unzip(file, id));
 			return id;
 		} catch (Exception e) {
 			throw new RuntimeException("Error converting file", e);

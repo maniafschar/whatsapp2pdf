@@ -2,10 +2,12 @@ package com.jq.wa2pdf.service;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Component;
 
 import com.itextpdf.text.Anchor;
@@ -27,19 +29,25 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 @Component
 public class PdfService {
-	void createPdf(Path dir) throws IOException, DocumentException {
+	static final String filename = "wa";
+
+	void create(Path dir) throws IOException, DocumentException {
 		new PDF(dir).create();
 	}
 
-	public Path getPdf(final String id) throws IOException {
-		final Path pdfPath = ExtractService.getTempDir(id).resolve(PDF.filename + ".pdf");
+	public String getFilename(final String id) throws IOException, InterruptedException {
+		return IOUtils.toString(ExtractService.getTempDir(id).resolve(filename + "Filename").toUri().toURL(),
+				StandardCharsets.UTF_8);
+	}
+
+	public Path get(final String id) throws IOException {
+		final Path pdfPath = ExtractService.getTempDir(id).resolve(filename + ".pdf");
 		if (Files.exists(pdfPath))
 			return pdfPath;
 		throw new RuntimeException("PDF file not found: " + pdfPath.toAbsolutePath());
 	}
 
 	private class PDF {
-		private static final String filename = "wa";
 		private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
 		private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
 		private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);

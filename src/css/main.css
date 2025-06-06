@@ -5,26 +5,18 @@
     src: url(../font/Comfortaa-Regular.ttf) format('truetype');
 }
 
+html {
+    height: 100%;
+}
+
+
 body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
     text-align: center;
-    font-family: Calibri, 'PT Sans', sens-serif;
     background: linear-gradient(135deg, #fff, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9) 50% fixed;
     font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
-
-body>buttons {
-    position: fixed;
-    top: 0.5em;
-    z-index: 8;
-    opacity: 0.8;
-    left: 0.25em;
-}
-
-buttons button {
-    margin: 0 0.25em;
 }
 
 button {
@@ -41,7 +33,87 @@ h1 {
     margin-top: 0.3em;
 }
 
-a {
-    text-decoration: none;
-    color: darkblue;
+error {
+    position: relative;
+    display: block;
+    color: rgb(255, 100, 50);
+}
+
+progressbar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+}
+
+progressbar loader {
+    position: absolute;
+    top: calc(50% - 32px);
+    left: calc(50% - 32px);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    perspective: 800px;
+}
+
+progressbar loader div {
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+progressbar loader .one {
+    left: 0%;
+    top: 0%;
+    animation: rotate-one 1s linear infinite;
+    border-bottom: 3px solid #b55;
+}
+
+progressbar loader .two {
+    right: 0%;
+    top: 0%;
+    animation: rotate-two 1s linear infinite;
+    border-right: 3px solid #8d8;
+}
+
+progressbar loader .three {
+    right: 0%;
+    bottom: 0%;
+    animation: rotate-three 1s linear infinite;
+    border-top: 3px solid #aaf;
+}
+
+@keyframes rotate-one {
+    0% {
+        transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+    }
+
+    100% {
+        transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+    }
+}
+
+@keyframes rotate-two {
+    0% {
+        transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+    }
+
+    100% {
+        transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+    }
+}
+
+@keyframes rotate-three {
+    0% {
+        transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+    }
+
+    100% {
+        transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+    }
 }

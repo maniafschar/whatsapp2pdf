@@ -38,7 +38,7 @@ module.exports = (env) => {
 				apply: compiler => {
 					compiler.hooks.afterEmit.tap('params', () => {
 						if (!env.server)
-							throw 'Server not set!';
+							throw 'Server not set!\ne.g. npx webpack --env server=http://localhost:9000';
 						var fs = require('fs');
 						var file = 'dist/js/main.js';
 						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
