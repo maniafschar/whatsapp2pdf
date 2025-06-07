@@ -1,4 +1,4 @@
-package com.jq.wa2pdf.service;
+package com.jq.wa2pdf.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,12 +15,11 @@ public class GlobalExceptionHandler {
 	@Autowired
 	private Repository repository;
 
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
-		// Log exception with context information
+	@ExceptionHandler(Throwable.class)
+	public ResponseEntity<Object> handleAllExceptions(Throwable ex, WebRequest request) {
 		final Ticket ticket = new Ticket();
-		ticket.setNote("Exception occurred: " + ex.getMessage() + "\nRequest URI: " + request.getDescription(false));
+		ticket.setNote(request.getDescription(false) + "\n" + Utilities.stackTraceToString(ex));
 		repository.save(ticket);
-		return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
