@@ -10,7 +10,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,9 +45,7 @@ public class ExtractService {
 		}
 	}
 
-	@Async
-	public void cleanUp(final String id) throws InterruptedException, IOException {
-		Thread.sleep(1000);
+	public void cleanUp(final String id) throws IOException {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 }

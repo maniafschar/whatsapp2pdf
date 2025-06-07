@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -56,7 +57,11 @@ public class ApplicationApi {
 					"attachment; filename=\"" + name.replaceAll("[^a-zA-Z0-9.\\-_]", "") + ".pdf\"");
 			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 			response.flushBuffer();
-			extractService.cleanUp(id);
 		}
+	}
+
+	@DeleteMapping("cleanUp/{id}")
+	public void cleanUp(@PathVariable final String id) throws IOException {
+		extractService.cleanUp(id);
 	}
 }

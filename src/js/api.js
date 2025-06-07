@@ -42,6 +42,22 @@ class api {
 		});
 	}
 
+	static cleanUp() {
+		var file = document.getElementById('chatFile');
+		api.count = 0;
+		document.getElementsByTagName('error')[0].innerHTML = '';
+		document.getElementsByTagName('progressbar')[0].style.display = 'block';
+		api.ajax({
+			url: api.url + '/rest/api/cleanUp/' + document.querySelector('id').innerText,
+			method: 'DELETE',
+			success: () => {
+				document.getElementsByTagName('progressbar')[0].style.display = null;
+				document.getElementsByTagName('attributes')[0].style.display = null;
+				document.getElementById('chatFile').value = '';
+			}
+		});
+	}
+
 	static postAnalyse(data) {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
@@ -78,8 +94,6 @@ class api {
 					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText);
 					link.setAttribute('target', '_blank');
 					link.click();
-					document.getElementById('chatFile').value = '';
-					document.getElementsByTagName('attributes')[0].style.display = null;
 				},
 				error: xhr => {
 					if (++api.count > 600 || xhr.status < 500) {

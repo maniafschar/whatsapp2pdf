@@ -30,8 +30,9 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 			@Override
 			public void addCorsMappings(final CorsRegistry registry) {
 				registry.addMapping("/**").allowedOriginPatterns(allowedOrigins)
-						.allowedHeaders("clientid", "content-type", "password", "salt", "secret", "user", "webcall")
-						.allowedMethods("GET", "PUT", "POST", "PATCH", "OPTIONS", "DELETE");
+						.allowedHeaders("content-type", "authorization", "x-requested-with")
+						.exposedHeaders("content-disposition")
+						.allowedMethods("GET", "PUT", "POST", "OPTIONS", "DELETE");
 			}
 		};
 	}

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -42,32 +40,12 @@ public class PdfService {
 	public static final String filename = "wa";
 
 	public Attributes analyse(final String id) throws IOException, DocumentException {
-		try {
-			return new PDF(id, null, null).analyse();
-		} catch (IOException | DocumentException ex) {
-			cleanUpAndWriteError(id, ex);
-			throw ex;
-		}
+		return new PDF(id, null, null).analyse();
 	}
 
 	@Async
 	public void create(final String id, final String month, final String user) throws IOException, DocumentException {
-		try {
-			new PDF(id, month, user).create();
-		} catch (IOException | DocumentException ex) {
-			cleanUpAndWriteError(id, ex);
-			throw ex;
-		}
-	}
-
-	private void cleanUpAndWriteError(final String id, final Exception ex) throws IOException {
-		final Path dir = ExtractService.getTempDir(id);
-		FileUtils.deleteDirectory(dir.toFile());
-		Files.createDirectories(dir);
-		try (final PrintStream ps = new PrintStream(dir.resolve("error").toAbsolutePath()
-				.toFile())) {
-			ex.printStackTrace(ps);
-		}
+		new PDF(id, month, user).create();
 	}
 
 	public String getFilename(final String id) throws IOException, InterruptedException {
@@ -145,6 +123,8 @@ public class PdfService {
 				this.document = null;
 			else {
 				this.document = new Document();
+				Files.deleteIfExists(dir.resolve(filename + ".tmp"));
+				Files.deleteIfExists(dir.resolve(filename + ".pdf"));
 				PdfWriter.getInstance(document,
 						new FileOutputStream(
 								dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
