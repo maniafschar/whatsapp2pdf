@@ -96,9 +96,17 @@ class api {
 					link.click();
 				},
 				error: xhr => {
-					if (++api.count > 600 || xhr.status < 500) {
+					if (xhr.status == 500 && xhr.responseText.indexOf('Invalid ID') > -1) {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
-						document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Download timed out after 10 minutes. Please try again later.';
+						document.getElementsByTagName('attributes')[0].style.display = null;
+						document.getElementById('chatFile').value = '';
+						document.getElementsByTagName('error')[0].innerHTML = 'Data already deleted. Please upload new chat.';
+						return;
+					} else if (++api.count > 600 || xhr.status < 500) {
+						document.getElementsByTagName('progressbar')[0].style.display = null;
+						document.getElementsByTagName('error')[0].innerHTML =
+							xhr.status < 500 ? 'The server is unavailable. Please try again later.' :
+								'Download timed out after 10 minutes. Please try again later.';
 						return;
 					}
 					setTimeout(download, 1000);

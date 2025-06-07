@@ -2,10 +2,12 @@ package com.jq.wa2pdf.api;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,11 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jq.wa2pdf.service.ExtractService;
+import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.PdfService;
-import com.jq.wa2pdf.service.PdfService.Attributes;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -31,10 +34,10 @@ public class ApplicationApi {
 	private ExtractService extractService;
 
 	@PostMapping("analyse")
-	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws Exception {
+	public Attributes analyse(@RequestParam("file") final MultipartFile file)
+			throws Exception {
 		final String id = "" + System.currentTimeMillis() + Math.random();
-		extractService.unzip(file, id);
-		return pdfService.analyse(id);
+		return extractService.unzip(file, id);
 	}
 
 	@PostMapping("conversion/{month}/{user}/{id}")
@@ -48,16 +51,15 @@ public class ApplicationApi {
 			throws IOException, InterruptedException {
 		final Path file = pdfService.get(id);
 		if (file == null)
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "PDF not found for id: " + id);
-		else {
-			String name = pdfService.getFilename(id);
-			if (name.contains("."))
-				name = name.substring(0, name.lastIndexOf('.'));
-			response.setHeader("Content-Disposition",
-					"attachment; filename=\"" + name.replaceAll("[^a-zA-Z0-9.\\-_]", "") + ".pdf\"");
-			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
-			response.flushBuffer();
-		}
+			throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+					Files.exists(ExtractService.getTempDir(id)) ? "PDF not created" : "Invalid ID");
+		String name = pdfService.getFilename(id);
+		if (name.contains("."))
+			name = name.substring(0, name.lastIndexOf('.'));
+		response.setHeader("Content-Disposition",
+				"attachment; filename=\"" + name.replaceAll("[^a-zA-Z0-9.\\-_]", "") + ".pdf\"");
+		IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
+		response.flushBuffer();
 	}
 
 	@DeleteMapping("cleanUp/{id}")

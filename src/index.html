@@ -11,7 +11,7 @@
 
 <body>
     <h1>WhatsApp to PDF Converter</h1>
-    <div style="margin-bottom:0.5em;">Upload WhatsApp Chat Exported ZIP-File</div>
+    <div style="margin-bottom:0.5em;">Upload exported WhatsApp chat file</div>
     <input type="file" id="chatFile" accept=".zip" required />
     <error style="margin-top:0.3em;"></error>
     <attributes>
@@ -21,7 +21,7 @@
         <div>Choose the viewers perspective</div>
         <user></user>
         <button onclick="api.convert()" style="margin-top:3em;">Create PDF</button>
-        <button onclick="api.cleanUp()" style="margin-top:3em;">Hochgeladene Daten sofort löschen</button>
+        <button onclick="api.cleanUp()" style="margin-top:3em;">Delete uploaded data!</button>
     </attributes>
     <progressbar>
         <loader>

@@ -27,21 +27,19 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Section;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 
 @Component
 public class PdfService {
 	public static final String filename = "wa";
-
-	public Attributes analyse(final String id) throws IOException, DocumentException {
-		return new PDF(id, null, null).analyse();
-	}
 
 	@Async
 	public void create(final String id, final String month, final String user) throws IOException, DocumentException {
@@ -61,9 +59,9 @@ public class PdfService {
 	}
 
 	public static class Statistics {
-		private int chats = 0;
-		private int words = 0;
-		private int letters = 0;
+		int chats = 0;
+		int words = 0;
+		int letters = 0;
 
 		public int getChats() {
 			return chats;
@@ -78,29 +76,9 @@ public class PdfService {
 		}
 	}
 
-	public static class Attributes {
-		private final Map<String, Statistics> users = new HashMap<>();
-		private final Map<String, Statistics> months = new HashMap<>();
-		private final String id;
-
-		public Attributes(String id) {
-			this.id = id;
-		}
-
-		public Map<String, Statistics> getUsers() {
-			return users;
-		}
-
-		public Map<String, Statistics> getMonths() {
-			return months;
-		}
-
-		public String getId() {
-			return id;
-		}
-	}
-
-	private class PDF {
+	class PDF {
+		private static Font fontMessage = new Font(Font.FontFamily.HELVETICA, 11f, Font.NORMAL);
+		private static Font fontTime = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.NORMAL);
 		private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
 		private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
 		private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
@@ -109,26 +87,36 @@ public class PdfService {
 		private final Document document;
 		private final TableOfContent tableOfContent = new TableOfContent();
 		private final Map<String, Statistics> total = new HashMap<>();
-		private final List<Paragraph> content = new ArrayList<>();
+		private final List<PdfPTable> content = new ArrayList<>();
 		private final String month;
 		private final String user;
-		private final String id;
 
 		private PDF(final String id, final String month, final String user) throws IOException, DocumentException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
-			this.id = id;
 			this.month = month;
 			this.user = user;
-			if (user == null)
-				this.document = null;
-			else {
-				this.document = new Document();
-				Files.deleteIfExists(dir.resolve(filename + ".tmp"));
-				Files.deleteIfExists(dir.resolve(filename + ".pdf"));
-				PdfWriter.getInstance(document,
-						new FileOutputStream(
-								dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
-			}
+			this.document = new Document();
+			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
+			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
+			PdfWriter.getInstance(document,
+					new FileOutputStream(
+							dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()))
+					.setPageEvent(new PdfPageEventHelper() {
+						@Override
+						public void onEndPage(PdfWriter writer, Document document) {
+							try {
+								writer.getDirectContentUnder()
+										.addImage(
+												Image.getInstance(
+														getClass().getResource("/background/000001.png")
+																.toExternalForm()),
+												document.getPageSize().getWidth(), 0, 0,
+												document.getPageSize().getHeight(), 0, 0);
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+						}
+					});
 		}
 
 		private class TableOfContent {
@@ -136,73 +124,20 @@ public class PdfService {
 			private String date = null;
 		}
 
-		private Attributes analyse() throws IOException, DocumentException {
-			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
-				final Attributes attributes = new Attributes(id);
-				final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				String s[], currentDate = null, lastChat = null, line, user = null;
-				while ((line = chat.readLine()) != null) {
-					if (line.trim().length() > 0 && start.matcher(line).matches()) {
-						user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
-						if (lastChat != null) {
-							if (!attributes.users.containsKey(user))
-								attributes.users.put(user, new Statistics());
-							attributes.users.get(user).chats++;
-							if (lastChat != null) {
-								lastChat = lastChat.replaceAll("\t", " ");
-								lastChat = lastChat.replaceAll("\r", " ");
-								lastChat = lastChat.replaceAll("\n", " ");
-								while (lastChat.indexOf("  ") > -1)
-									lastChat = lastChat.replaceAll("  ", "");
-								attributes.users.get(user).words += lastChat.split(" ").length;
-								attributes.users.get(user).letters += lastChat.replaceAll(" ", "").length();
-							}
-						}
-						s = line.split(" ");
-						s = s[0].replace("[", "").replace(",", "").trim().split("\\.");
-						if (currentDate != s[2] + "-" + s[1]) {
-							currentDate = s[2] + "-" + s[1];
-							if (!attributes.months.containsKey(currentDate))
-								attributes.months.put(currentDate, new Statistics());
-							attributes.months.get(currentDate).chats++;
-							if (lastChat != null) {
-								lastChat = sanitize(lastChat);
-								lastChat = lastChat.replaceAll("\t", " ");
-								lastChat = lastChat.replaceAll("\r", " ");
-								lastChat = lastChat.replaceAll("\n", " ");
-								while (lastChat.indexOf("  ") > -1)
-									lastChat = lastChat.replaceAll("  ", " ");
-								attributes.months.get(currentDate).words += lastChat.split(" ").length;
-								attributes.months.get(currentDate).letters += lastChat.replaceAll(" ", "").length();
-							}
-						}
-						if (line.indexOf("<Anhang: ") < 0)
-							lastChat = line.substring(line.indexOf(": ") + 2);
-					} else
-						lastChat += " " + line;
-				}
-				return attributes;
-			}
-		}
-
 		private void create() throws IOException, DocumentException {
 			total.clear();
 			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
 				document.open();
 				final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				String e, s[], currentDate = null, lastChat = null, me = "man", line, user = null;
+				String lastChat = null, line, user = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && start.matcher(line).matches()) {
-						user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
 						if (lastChat != null) {
-							// addElement("msg", lastChat);
-							// document.body.append(currentChat);
 							if (!tableOfContent.users.containsKey(user))
 								tableOfContent.users.put(user, new Statistics());
 							tableOfContent.users.get(user).chats++;
 							if (lastChat != null) {
-								lastChat = sanitize(lastChat);
 								lastChat = lastChat.replaceAll("\t", " ");
 								lastChat = lastChat.replaceAll("\r", " ");
 								lastChat = lastChat.replaceAll("\n", " ");
@@ -211,17 +146,11 @@ public class PdfService {
 								tableOfContent.users.get(user).words += lastChat.split(" ").length;
 								tableOfContent.users.get(user).letters += lastChat.replaceAll(" ", "").length();
 							}
-							// currentChat = document.createElement("chat");
+							addMessage(user, time, lastChat);
 						}
-						s = line.split(" ");
-						if (currentDate != s[0]) {
-							currentDate = s[0];
-							addDate(currentDate);
-						}
-						// addElement("time", s[1].replace("]", ""));
-						// e = addElement("user", line.substring(line.indexOf("]") + 1, line.indexOf(":
-						// ")).trim());
-						// currentChat.classList = "user" + (e.innerText == me ? "Me" : "");
+						addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
+						user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
+						time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
 						if (line.indexOf("<Anhang: ") < 0)
 							lastChat = line.substring(line.indexOf(": ") + 2);
 						else if (line.indexOf(".mp4") > 0)
@@ -232,40 +161,123 @@ public class PdfService {
 							lastChat = "<img src=\"wa/"
 									+ line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim() + "\" />";
 					} else
-						lastChat += "<br/>" + line;
+						lastChat += "\n" + line;
 				}
+				addMessage(user, time, lastChat);
+				document.newPage();
+				content.stream().forEach(e -> {
+					try {
+						document.add(e);
+					} catch (DocumentException ex) {
+						throw new RuntimeException(ex);
+					}
+				});
 				document.close();
 			}
 			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
 		}
 
 		private void addDate(final String date) throws DocumentException {
-			if (tableOfContent.date != null) {
-				String s = tableOfContent.date;
-				for (final Map.Entry<String, Statistics> entry : tableOfContent.users.entrySet()) {
-					final Statistics user = entry.getValue();
-					s += entry.getKey() + " - " + user.chats + " ";
-					if (!total.containsKey(entry.getKey()))
-						total.put(entry.getKey(), new Statistics());
-					total.get(entry.getKey()).chats += user.chats;
-					total.get(entry.getKey()).words += user.words;
-					total.get(entry.getKey()).letters += user.letters;
+			if (!date.equals(tableOfContent.date)) {
+				if (tableOfContent.date != null) {
+					String s = tableOfContent.date;
+					for (final Map.Entry<String, Statistics> entry : tableOfContent.users.entrySet()) {
+						final Statistics user = entry.getValue();
+						s += " " + entry.getKey() + " - " + user.chats;
+						if (!total.containsKey(entry.getKey()))
+							total.put(entry.getKey(), new Statistics());
+						total.get(entry.getKey()).chats += user.chats;
+						total.get(entry.getKey()).words += user.words;
+						total.get(entry.getKey()).letters += user.letters;
+					}
+					final Chunk tableOfContentEntry = new Chunk(s);
+					tableOfContentEntry.setLocalGoto("date_" + tableOfContent.date.replace(".", "_"));
+					document.add(new Paragraph(tableOfContentEntry));
 				}
-				final Chunk tableOfContentEntry = new Chunk(s.trim());
-				tableOfContentEntry.setLocalGoto(tableOfContent.date.replaceAll(".", ""));
-				document.add(new Paragraph(tableOfContentEntry));
+				tableOfContent.date = date;
+				tableOfContent.users.clear();
+
+				final Chunk dateHeader = new Chunk(date);
+				dateHeader.setLocalDestination("date_" + date.replace(".", "_"));
+
+				final PdfPCell cell = new PdfPCell();
+				cell.setBorder(0);
+				cell.setPaddingTop(1.5f);
+				cell.setPaddingLeft(0);
+				cell.setPaddingRight(0);
+				cell.setPaddingBottom(10);
+				cell.setBackgroundColor(new BaseColor(200, 200, 200, 200));
+				final Paragraph paragraph = new Paragraph(dateHeader);
+				paragraph.setAlignment(Element.ALIGN_CENTER);
+				cell.addElement(paragraph);
+
+				final PdfPTable table = new PdfPTable(1);
+				table.setWidthPercentage(100.0f);
+				table.addCell(cell);
+				table.setComplete(true);
+				content.add(table);
+				addEmptyLine();
 			}
-
-			tableOfContent.date = date.replace("[", "").replace(",", "").trim();
-			tableOfContent.users.clear();
-
-			final Chunk dateHeader = new Chunk(tableOfContent.date);
-			dateHeader.setLocalDestination(tableOfContent.date.replaceAll(".", ""));
-			content.add(new Paragraph(dateHeader));
 		}
 
-		private String sanitize(String s) {
-			return s.replace("<Diese Nachricht wurde bearbeitet.>", "").replaceAll("<", "&lt;").trim();
+		private void addMessage(final String user, final String time, final String message) throws DocumentException {
+			final PdfPTable table = new PdfPTable(2);
+			table.setWidthPercentage(100f);
+
+			final PdfPCell cellMessage = new PdfPCell();
+			cellMessage.setBorder(0);
+			cellMessage.setPaddingTop(0);
+			cellMessage.setPaddingLeft(10);
+			cellMessage.setPaddingRight(10);
+			cellMessage.setPaddingBottom(10);
+			final Chunk chunkMessage = new Chunk(message);
+			chunkMessage.setFont(fontMessage);
+			cellMessage.addElement(chunkMessage);
+
+			final PdfPCell cellTime = new PdfPCell();
+			cellTime.setBorder(0);
+			cellTime.setPaddingTop(0);
+			cellTime.setPaddingLeft(10);
+			cellTime.setPaddingRight(0);
+			cellTime.setPaddingBottom(2);
+			final Chunk chunkTime = new Chunk(time);
+			chunkTime.setFont(fontTime);
+			cellTime.addElement(chunkTime);
+
+			final PdfPCell empty = new PdfPCell();
+			empty.setBorder(0);
+			empty.setPadding(0);
+
+			if (user.equals(this.user)) {
+				table.setTotalWidth(new float[] { 20f, 80f });
+				cellMessage.setBackgroundColor(new BaseColor(0, 200, 255, 20));
+				table.addCell(empty);
+				table.addCell(cellTime);
+				table.addCell(empty);
+				table.addCell(cellMessage);
+			} else {
+				table.setTotalWidth(new float[] { 80f, 20f });
+				cellMessage.setBackgroundColor(new BaseColor(255, 200, 0, 20));
+				table.addCell(cellTime);
+				table.addCell(empty);
+				table.addCell(cellMessage);
+				table.addCell(empty);
+			}
+			table.setKeepTogether(true);
+			table.setComplete(true);
+			content.add(table);
+			addEmptyLine();
+		}
+
+		private void addEmptyLine() {
+			final PdfPTable empty = new PdfPTable(1);
+			empty.setWidthPercentage(100f);
+			final PdfPCell cell = new PdfPCell();
+			cell.setFixedHeight(5f);
+			cell.setBorder(0);
+			cell.addElement(new Paragraph(" "));
+			empty.addCell(cell);
+			content.add(empty);
 		}
 
 		private void addMetaData() {
