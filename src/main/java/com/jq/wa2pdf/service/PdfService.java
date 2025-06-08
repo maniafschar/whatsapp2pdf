@@ -32,6 +32,8 @@ import com.itextpdf.text.ListItem;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Section;
+import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
@@ -46,7 +48,7 @@ public class PdfService {
 		new PDF(id, month, user).create();
 	}
 
-	public String getFilename(final String id) throws IOException, InterruptedException {
+	public String getFilename(final String id) throws IOException {
 		return IOUtils.toString(ExtractService.getTempDir(id).resolve(filename + "Filename").toUri().toURL(),
 				StandardCharsets.UTF_8);
 	}
@@ -59,6 +61,8 @@ public class PdfService {
 	}
 
 	public static class Statistics {
+		String user;
+		String month;
 		int chats = 0;
 		int words = 0;
 		int letters = 0;
@@ -74,6 +78,14 @@ public class PdfService {
 		public int getLetters() {
 			return letters;
 		}
+
+		public String getUser() {
+			return user;
+		}
+
+		public String getMonth() {
+			return month;
+		}
 	}
 
 	class PDF {
@@ -84,39 +96,45 @@ public class PdfService {
 		private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
 		private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 		private final Path dir;
+		private final PdfWriter writer;
 		private final Document document;
+		private final List<String> outline = new ArrayList<>();
 		private final TableOfContent tableOfContent = new TableOfContent();
 		private final Map<String, Statistics> total = new HashMap<>();
 		private final List<PdfPTable> content = new ArrayList<>();
 		private final String month;
 		private final String user;
+		private final String id;
+		private float position;
 
 		private PDF(final String id, final String month, final String user) throws IOException, DocumentException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
 			this.month = month;
 			this.user = user;
+			this.id = id;
 			this.document = new Document();
+
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
-			PdfWriter.getInstance(document,
+			writer = PdfWriter.getInstance(document,
 					new FileOutputStream(
-							dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()))
-					.setPageEvent(new PdfPageEventHelper() {
-						@Override
-						public void onEndPage(PdfWriter writer, Document document) {
-							try {
-								writer.getDirectContentUnder()
-										.addImage(
-												Image.getInstance(
-														getClass().getResource("/background/000001.png")
-																.toExternalForm()),
-												document.getPageSize().getWidth(), 0, 0,
-												document.getPageSize().getHeight(), 0, 0);
-							} catch (Exception e) {
-								throw new RuntimeException(e);
-							}
-						}
-					});
+							dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
+			writer.setPageEvent(new PdfPageEventHelper() {
+				@Override
+				public void onEndPage(PdfWriter writer, Document document) {
+					try {
+						writer.getDirectContentUnder()
+								.addImage(
+										Image.getInstance(
+												getClass().getResource("/background/000001.png")
+														.toExternalForm()),
+										document.getPageSize().getWidth(), 0, 0,
+										document.getPageSize().getHeight(), 0, 0);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
 		}
 
 		private class TableOfContent {
@@ -128,6 +146,7 @@ public class PdfService {
 			total.clear();
 			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
 				document.open();
+				addMetaData();
 				final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				String lastChat = null, line, user = null, time = null;
 				while ((line = chat.readLine()) != null) {
@@ -164,41 +183,43 @@ public class PdfService {
 						lastChat += "\n" + line;
 				}
 				addMessage(user, time, lastChat);
+				addDate(null);
 				document.newPage();
-				content.stream().forEach(e -> {
+				int i = 0;
+				for (PdfPTable e : content) {
 					try {
 						document.add(e);
+						if (e.getNumberOfColumns() == 1 && !e.getRow(0).getCells()[0].hasFixedHeight())
+							writer.getRootOutline().addKid(new PdfOutline(writer.getRootOutline(),
+									new PdfDestination(PdfDestination.XYZ, 0,
+											writer.getVerticalPosition(false) + e.getTotalHeight(), 0),
+									new Paragraph(outline.get(i++))));
 					} catch (DocumentException ex) {
 						throw new RuntimeException(ex);
 					}
-				});
+				}
 				document.close();
 			}
 			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
 		}
 
 		private void addDate(final String date) throws DocumentException {
-			if (!date.equals(tableOfContent.date)) {
-				if (tableOfContent.date != null) {
-					String s = tableOfContent.date;
-					for (final Map.Entry<String, Statistics> entry : tableOfContent.users.entrySet()) {
-						final Statistics user = entry.getValue();
-						s += " " + entry.getKey() + " - " + user.chats;
-						if (!total.containsKey(entry.getKey()))
-							total.put(entry.getKey(), new Statistics());
-						total.get(entry.getKey()).chats += user.chats;
-						total.get(entry.getKey()).words += user.words;
-						total.get(entry.getKey()).letters += user.letters;
-					}
-					final Chunk tableOfContentEntry = new Chunk(s);
-					tableOfContentEntry.setLocalGoto("date_" + tableOfContent.date.replace(".", "_"));
-					document.add(new Paragraph(tableOfContentEntry));
+			if (tableOfContent.date != null && !tableOfContent.date.equals(date)) {
+				String s = tableOfContent.date;
+				for (final Map.Entry<String, Statistics> entry : tableOfContent.users.entrySet()) {
+					final Statistics user = entry.getValue();
+					s += " · " + entry.getKey() + " " + user.chats;
+					if (!total.containsKey(entry.getKey()))
+						total.put(entry.getKey(), new Statistics());
+					total.get(entry.getKey()).chats += user.chats;
+					total.get(entry.getKey()).words += user.words;
+					total.get(entry.getKey()).letters += user.letters;
 				}
+				outline.add(s);
+			}
+			if (date != null && !date.equals(tableOfContent.date)) {
 				tableOfContent.date = date;
 				tableOfContent.users.clear();
-
-				final Chunk dateHeader = new Chunk(date);
-				dateHeader.setLocalDestination("date_" + date.replace(".", "_"));
 
 				final PdfPCell cell = new PdfPCell();
 				cell.setBorder(0);
@@ -207,7 +228,8 @@ public class PdfService {
 				cell.setPaddingRight(0);
 				cell.setPaddingBottom(10);
 				cell.setBackgroundColor(new BaseColor(200, 200, 200, 200));
-				final Paragraph paragraph = new Paragraph(dateHeader);
+
+				final Paragraph paragraph = new Paragraph(new Chunk(date));
 				paragraph.setAlignment(Element.ALIGN_CENTER);
 				cell.addElement(paragraph);
 
@@ -221,9 +243,6 @@ public class PdfService {
 		}
 
 		private void addMessage(final String user, final String time, final String message) throws DocumentException {
-			final PdfPTable table = new PdfPTable(2);
-			table.setWidthPercentage(100f);
-
 			final PdfPCell cellMessage = new PdfPCell();
 			cellMessage.setBorder(0);
 			cellMessage.setPaddingTop(0);
@@ -248,6 +267,8 @@ public class PdfService {
 			empty.setBorder(0);
 			empty.setPadding(0);
 
+			final PdfPTable table = new PdfPTable(2);
+			table.setWidthPercentage(100f);
 			if (user.equals(this.user)) {
 				table.setTotalWidth(new float[] { 20f, 80f });
 				cellMessage.setBackgroundColor(new BaseColor(0, 200, 255, 20));
@@ -280,12 +301,13 @@ public class PdfService {
 			content.add(empty);
 		}
 
-		private void addMetaData() {
-			document.addTitle("My first PDF");
-			document.addSubject("Using iText");
-			document.addKeywords("Java, PDF, iText");
-			document.addAuthor("Lars Vogel");
-			document.addCreator("Lars Vogel");
+		private void addMetaData() throws IOException {
+			document.addTitle("PDF of exported WhatsApp Conversation");
+			document.addSubject(getFilename(id));
+			document.addKeywords("WhatsApp PDF Converter");
+			document.addAuthor(user);
+			document.addCreator("https://wa2pdf.com");
+			document.addCreationDate();
 		}
 
 		private void addTitlePage() throws DocumentException {

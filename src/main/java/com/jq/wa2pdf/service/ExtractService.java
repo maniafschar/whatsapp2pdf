@@ -8,8 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -24,19 +24,19 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 public class ExtractService {
 
 	public static class Attributes {
-		private final Map<String, Statistics> users = new HashMap<>();
-		private final Map<String, Statistics> months = new HashMap<>();
+		private final List<Statistics> users = new ArrayList<>();
+		private final List<Statistics> months = new ArrayList<>();
 		private final String id;
 
 		public Attributes(String id) {
 			this.id = id;
 		}
 
-		public Map<String, Statistics> getUsers() {
+		public List<Statistics> getUsers() {
 			return users;
 		}
 
-		public Map<String, Statistics> getMonths() {
+		public List<Statistics> getMonths() {
 			return months;
 		}
 
@@ -85,39 +85,50 @@ public class ExtractService {
 				new FileReader(ExtractService.getTempDir(id).toAbsolutePath().resolve("_chat.txt").toFile()))) {
 			final Attributes attributes = new Attributes(id);
 			final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-			String s[], currentDate = null, lastChat = null, line, user = null;
+			String s[], currentDate = null, lastChat = null, line;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
-					user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
+					final String user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]")))
+							.trim();
 					if (lastChat != null) {
-						if (!attributes.users.containsKey(user))
-							attributes.users.put(user, new Statistics());
-						attributes.users.get(user).chats++;
+						Statistics u = attributes.users.stream().filter(e -> e.user.equals(user)).findFirst()
+								.orElse(null);
+						if (u == null) {
+							u = new Statistics();
+							u.user = user;
+							attributes.users.add(u);
+						}
+						u.chats++;
 						if (lastChat != null) {
 							lastChat = lastChat.replaceAll("\t", " ");
 							lastChat = lastChat.replaceAll("\r", " ");
 							lastChat = lastChat.replaceAll("\n", " ");
 							while (lastChat.indexOf("  ") > -1)
 								lastChat = lastChat.replaceAll("  ", "");
-							attributes.users.get(user).words += lastChat.split(" ").length;
-							attributes.users.get(user).letters += lastChat.replaceAll(" ", "").length();
+							u.words += lastChat.split(" ").length;
+							u.letters += lastChat.replaceAll(" ", "").length();
 						}
 					}
 					s = line.split(" ");
 					s = s[0].replace("[", "").replace(",", "").trim().split("\\.");
 					if (currentDate != s[2] + "-" + s[1]) {
 						currentDate = s[2] + "-" + s[1];
-						if (!attributes.months.containsKey(currentDate))
-							attributes.months.put(currentDate, new Statistics());
-						attributes.months.get(currentDate).chats++;
+						if (attributes.months.size() == 0
+								|| !attributes.months.get(attributes.months.size() - 1).month.equals(currentDate)) {
+							final Statistics statistics = new Statistics();
+							statistics.month = currentDate;
+							attributes.months.add(statistics);
+						}
+						final Statistics month = attributes.months.get(attributes.months.size() - 1);
+						month.chats++;
 						if (lastChat != null) {
 							lastChat = lastChat.replaceAll("\t", " ");
 							lastChat = lastChat.replaceAll("\r", " ");
 							lastChat = lastChat.replaceAll("\n", " ");
 							while (lastChat.indexOf("  ") > -1)
 								lastChat = lastChat.replaceAll("  ", " ");
-							attributes.months.get(currentDate).words += lastChat.split(" ").length;
-							attributes.months.get(currentDate).letters += lastChat.replaceAll(" ", "").length();
+							month.words += lastChat.split(" ").length;
+							month.letters += lastChat.replaceAll(" ", "").length();
 						}
 					}
 					if (line.indexOf("<Anhang: ") < 0)

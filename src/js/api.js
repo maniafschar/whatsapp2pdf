@@ -63,8 +63,8 @@ class api {
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('attributes')[0].querySelector('id').innerText = data.id;
 		var s = '<table><tr><th>Month</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
-		for (var month in data.months)
-			s += '<tr value="' + month + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + month.split('-')[1] + '.20' + month.split('-')[0] + '</td><td>' + data.months[month].chats + '</td><td>' + data.months[month].words + '</td><td>' + data.months[month].letters + '</td></tr>';
+		for (var i = 0; i < data.months.length; i++)
+			s += '<tr value="' + data.months[i].month + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.months[i].month.split('-')[1] + '.20' + data.months[i].month.split('-')[0] + '</td><td>' + data.months[i].chats + '</td><td>' + data.months[i].words + '</td><td>' + data.months[i].letters + '</td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('month').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('month td').forEach(td => {
 			td.addEventListener('click', () => {
@@ -73,8 +73,8 @@ class api {
 			});
 		});
 		s = '<table><tr><th>User</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
-		for (var user in data.users)
-			s += '<tr value="' + user + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + user + '</td><td>' + data.users[user].chats + '</td><td>' + data.users[user].words + '</td><td>' + data.users[user].letters + '</td></tr>';
+		for (var i = 0; i < data.users.length; i++)
+			s += '<tr value="' + data.users[i].user + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.users[i].user + '</td><td>' + data.users[i].chats + '</td><td>' + data.users[i].words + '</td><td>' + data.users[i].letters + '</td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('user').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('user td').forEach(td => {
 			td.addEventListener('click', () => {
