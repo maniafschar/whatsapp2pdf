@@ -48,14 +48,12 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 								.collect(Collectors.joining(", ")) + "\n")
 						+ Utilities.stackTraceToString(ex));
 				repository.save(ticket);
-				System.out.println(ticket.getNote());
 			}
 		};
 	}
 
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
-		System.out.println("Configuring CORS with allowed origins: " + String.join(", ", allowedOrigins));
 		return new WebMvcConfigurer() {
 			@SuppressWarnings("null")
 			@Override

@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -141,7 +142,6 @@ public class PdfService {
 						.compile("^.?\\[" + month.replaceAll("[0-9]", "\\\\d") + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				final Pattern patternMonth = Pattern
 						.compile("^.?\\[" + month + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				System.out.println(patternStart.pattern());
 				String lastChat = null, line, user = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
@@ -160,6 +160,7 @@ public class PdfService {
 									u.user = user;
 									tableOfContent.users.add(u);
 								}
+								addMessage(user, time, lastChat);
 								u.chats++;
 								if (lastChat != null) {
 									lastChat = lastChat.replaceAll("\t", " ");
@@ -170,21 +171,15 @@ public class PdfService {
 									u.words += lastChat.split(" ").length;
 									u.letters += lastChat.replaceAll(" ", "").length();
 								}
-								addMessage(user, time, lastChat);
 							}
 							addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
 							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
-							if (line.indexOf("<Anhang: ") < 0)
+							if (line.indexOf("<Anhang: ") < 0 || !line.endsWith(">"))
 								lastChat = line.substring(line.indexOf(": ") + 2);
-							else if (line.indexOf(".mp4") > 0)
-								lastChat = "<video controls><source src=\"wa/"
-										+ line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim()
-										+ "\" /></video>";
 							else
-								lastChat = "<img src=\"wa/"
-										+ line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim()
-										+ "\" />";
+								addMessage(user, time,
+										line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim(), true);
 						}
 					} else if (foundMonth)
 						lastChat += "\n" + line;
@@ -241,7 +236,12 @@ public class PdfService {
 		}
 
 		private void addMessage(final String user, final String time, final String message) throws DocumentException {
-			final PdfPCell cellMessage = createCell(message);
+			addMessage(user, time, message, false);
+		}
+
+		private void addMessage(final String user, final String time, final String message, boolean media)
+				throws DocumentException {
+			final PdfPCell cellMessage = createCell(message, media);
 
 			final PdfPCell cellTime = createCell(time);
 			cellTime.setPaddingBottom(2);
@@ -296,7 +296,6 @@ public class PdfService {
 			table.addCell(createCell("Chats", Element.ALIGN_RIGHT, 0, 0, 0, 0));
 			table.addCell(createCell("Words", Element.ALIGN_RIGHT, 0, 0, 0, 0));
 			table.addCell(createCell("Letters", Element.ALIGN_RIGHT, 0, 0, 0, 0));
-			System.out.println(total);
 			total.stream().forEach(e -> {
 				table.addCell(createCell(e.user, Element.ALIGN_RIGHT, 0, 0, 0, 0));
 				table.addCell(createCell("" + e.chats, Element.ALIGN_RIGHT, 0, 0, 0, 0));
@@ -308,22 +307,42 @@ public class PdfService {
 			document.add(table);
 		}
 
-		private PdfPCell createCell(String text) {
-			return createCell(text, Element.ALIGN_LEFT);
+		private PdfPCell createCell(String text, boolean... media) {
+			return createCell(text, Element.ALIGN_LEFT, media == null || media.length == 0 ? false : media[0]);
 		}
 
 		private PdfPCell createCell(String text, int alignment, float... padding) {
+			return createCell(text, alignment, false, padding);
+		}
+
+		private PdfPCell createCell(String text, int alignment, boolean media, float... padding) {
 			final PdfPCell cell = new PdfPCell();
+			final int defaultPadding = 10;
 			cell.setBorder(0);
 			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : 0);
-			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : 10);
-			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : 10);
-			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : 10);
-			final Chunk chunkMessage = new Chunk(text);
-			chunkMessage.setFont(fontMessage);
-			final Paragraph paragraph = new Paragraph(chunkMessage);
-			paragraph.setAlignment(alignment);
-			cell.addElement(paragraph);
+			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
+			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding);
+			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
+			if (media) {
+				try {
+					System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+					if (padding == null || padding.length == 0)
+						cell.setPaddingTop(defaultPadding);
+					if (!text.endsWith(".mp4") && !text.endsWith(".webp")) {
+						Image image = Image.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+						cell.addElement(image);
+					}
+				} catch (BadElementException | IOException ex) {
+					throw new RuntimeException(ex);
+				}
+			} else {
+				final Chunk chunkMessage = new Chunk(text);
+				chunkMessage.setFont(fontMessage);
+				final Paragraph paragraph = new Paragraph();
+				paragraph.add(chunkMessage);
+				paragraph.setAlignment(alignment);
+				cell.addElement(paragraph);
+			}
 			return cell;
 		}
 	}
