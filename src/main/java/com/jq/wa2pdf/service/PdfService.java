@@ -310,9 +310,9 @@ public class PdfService {
 			table.addCell(createCell("Letters", Element.ALIGN_RIGHT, 0, 0, 0, 0));
 			total.stream().forEach(e -> {
 				table.addCell(createCell(e.user, Element.ALIGN_RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell("" + e.chats, Element.ALIGN_RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell("" + e.words, Element.ALIGN_RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell("" + e.letters, Element.ALIGN_RIGHT, 0, 0, 0, 0));
+				table.addCell(createCell(String.format("%,d", e.chats), Element.ALIGN_RIGHT, 0, 0, 0, 0));
+				table.addCell(createCell(String.format("%,d", e.words), Element.ALIGN_RIGHT, 0, 0, 0, 0));
+				table.addCell(createCell(String.format("%,d", e.letters), Element.ALIGN_RIGHT, 0, 0, 0, 0));
 			});
 			table.setSpacingAfter(20f);
 			table.setComplete(true);
