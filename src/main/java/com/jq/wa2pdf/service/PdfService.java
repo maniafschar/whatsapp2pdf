@@ -27,6 +27,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfAnnotation;
@@ -91,6 +92,7 @@ public class PdfService {
 	}
 
 	private class PDF {
+		private static Font fontEmoji;
 		private static Font fontMessage = new Font(Font.FontFamily.HELVETICA, 11f, Font.NORMAL);
 		private static Font fontTime = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.NORMAL);
 		private final Path dir;
@@ -110,6 +112,8 @@ public class PdfService {
 			this.user = user;
 			this.id = id;
 			this.document = new Document();
+			FontFactory.register(getClass().getResource("/font/NotoColorEmoji.ttf").toExternalForm());
+			fontEmoji = FontFactory.getFont("NotoColorEmoji");
 
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
