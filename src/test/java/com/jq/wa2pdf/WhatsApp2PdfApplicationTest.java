@@ -20,6 +20,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 				"server.port=9001", "server.servlet.context-path=/rest" })
 public class WhatsApp2PdfApplicationTest {
 	private static String url = "http://localhost:9000/";
+	private WebDriver driver;
 
 	@Test
 	public void run() throws Exception {
@@ -29,11 +30,13 @@ public class WhatsApp2PdfApplicationTest {
 	@BeforeEach
 	public void beforeEach() throws Exception {
 		new ProcessBuilder("./web.sh", "start").start();
-		createWebDriver(600, 900).get(url);
+		driver = createWebDriver(600, 900);
+		driver.get(url);
 	}
 
 	@AfterEach
 	public void afterEach() throws Exception {
+		driver.close();
 		new ProcessBuilder("./web.sh", "stop").start();
 	}
 

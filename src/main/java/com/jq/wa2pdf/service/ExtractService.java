@@ -110,26 +110,32 @@ public class ExtractService {
 						}
 					}
 					s = line.split(" ");
-					s = s[0].replace("[", "").replace(",", "").trim().split("\\.");
-					if (currentDate != s[2] + "-" + s[1]) {
-						currentDate = s[2] + "-" + s[1];
+					s[0] = s[0].replace("[", "").replace(",", "").trim();
+					if (s[0].contains("/"))
+						s[0] = s[0].split("/")[0] + "/\\d\\d/" + s[0].split("/")[2];
+					else if (s[0].contains("."))
+						s[0] = "\\d\\d" + s[0].substring(s[0].indexOf('.'));
+					else if (s[0].contains("-"))
+						s[0] = s[0].substring(0, s[0].lastIndexOf('-') + 1) + "\\d\\d";
+					if (currentDate == null || !currentDate.equals(s[0])) {
+						currentDate = s[0];
 						if (attributes.months.size() == 0
 								|| !attributes.months.get(attributes.months.size() - 1).month.equals(currentDate)) {
 							final Statistics statistics = new Statistics();
 							statistics.month = currentDate;
 							attributes.months.add(statistics);
 						}
-						final Statistics month = attributes.months.get(attributes.months.size() - 1);
-						month.chats++;
-						if (lastChat != null) {
-							lastChat = lastChat.replaceAll("\t", " ");
-							lastChat = lastChat.replaceAll("\r", " ");
-							lastChat = lastChat.replaceAll("\n", " ");
-							while (lastChat.indexOf("  ") > -1)
-								lastChat = lastChat.replaceAll("  ", " ");
-							month.words += lastChat.split(" ").length;
-							month.letters += lastChat.replaceAll(" ", "").length();
-						}
+					}
+					final Statistics month = attributes.months.get(attributes.months.size() - 1);
+					month.chats++;
+					if (lastChat != null) {
+						lastChat = lastChat.replaceAll("\t", " ");
+						lastChat = lastChat.replaceAll("\r", " ");
+						lastChat = lastChat.replaceAll("\n", " ");
+						while (lastChat.indexOf("  ") > -1)
+							lastChat = lastChat.replaceAll("  ", " ");
+						month.words += lastChat.split(" ").length;
+						month.letters += lastChat.replaceAll(" ", "").length();
 					}
 					if (line.indexOf("<Anhang: ") < 0)
 						lastChat = line.substring(line.indexOf(": ") + 2);
