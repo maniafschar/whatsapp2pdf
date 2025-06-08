@@ -15,6 +15,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,7 @@ public class ExtractService {
 
 	public static class Attributes {
 		private final List<Statistics> users = new ArrayList<>();
-		private final List<Statistics> months = new ArrayList<>();
+		private final List<Statistics> periods = new ArrayList<>();
 		private final String id;
 
 		public Attributes(String id) {
@@ -36,8 +37,8 @@ public class ExtractService {
 			return users;
 		}
 
-		public List<Statistics> getMonths() {
-			return months;
+		public List<Statistics> getPeriods() {
+			return periods;
 		}
 
 		public String getId() {
@@ -47,6 +48,11 @@ public class ExtractService {
 
 	public static Path getTempDir(final String id) {
 		return Paths.get(System.getProperty("java.io.tmpdir")).resolve("whatsapp2pdf_" + id);
+	}
+
+	public String getFilename(final String id) throws IOException {
+		return IOUtils.toString(ExtractService.getTempDir(id).resolve(PdfService.filename + "Filename").toUri().toURL(),
+				StandardCharsets.UTF_8);
 	}
 
 	@SuppressWarnings("null")
@@ -119,23 +125,23 @@ public class ExtractService {
 						s[0] = s[0].substring(0, s[0].lastIndexOf('-') + 1) + "\\d\\d";
 					if (currentDate == null || !currentDate.equals(s[0])) {
 						currentDate = s[0];
-						if (attributes.months.size() == 0
-								|| !attributes.months.get(attributes.months.size() - 1).month.equals(currentDate)) {
+						if (attributes.periods.size() == 0
+								|| !attributes.periods.get(attributes.periods.size() - 1).period.equals(currentDate)) {
 							final Statistics statistics = new Statistics();
-							statistics.month = currentDate;
-							attributes.months.add(statistics);
+							statistics.period = currentDate;
+							attributes.periods.add(statistics);
 						}
 					}
-					final Statistics month = attributes.months.get(attributes.months.size() - 1);
-					month.chats++;
+					final Statistics period = attributes.periods.get(attributes.periods.size() - 1);
+					period.chats++;
 					if (lastChat != null) {
 						lastChat = lastChat.replaceAll("\t", " ");
 						lastChat = lastChat.replaceAll("\r", " ");
 						lastChat = lastChat.replaceAll("\n", " ");
 						while (lastChat.indexOf("  ") > -1)
 							lastChat = lastChat.replaceAll("  ", " ");
-						month.words += lastChat.split(" ").length;
-						month.letters += lastChat.replaceAll(" ", "").length();
+						period.words += lastChat.split(" ").length;
+						period.letters += lastChat.replaceAll(" ", "").length();
 					}
 					if (line.indexOf("<Anhang: ") < 0)
 						lastChat = line.substring(line.indexOf(": ") + 2);

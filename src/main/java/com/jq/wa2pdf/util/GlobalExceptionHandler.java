@@ -20,6 +20,7 @@ public class GlobalExceptionHandler {
 		final Ticket ticket = new Ticket();
 		ticket.setNote(request.getDescription(false) + "\n" + Utilities.stackTraceToString(ex));
 		repository.save(ticket);
+		System.out.println(ticket.getNote());
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }

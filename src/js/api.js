@@ -32,7 +32,7 @@ class api {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
-			url: api.url + '/rest/api/conversion/' + document.querySelector('id').innerText + '?month=' + encodeURIComponent(document.querySelector('month .selected').getAttribute('value')) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/conversion/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(document.querySelector('period .selected').getAttribute('value')) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
 			error: xhr => {
@@ -62,13 +62,13 @@ class api {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('attributes')[0].querySelector('id').innerText = data.id;
-		var s = '<table><tr><th>Month</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
-		for (var i = 0; i < data.months.length; i++)
-			s += '<tr value="' + data.months[i].month + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.months[i].month.replace('-\\d\\d', '').replace('/\\d\\d', '').replace('\\d\\d.', '') + '</td><td>' + data.months[i].chats + '</td><td>' + data.months[i].words + '</td><td>' + data.months[i].letters + '</td></tr>';
-		document.getElementsByTagName('attributes')[0].querySelector('month').innerHTML = s + '</table>';
-		document.getElementsByTagName('attributes')[0].querySelectorAll('month td').forEach(td => {
+		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
+		for (var i = 0; i < data.periods.length; i++)
+			s += '<tr value="' + data.periods[i].period + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.periods[i].period.replace('-\\d\\d', '').replace('/\\d\\d', '').replace('\\d\\d.', '') + '</td><td>' + data.periods[i].chats + '</td><td>' + data.periods[i].words + '</td><td>' + data.periods[i].letters + '</td></tr>';
+		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
+		document.getElementsByTagName('attributes')[0].querySelectorAll('period td').forEach(td => {
 			td.addEventListener('click', () => {
-				document.querySelector('month .selected').classList.remove('selected');
+				document.querySelector('period .selected').classList.remove('selected');
 				td.parentElement.classList.add('selected');
 			});
 		});

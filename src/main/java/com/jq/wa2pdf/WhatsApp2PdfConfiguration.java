@@ -48,6 +48,7 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 								.collect(Collectors.joining(", ")) + "\n")
 						+ Utilities.stackTraceToString(ex));
 				repository.save(ticket);
+				System.out.println(ticket.getNote());
 			}
 		};
 	}

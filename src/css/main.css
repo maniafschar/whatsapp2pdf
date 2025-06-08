@@ -48,7 +48,7 @@ attributes id {
     display: none;
 }
 
-attributes month,
+attributes period,
 attributes user {
     display: block;
     position: relative;

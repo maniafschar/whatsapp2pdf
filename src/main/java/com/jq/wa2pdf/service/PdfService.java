@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,9 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfAnnotation;
 import com.itextpdf.text.pdf.PdfDestination;
+import com.itextpdf.text.pdf.PdfFileSpecification;
 import com.itextpdf.text.pdf.PdfOutline;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -39,13 +42,16 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class PdfService {
 	public static final String filename = "wa";
 
+	@Autowired
+	private ExtractService extractService;
+
 	@Async
-	public void create(final String id, final String month, final String user) throws IOException, DocumentException {
-		new PDF(id, month, user).create();
+	public void create(final String id, final String period, final String user) throws IOException, DocumentException {
+		new PDF(id, period, user).create();
 	}
 
-	public String getFilename(final String id) throws IOException {
-		return IOUtils.toString(ExtractService.getTempDir(id).resolve(filename + "Filename").toUri().toURL(),
+	public String getPeriod(final String id) throws IOException {
+		return IOUtils.toString(ExtractService.getTempDir(id).resolve(filename + "Period").toUri().toURL(),
 				StandardCharsets.UTF_8);
 	}
 
@@ -58,7 +64,7 @@ public class PdfService {
 
 	public static class Statistics {
 		String user;
-		String month;
+		String period;
 		int chats = 0;
 		int words = 0;
 		int letters = 0;
@@ -79,12 +85,12 @@ public class PdfService {
 			return user;
 		}
 
-		public String getMonth() {
-			return month;
+		public String getPeriod() {
+			return period;
 		}
 	}
 
-	class PDF {
+	private class PDF {
 		private static Font fontMessage = new Font(Font.FontFamily.HELVETICA, 11f, Font.NORMAL);
 		private static Font fontTime = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.NORMAL);
 		private final Path dir;
@@ -94,13 +100,13 @@ public class PdfService {
 		private final TableOfContent tableOfContent = new TableOfContent();
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<PdfPTable> content = new ArrayList<>();
-		private final String month;
+		private final String period;
 		private final String user;
 		private final String id;
 
-		private PDF(final String id, final String month, final String user) throws IOException, DocumentException {
+		private PDF(final String id, final String period, final String user) throws IOException, DocumentException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
-			this.month = month;
+			this.period = period;
 			this.user = user;
 			this.id = id;
 			this.document = new Document();
@@ -135,13 +141,16 @@ public class PdfService {
 
 		private void create() throws IOException, DocumentException {
 			total.clear();
-			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
+			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()));
+					final FileOutputStream filenamePeriod = new FileOutputStream(
+							ExtractService.getTempDir(id).resolve(PdfService.filename + "Period").toFile())) {
 				document.open();
 				boolean foundMonth = false;
 				final Pattern patternStart = Pattern
-						.compile("^.?\\[" + month.replaceAll("[0-9]", "\\\\d") + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
+						.compile(
+								"^.?\\[" + period.replaceAll("[0-9]", "\\\\d") + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				final Pattern patternMonth = Pattern
-						.compile("^.?\\[" + month + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
+						.compile("^.?\\[" + period + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				String lastChat = null, line, user = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
@@ -177,9 +186,11 @@ public class PdfService {
 							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
 							if (line.indexOf("<Anhang: ") < 0 || !line.endsWith(">"))
 								lastChat = line.substring(line.indexOf(": ") + 2);
-							else
+							else {
+								lastChat = null;
 								addMessage(user, time,
 										line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim(), true);
+							}
 						}
 					} else if (foundMonth)
 						lastChat += "\n" + line;
@@ -197,6 +208,7 @@ public class PdfService {
 								new Paragraph(outline.get(i++))));
 				}
 				document.close();
+				filenamePeriod.write(period.getBytes(StandardCharsets.UTF_8));
 			}
 			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
 		}
@@ -284,7 +296,7 @@ public class PdfService {
 
 		private void addMetaData() throws IOException, DocumentException {
 			document.addTitle("PDF of exported WhatsApp Conversation");
-			document.addSubject(getFilename(id));
+			document.addSubject(extractService.getFilename(id));
 			document.addKeywords("WhatsApp PDF Converter");
 			document.addAuthor(user);
 			document.addCreator("https://wa2pdf.com");
@@ -329,7 +341,15 @@ public class PdfService {
 					if (padding == null || padding.length == 0)
 						cell.setPaddingTop(defaultPadding);
 					if (text.endsWith(".mp4")) {
-
+						final Chunk chunk = new Chunk();
+						chunk.setAnnotation(PdfAnnotation
+								.createScreen(
+										writer, cell, "", PdfFileSpecification.fileEmbedded(writer, null, "",
+												IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(text)
+														.toUri().toURL())),
+										"video/mp4", true));
+						cell.setMinimumHeight(200f);
+						cell.addElement(chunk);
 					} else {
 						if (text.endsWith(".webp")) {
 							final BufferedImage originalImage = ImageIO
@@ -345,9 +365,8 @@ public class PdfService {
 							ImageIO.write(image, "jpg",
 									ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
 						}
-						final Image image = Image
-								.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-						cell.addElement(image);
+						cell.addElement(Image
+								.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL()));
 					}
 				} catch (BadElementException | IOException ex) {
 					throw new RuntimeException(ex);

@@ -41,9 +41,9 @@ public class ApplicationApi {
 	}
 
 	@PostMapping("conversion/{id}")
-	public void conversion(@PathVariable String id, @RequestParam String month, @RequestParam String user)
+	public void conversion(@PathVariable String id, @RequestParam String period, @RequestParam String user)
 			throws Exception {
-		pdfService.create(id, month, user);
+		pdfService.create(id, period, user);
 	}
 
 	@GetMapping("pdf/{id}")
@@ -53,13 +53,27 @@ public class ApplicationApi {
 		if (file == null)
 			throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 					Files.exists(ExtractService.getTempDir(id)) ? "PDF not created" : "Invalid ID");
-		String name = pdfService.getFilename(id);
-		if (name.contains("."))
-			name = name.substring(0, name.lastIndexOf('.'));
 		response.setHeader("Content-Disposition",
-				"attachment; filename=\"" + name.replaceAll("[^a-zA-Z0-9.\\-_]", "") + ".pdf\"");
+				"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
+						sanatizePeriod(pdfService.getPeriod(id)) + ".pdf\"");
 		IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 		response.flushBuffer();
+	}
+
+	private String sanatizeFilename(String filename) {
+		if (filename.contains("."))
+			filename = filename.substring(0, filename.lastIndexOf('.'));
+		return filename.replaceAll("[^a-zA-Z0-9.\\-_]", "");
+	}
+
+	private String sanatizePeriod(String period) {
+		if (period.contains("/"))
+			period = period.replace("/\\d\\d", "");
+		else if (period.contains("."))
+			period = period.replace("\\d\\d.", "");
+		else if (period.contains("-"))
+			period = period.substring(0, period.lastIndexOf('-'));
+		return "_" + period;
 	}
 
 	@DeleteMapping("cleanUp/{id}")
