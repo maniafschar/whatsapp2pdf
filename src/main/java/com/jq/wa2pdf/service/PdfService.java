@@ -1,5 +1,7 @@
 package com.jq.wa2pdf.service;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -10,6 +12,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.imageio.ImageIO;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -83,10 +87,6 @@ public class PdfService {
 	class PDF {
 		private static Font fontMessage = new Font(Font.FontFamily.HELVETICA, 11f, Font.NORMAL);
 		private static Font fontTime = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.NORMAL);
-		private static Font catFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
-		private static Font redFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL, BaseColor.RED);
-		private static Font subFont = new Font(Font.FontFamily.TIMES_ROMAN, 16, Font.BOLD);
-		private static Font smallBold = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.BOLD);
 		private final Path dir;
 		private final PdfWriter writer;
 		private final Document document;
@@ -307,15 +307,15 @@ public class PdfService {
 			document.add(table);
 		}
 
-		private PdfPCell createCell(String text, boolean... media) {
+		private PdfPCell createCell(final String text, final boolean... media) {
 			return createCell(text, Element.ALIGN_LEFT, media == null || media.length == 0 ? false : media[0]);
 		}
 
-		private PdfPCell createCell(String text, int alignment, float... padding) {
+		private PdfPCell createCell(String text, final int alignment, final float... padding) {
 			return createCell(text, alignment, false, padding);
 		}
 
-		private PdfPCell createCell(String text, int alignment, boolean media, float... padding) {
+		private PdfPCell createCell(String text, final int alignment, final boolean media, final float... padding) {
 			final PdfPCell cell = new PdfPCell();
 			final int defaultPadding = 10;
 			cell.setBorder(0);
@@ -328,8 +328,25 @@ public class PdfService {
 					System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
 					if (padding == null || padding.length == 0)
 						cell.setPaddingTop(defaultPadding);
-					if (!text.endsWith(".mp4") && !text.endsWith(".webp")) {
-						Image image = Image.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+					if (text.endsWith(".mp4")) {
+
+					} else {
+						if (text.endsWith(".webp")) {
+							final BufferedImage originalImage = ImageIO
+									.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+							final BufferedImage image = new BufferedImage(originalImage.getWidth(),
+									originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+							final Graphics2D g = image.createGraphics();
+							g.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), 0, 0,
+									originalImage.getWidth(), originalImage.getHeight(), null);
+							image.flush();
+							g.dispose();
+							text = text.substring(0, text.length() - 4) + "jpg";
+							ImageIO.write(image, "jpg",
+									ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
+						}
+						final Image image = Image
+								.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
 						cell.addElement(image);
 					}
 				} catch (BadElementException | IOException ex) {
