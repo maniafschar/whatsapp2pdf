@@ -100,8 +100,8 @@ public class PdfService {
 		private final Path dir;
 		private final PdfWriter writer;
 		private final Document document;
+		private final UsersPerDay usersPerDay = new UsersPerDay();
 		private final List<String> outline = new ArrayList<>();
-		private final TableOfContent tableOfContent = new TableOfContent();
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<PdfPTable> content = new ArrayList<>();
 		private final String period;
@@ -143,7 +143,7 @@ public class PdfService {
 			});
 		}
 
-		private class TableOfContent {
+		private class UsersPerDay {
 			private final List<Statistics> users = new ArrayList<>();
 			private String date = null;
 		}
@@ -170,12 +170,12 @@ public class PdfService {
 						if (foundMonth) {
 							if (lastChat != null) {
 								final String s = user;
-								Statistics u = tableOfContent.users.stream().filter(e -> e.user.equals(s)).findFirst()
+								Statistics u = usersPerDay.users.stream().filter(e -> e.user.equals(s)).findFirst()
 										.orElse(null);
 								if (u == null) {
 									u = new Statistics();
 									u.user = user;
-									tableOfContent.users.add(u);
+									usersPerDay.users.add(u);
 								}
 								addMessage(user, time, lastChat);
 								u.chats++;
@@ -236,9 +236,9 @@ public class PdfService {
 		}
 
 		private void addDate(final String date) throws DocumentException {
-			if (tableOfContent.date != null && !tableOfContent.date.equals(date)) {
-				String s = tableOfContent.date;
-				for (final Statistics statistics : tableOfContent.users) {
+			if (usersPerDay.date != null && !usersPerDay.date.equals(date)) {
+				String s = usersPerDay.date;
+				for (final Statistics statistics : usersPerDay.users) {
 					s += " · " + statistics.user + " " + statistics.chats;
 					Statistics statisticsTotal = total.stream().filter(e -> e.user.equals(statistics.user)).findFirst()
 							.orElse(null);
@@ -253,9 +253,9 @@ public class PdfService {
 				}
 				outline.add(s);
 			}
-			if (date != null && !date.equals(tableOfContent.date)) {
-				tableOfContent.date = date;
-				tableOfContent.users.clear();
+			if (date != null && !date.equals(usersPerDay.date)) {
+				usersPerDay.date = date;
+				usersPerDay.users.clear();
 
 				final PdfPCell cell = createCell(date, Element.ALIGN_CENTER, 1.5f, 0, 10, 0);
 				cell.setBackgroundColor(new BaseColor(200, 200, 200, 200));
