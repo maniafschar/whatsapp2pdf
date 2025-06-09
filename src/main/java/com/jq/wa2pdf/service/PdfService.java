@@ -370,39 +370,38 @@ public class PdfService {
 			return cell;
 		}
 
-		private void fillMedia(final PdfPCell cell, String text) {
+		private void fillMedia(final PdfPCell cell, String mediaId) {
 			try {
-				System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-				if (text.endsWith(".mp4")) {
+				System.out.println(ExtractService.getTempDir(id).resolve(mediaId).toUri().toURL());
+				if (mediaId.endsWith(".mp4")) {
 					final Chunk chunk = new Chunk();
 					chunk.setAnnotation(PdfAnnotation
 							.createScreen(
 									writer, cell, "", PdfFileSpecification.fileEmbedded(writer, null, "",
-											IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(text)
+											IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(mediaId)
 													.toUri().toURL())),
 									"video/mp4", true));
 					cell.setMinimumHeight(200f);
 					cell.addElement(chunk);
 				} else {
 					final BufferedImage originalImage = ImageIO
-							.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-					final double max = 200;
-					if (text.endsWith(".webp") || originalImage.getWidth() > max) {
-						final double factor = originalImage.getWidth() > max ? max / originalImage.getWidth() : 1;
-						final BufferedImage image = new BufferedImage((int) (factor * originalImage.getWidth()),
-								(int) (factor * originalImage.getHeight()), BufferedImage.TYPE_INT_RGB);
+							.read(ExtractService.getTempDir(id).resolve(mediaId).toUri().toURL());
+					final double max = 800;
+					final int w = originalImage.getWidth(), h = originalImage.getHeight();
+					if (mediaId.endsWith(".webp") || w > max || h > max) {
+						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
+						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
+								BufferedImage.TYPE_INT_RGB);
 						final Graphics2D g = image.createGraphics();
-						g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0,
-								originalImage.getWidth(), originalImage.getHeight(), null);
+						g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0, w, h, null);
 						image.flush();
 						g.dispose();
-						System.out.println(image.getWidth() + "x" + image.getHeight());
-						text = text.substring(0, text.length() - 4) + "jpg";
+						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.jpg";
 						ImageIO.write(image, "jpg",
-								ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
+								ExtractService.getTempDir(id).resolve(mediaId).toAbsolutePath().toFile());
 					}
-					cell.addElement(Image
-							.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL()));
+					cell.setImage(Image
+							.getInstance(ExtractService.getTempDir(id).resolve(mediaId).toUri().toURL()));
 				}
 			} catch (BadElementException | IOException ex) {
 				throw new RuntimeException(ex);
