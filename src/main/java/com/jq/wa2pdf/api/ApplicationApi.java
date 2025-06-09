@@ -2,6 +2,7 @@ package com.jq.wa2pdf.api;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -52,6 +53,12 @@ public class ApplicationApi {
 		final Path file = pdfService.get(id);
 		if (file == null) {
 			if (Files.exists(ExtractService.getTempDir(id))) {
+				if (Files.exists(ExtractService.getTempDir(id).resolve(PdfService.filename + "Error")))
+					throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+							IOUtils.toString(
+									ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toUri()
+											.toURL(),
+									StandardCharsets.UTF_8));
 				response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "PDF not created");
 				return;
 			}

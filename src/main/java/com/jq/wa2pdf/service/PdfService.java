@@ -49,8 +49,16 @@ public class PdfService {
 
 	@Async
 	public void create(final String id, final String period, final String user, boolean preview)
-			throws IOException, DocumentException {
-		new PDF(id, period, user, preview).create();
+			throws Exception {
+		try {
+			new PDF(id, period, user, preview).create();
+		} catch (Exception ex) {
+			try (final FileOutputStream filename = new FileOutputStream(
+					ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toFile())) {
+				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
+			}
+			throw ex;
+		}
 	}
 
 	public String getPeriod(final String id) throws IOException {
@@ -117,8 +125,8 @@ public class PdfService {
 			this.id = id;
 			this.preview = preview;
 			this.document = new Document();
-			FontFactory.register(getClass().getResource("/font/NotoColorEmoji.ttf").toExternalForm());
-			fontEmoji = new Font(FontFactory.getFont("NotoColorEmoji").getBaseFont(), 40f, Font.NORMAL);
+			FontFactory.register(getClass().getResource("/font/Apple Color Emoji.ttc").toExternalForm());
+			fontEmoji = new Font(FontFactory.getFont("Apple Color Emoji").getBaseFont(), 40f, Font.NORMAL);
 
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
@@ -412,6 +420,7 @@ public class PdfService {
 				System.out.println(paragraph.getChunks());
 			paragraph.setAlignment(alignment);
 			cell.addElement(paragraph);
+			throw new NullPointerException("shit");
 		}
 	}
 }

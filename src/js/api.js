@@ -2,12 +2,10 @@ export { api };
 
 class api {
 	static url = '{placeholderServer}';
-	static count = 0;
 
 	static analyse() {
 		var file = document.getElementById('chatFile');
 		if (file.files[0]) {
-			api.count = 0;
 			document.getElementsByTagName('error')[0].innerHTML = '';
 			document.getElementsByTagName('progressbar')[0].style.display = 'block';
 			var formData = new FormData();
@@ -28,7 +26,6 @@ class api {
 
 	static preview() {
 		var file = document.getElementById('chatFile');
-		api.count = 0;
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
@@ -99,13 +96,16 @@ class api {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						document.getElementsByTagName('attributes')[0].style.display = null;
 						document.getElementById('chatFile').value = '';
-						document.getElementsByTagName('error')[0].innerHTML = 'Data already deleted. Please upload new chat.';
+						document.getElementsByTagName('error')[0].innerHTML = 'Uploaded chat already deleted. Please upload new chat.';
 						return;
-					} else if (++api.count > 120 || xhr.status < 500) {
+					} else if (xhr.status < 500 || xhr.responseText.indexOf('PDF not created') < 0) {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
+						var error = xhr.responseText;
+						if (error.indexOf(' ') < 5)
+							error = error.substring(error.indexOf(' ')).trim();
 						document.getElementsByTagName('error')[0].innerHTML =
 							xhr.status < 500 ? 'The server is unavailable. Please try again later.' :
-								'Download timed out after 2 minutes. Please try again later.';
+								'Creation failed: ' + error + '! Please try again later.';
 						return;
 					}
 					setTimeout(download, 1000);
