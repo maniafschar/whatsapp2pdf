@@ -92,23 +92,24 @@ class api {
 					link.click();
 				},
 				error: xhr => {
-					if (xhr.status == 500 && xhr.responseText.indexOf('Invalid ID') > -1) {
+					var error = xhr.responseText || 'Unknown error';
+					if (error.indexOf('"status":566,') > -1)
+						setTimeout(download, 1000);
+					else {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
-						document.getElementsByTagName('attributes')[0].style.display = null;
-						document.getElementById('chatFile').value = '';
-						document.getElementsByTagName('error')[0].innerHTML = 'Uploaded chat already deleted. Please upload new chat.';
-						return;
-					} else if (xhr.status < 500 || xhr.responseText.indexOf('PDF not created') < 0) {
-						document.getElementsByTagName('progressbar')[0].style.display = null;
-						var error = xhr.responseText;
-						if (error.indexOf(' ') < 5)
-							error = error.substring(error.indexOf(' ')).trim();
-						document.getElementsByTagName('error')[0].innerHTML =
-							xhr.status < 500 ? 'The server is unavailable. Please try again later.' :
-								'Creation failed: ' + error + '! Please try again later.';
-						return;
+						if (xhr.status < 500)
+							error = 'The server is unavailable. Please try again later.';
+						else if (error.indexOf('Invalid ID') > -1) {
+							document.getElementsByTagName('attributes')[0].style.display = null;
+							document.getElementById('chatFile').value = '';
+							error = 'Uploaded chat already deleted. Please upload new chat.';
+						} else {
+							if (error.indexOf(' ') < 5)
+								error = error.substring(error.indexOf(' ')).trim();
+							error = 'Creation failed: ' + error + '!';
+						}
+						document.getElementsByTagName('error')[0].innerHTML = error;
 					}
-					setTimeout(download, 1000);
 				}
 			});
 		}

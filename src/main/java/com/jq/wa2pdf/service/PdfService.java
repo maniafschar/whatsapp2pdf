@@ -50,11 +50,12 @@ public class PdfService {
 	@Async
 	public void create(final String id, final String period, final String user, boolean preview)
 			throws Exception {
+		final Path error = ExtractService.getTempDir(id).resolve(PdfService.filename + "Error");
 		try {
+			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
 		} catch (Exception ex) {
-			try (final FileOutputStream filename = new FileOutputStream(
-					ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toFile())) {
+			try (final FileOutputStream filename = new FileOutputStream(error.toFile())) {
 				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
 			}
 			throw ex;
@@ -383,16 +384,19 @@ public class PdfService {
 					cell.setMinimumHeight(200f);
 					cell.addElement(chunk);
 				} else {
-					if (text.endsWith(".webp")) {
-						final BufferedImage originalImage = ImageIO
-								.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-						final BufferedImage image = new BufferedImage(originalImage.getWidth(),
-								originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+					final BufferedImage originalImage = ImageIO
+							.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+					final double max = 200;
+					if (text.endsWith(".webp") || originalImage.getWidth() > max) {
+						final double factor = originalImage.getWidth() > max ? max / originalImage.getWidth() : 1;
+						final BufferedImage image = new BufferedImage((int) (factor * originalImage.getWidth()),
+								(int) (factor * originalImage.getHeight()), BufferedImage.TYPE_INT_RGB);
 						final Graphics2D g = image.createGraphics();
-						g.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), 0, 0,
+						g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0,
 								originalImage.getWidth(), originalImage.getHeight(), null);
 						image.flush();
 						g.dispose();
+						System.out.println(image.getWidth() + "x" + image.getHeight());
 						text = text.substring(0, text.length() - 4) + "jpg";
 						ImageIO.write(image, "jpg",
 								ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
@@ -416,11 +420,8 @@ public class PdfService {
 			}
 			if (text.length() > 0)
 				paragraph.add(new Chunk(text, fontMessage));
-			if (emojis.size() > 0)
-				System.out.println(paragraph.getChunks());
 			paragraph.setAlignment(alignment);
 			cell.addElement(paragraph);
-			throw new NullPointerException("shit");
 		}
 	}
 }

@@ -49,26 +49,25 @@ public class ApplicationApi {
 
 	@GetMapping("pdf/{id}")
 	public void pdf(@PathVariable final String id, final HttpServletResponse response)
-			throws IOException, InterruptedException {
+			throws IOException {
 		final Path file = pdfService.get(id);
 		if (file == null) {
-			if (Files.exists(ExtractService.getTempDir(id))) {
-				if (Files.exists(ExtractService.getTempDir(id).resolve(PdfService.filename + "Error")))
-					throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
-							IOUtils.toString(
-									ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toUri()
-											.toURL(),
-									StandardCharsets.UTF_8));
-				response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "PDF not created");
-				return;
-			}
-			throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
+			if (!Files.exists(ExtractService.getTempDir(id)))
+				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
+			if (Files.exists(ExtractService.getTempDir(id).resolve(PdfService.filename + "Error")))
+				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+						IOUtils.toString(
+								ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toUri()
+										.toURL(),
+								StandardCharsets.UTF_8));
+			response.sendError(566);
+		} else {
+			response.setHeader("Content-Disposition",
+					"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
+							sanatizePeriod(pdfService.getPeriod(id)) + ".pdf\"");
+			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
+			response.flushBuffer();
 		}
-		response.setHeader("Content-Disposition",
-				"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
-						sanatizePeriod(pdfService.getPeriod(id)) + ".pdf\"");
-		IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
-		response.flushBuffer();
 	}
 
 	private String sanatizeFilename(String filename) {
