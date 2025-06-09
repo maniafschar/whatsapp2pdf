@@ -40,10 +40,10 @@ public class ApplicationApi {
 		return extractService.unzip(file, id);
 	}
 
-	@PostMapping("conversion/{id}")
-	public void conversion(@PathVariable String id, @RequestParam String period, @RequestParam String user)
+	@PostMapping("preview/{id}")
+	public void preview(@PathVariable String id, @RequestParam String period, @RequestParam String user)
 			throws Exception {
-		pdfService.create(id, period, user);
+		pdfService.create(id, period, user, false);
 	}
 
 	@GetMapping("pdf/{id}")

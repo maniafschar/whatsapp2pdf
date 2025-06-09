@@ -26,13 +26,13 @@ class api {
 			document.getElementsByTagName('error')[0].innerHTML = 'Please select a file to convert.';
 	}
 
-	static convert() {
+	static preview() {
 		var file = document.getElementById('chatFile');
 		api.count = 0;
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
-			url: api.url + '/rest/api/conversion/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(document.querySelector('period .selected').getAttribute('value')) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(document.querySelector('period .selected').getAttribute('value')) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
 			error: xhr => {

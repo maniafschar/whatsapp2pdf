@@ -47,8 +47,9 @@ public class PdfService {
 	private ExtractService extractService;
 
 	@Async
-	public void create(final String id, final String period, final String user) throws IOException, DocumentException {
-		new PDF(id, period, user).create();
+	public void create(final String id, final String period, final String user, boolean preview)
+			throws IOException, DocumentException {
+		new PDF(id, period, user, preview).create();
 	}
 
 	public String getPeriod(final String id) throws IOException {
@@ -105,12 +106,15 @@ public class PdfService {
 		private final String period;
 		private final String user;
 		private final String id;
+		private final boolean preview;
 
-		private PDF(final String id, final String period, final String user) throws IOException, DocumentException {
+		private PDF(final String id, final String period, final String user, boolean preview)
+				throws IOException, DocumentException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
 			this.period = period;
 			this.user = user;
 			this.id = id;
+			this.preview = preview;
 			this.document = new Document();
 			FontFactory.register(getClass().getResource("/font/NotoColorEmoji.ttf").toExternalForm());
 			fontEmoji = FontFactory.getFont("NotoColorEmoji");
@@ -210,11 +214,25 @@ public class PdfService {
 								new PdfDestination(PdfDestination.XYZ, 0,
 										writer.getVerticalPosition(false) + e.getTotalHeight(), 0),
 								new Paragraph(outline.get(i++))));
+					if (preview && writer.getPageNumber() > 4)
+						break;
 				}
+				if (preview)
+					addPreviewInfo();
 				document.close();
 				filenamePeriod.write(period.getBytes(StandardCharsets.UTF_8));
 			}
 			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
+		}
+
+		private void addPreviewInfo() throws DocumentException {
+			final Paragraph paragraph = new Paragraph();
+			paragraph.setLeading(20);
+			paragraph.setFont(fontMessage);
+			paragraph.add(
+					"\n\n\n\n\nThis is a preview of your chat.\nYou may download the whole chat on:\nhttps://wa2pdf.com");
+			paragraph.setAlignment(Element.ALIGN_CENTER);
+			document.add(paragraph);
 		}
 
 		private void addDate(final String date) throws DocumentException {
