@@ -149,7 +149,6 @@ public class PdfService {
 		}
 
 		private void create() throws IOException, DocumentException {
-			total.clear();
 			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()));
 					final FileOutputStream filenamePeriod = new FileOutputStream(
 							ExtractService.getTempDir(id).resolve(PdfService.filename + "Period").toFile())) {
@@ -356,13 +355,13 @@ public class PdfService {
 			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding);
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
 			if (media)
-				createCellMedia(cell, text);
+				fillMedia(cell, text);
 			else
-				createCellText(cell, text, alignment);
+				fillText(cell, text, alignment);
 			return cell;
 		}
 
-		private void createCellMedia(final PdfPCell cell, String text) {
+		private void fillMedia(final PdfPCell cell, String text) {
 			try {
 				System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
 				if (text.endsWith(".mp4")) {
@@ -398,7 +397,7 @@ public class PdfService {
 			}
 		}
 
-		private void createCellText(final PdfPCell cell, String text, final int alignment) {
+		private void fillText(final PdfPCell cell, String text, final int alignment) {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
 			for (String emoji : emojis) {
