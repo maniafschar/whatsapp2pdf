@@ -270,11 +270,7 @@ public class PdfService {
 			}
 		}
 
-		private void addMessage(final String user, final String time, final String message) throws DocumentException {
-			addMessage(user, time, message, false);
-		}
-
-		private void addMessage(final String user, final String time, final String message, boolean media)
+		private void addMessage(final String user, final String time, final String message, boolean... media)
 				throws DocumentException {
 			final PdfPCell cellMessage = createCell(message, media);
 
@@ -355,18 +351,18 @@ public class PdfService {
 			final PdfPCell cell = new PdfPCell();
 			final int defaultPadding = 10;
 			cell.setBorder(0);
-			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : media ? defaultPadding : 0);
+			cell.setPaddingTop(media ? defaultPadding : padding != null && padding.length > 0 ? padding[0] : 0);
 			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
 			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding);
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
 			if (media)
-				createMediaCell(cell, text);
+				createCellMedia(cell, text);
 			else
-				createTextCell(cell, text, alignment);
+				createCellText(cell, text, alignment);
 			return cell;
 		}
 
-		private void createMediaCell(final PdfPCell cell, String text) {
+		private void createCellMedia(final PdfPCell cell, String text) {
 			try {
 				System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
 				if (text.endsWith(".mp4")) {
@@ -402,7 +398,7 @@ public class PdfService {
 			}
 		}
 
-		private void createTextCell(final PdfPCell cell, String text, final int alignment) {
+		private void createCellText(final PdfPCell cell, String text, final int alignment) {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
 			for (String emoji : emojis) {
