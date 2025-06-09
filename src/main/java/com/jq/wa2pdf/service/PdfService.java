@@ -38,6 +38,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.vdurmont.emoji.EmojiParser;
 
 @Component
 public class PdfService {
@@ -117,7 +118,7 @@ public class PdfService {
 			this.preview = preview;
 			this.document = new Document();
 			FontFactory.register(getClass().getResource("/font/NotoColorEmoji.ttf").toExternalForm());
-			fontEmoji = FontFactory.getFont("NotoColorEmoji");
+			fontEmoji = new Font(FontFactory.getFont("NotoColorEmoji").getBaseFont(), 40f, Font.NORMAL);
 
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
@@ -345,63 +346,77 @@ public class PdfService {
 			return createCell(text, Element.ALIGN_LEFT, media == null || media.length == 0 ? false : media[0]);
 		}
 
-		private PdfPCell createCell(String text, final int alignment, final float... padding) {
+		private PdfPCell createCell(final String text, final int alignment, final float... padding) {
 			return createCell(text, alignment, false, padding);
 		}
 
-		private PdfPCell createCell(String text, final int alignment, final boolean media, final float... padding) {
+		private PdfPCell createCell(final String text, final int alignment, final boolean media,
+				final float... padding) {
 			final PdfPCell cell = new PdfPCell();
 			final int defaultPadding = 10;
 			cell.setBorder(0);
-			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : 0);
+			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : media ? defaultPadding : 0);
 			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
 			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding);
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
-			if (media) {
-				try {
-					System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-					if (padding == null || padding.length == 0)
-						cell.setPaddingTop(defaultPadding);
-					if (text.endsWith(".mp4")) {
-						final Chunk chunk = new Chunk();
-						chunk.setAnnotation(PdfAnnotation
-								.createScreen(
-										writer, cell, "", PdfFileSpecification.fileEmbedded(writer, null, "",
-												IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(text)
-														.toUri().toURL())),
-										"video/mp4", true));
-						cell.setMinimumHeight(200f);
-						cell.addElement(chunk);
-					} else {
-						if (text.endsWith(".webp")) {
-							final BufferedImage originalImage = ImageIO
-									.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
-							final BufferedImage image = new BufferedImage(originalImage.getWidth(),
-									originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
-							final Graphics2D g = image.createGraphics();
-							g.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), 0, 0,
-									originalImage.getWidth(), originalImage.getHeight(), null);
-							image.flush();
-							g.dispose();
-							text = text.substring(0, text.length() - 4) + "jpg";
-							ImageIO.write(image, "jpg",
-									ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
-						}
-						cell.addElement(Image
-								.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL()));
-					}
-				} catch (BadElementException | IOException ex) {
-					throw new RuntimeException(ex);
-				}
-			} else {
-				final Chunk chunkMessage = new Chunk(text);
-				chunkMessage.setFont(fontMessage);
-				final Paragraph paragraph = new Paragraph();
-				paragraph.add(chunkMessage);
-				paragraph.setAlignment(alignment);
-				cell.addElement(paragraph);
-			}
+			if (media)
+				createMediaCell(cell, text);
+			else
+				createTextCell(cell, text, alignment);
 			return cell;
+		}
+
+		private void createMediaCell(final PdfPCell cell, String text) {
+			try {
+				System.out.println(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+				if (text.endsWith(".mp4")) {
+					final Chunk chunk = new Chunk();
+					chunk.setAnnotation(PdfAnnotation
+							.createScreen(
+									writer, cell, "", PdfFileSpecification.fileEmbedded(writer, null, "",
+											IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(text)
+													.toUri().toURL())),
+									"video/mp4", true));
+					cell.setMinimumHeight(200f);
+					cell.addElement(chunk);
+				} else {
+					if (text.endsWith(".webp")) {
+						final BufferedImage originalImage = ImageIO
+								.read(ExtractService.getTempDir(id).resolve(text).toUri().toURL());
+						final BufferedImage image = new BufferedImage(originalImage.getWidth(),
+								originalImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+						final Graphics2D g = image.createGraphics();
+						g.drawImage(originalImage, 0, 0, originalImage.getWidth(), originalImage.getHeight(), 0, 0,
+								originalImage.getWidth(), originalImage.getHeight(), null);
+						image.flush();
+						g.dispose();
+						text = text.substring(0, text.length() - 4) + "jpg";
+						ImageIO.write(image, "jpg",
+								ExtractService.getTempDir(id).resolve(text).toAbsolutePath().toFile());
+					}
+					cell.addElement(Image
+							.getInstance(ExtractService.getTempDir(id).resolve(text).toUri().toURL()));
+				}
+			} catch (BadElementException | IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+
+		private void createTextCell(final PdfPCell cell, String text, final int alignment) {
+			final Paragraph paragraph = new Paragraph();
+			final List<String> emojis = EmojiParser.extractEmojis(text);
+			for (String emoji : emojis) {
+				if (text.indexOf(emoji) > 0)
+					paragraph.add(new Chunk(text.substring(0, text.indexOf(emoji)), fontMessage));
+				paragraph.add(new Chunk(emoji, fontEmoji));
+				text = text.substring(text.indexOf(emoji) + emoji.length());
+			}
+			if (text.length() > 0)
+				paragraph.add(new Chunk(text, fontMessage));
+			if (emojis.size() > 0)
+				System.out.println(paragraph.getChunks());
+			paragraph.setAlignment(alignment);
+			cell.addElement(paragraph);
 		}
 	}
 }
