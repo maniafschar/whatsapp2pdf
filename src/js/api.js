@@ -44,7 +44,6 @@ class api {
 
 	static cleanUp() {
 		var file = document.getElementById('chatFile');
-		api.count = 0;
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
@@ -102,11 +101,11 @@ class api {
 						document.getElementById('chatFile').value = '';
 						document.getElementsByTagName('error')[0].innerHTML = 'Data already deleted. Please upload new chat.';
 						return;
-					} else if (++api.count > 600 || xhr.status < 500) {
+					} else if (++api.count > 120 || xhr.status < 500) {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						document.getElementsByTagName('error')[0].innerHTML =
 							xhr.status < 500 ? 'The server is unavailable. Please try again later.' :
-								'Download timed out after 10 minutes. Please try again later.';
+								'Download timed out after 2 minutes. Please try again later.';
 						return;
 					}
 					setTimeout(download, 1000);

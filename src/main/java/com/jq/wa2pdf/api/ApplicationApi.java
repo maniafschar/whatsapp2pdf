@@ -50,9 +50,13 @@ public class ApplicationApi {
 	public void pdf(@PathVariable final String id, final HttpServletResponse response)
 			throws IOException, InterruptedException {
 		final Path file = pdfService.get(id);
-		if (file == null)
-			throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
-					Files.exists(ExtractService.getTempDir(id)) ? "PDF not created" : "Invalid ID");
+		if (file == null) {
+			if (Files.exists(ExtractService.getTempDir(id))) {
+				response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "PDF not created");
+				return;
+			}
+			throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
+		}
 		response.setHeader("Content-Disposition",
 				"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
 						sanatizePeriod(pdfService.getPeriod(id)) + ".pdf\"");
