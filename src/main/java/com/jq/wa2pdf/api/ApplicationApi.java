@@ -42,13 +42,13 @@ public class ApplicationApi {
 	}
 
 	@PostMapping("preview/{id}")
-	public void preview(@PathVariable String id, @RequestParam String period, @RequestParam String user)
+	public void preview(@PathVariable String id, @RequestParam final String period, @RequestParam final String user)
 			throws Exception {
 		pdfService.create(id, period, user, false);
 	}
 
-	@GetMapping("pdf/{id}/{period}")
-	public void pdf(@PathVariable final String id, @PathVariable final String period, final HttpServletResponse response)
+	@GetMapping("pdf/{id}")
+	public void pdf(@PathVariable final String id, @RequestParam final String period, final HttpServletResponse response)
 			throws IOException {
 		final Path file = pdfService.get(id, period);
 		if (file == null) {
@@ -64,7 +64,7 @@ public class ApplicationApi {
 		} else {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
-							sanatizePeriod(pdfService.getPeriod(id)) + ".pdf\"");
+							sanatizePeriod(period) + ".pdf\"");
 			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 			response.flushBuffer();
 		}
@@ -78,11 +78,11 @@ public class ApplicationApi {
 
 	private String sanatizePeriod(String period) {
 		if (period.contains("/"))
-			period = period.replace("/\\d\\d", "");
+			period = period.replace("/\\d\\d", "").replace("/", "_");
 		else if (period.contains("."))
-			period = period.replace("\\d\\d.", "");
+			period = period.replace("\\d\\d.", "").replace(".", "_");
 		else if (period.contains("-"))
-			period = period.substring(0, period.lastIndexOf('-'));
+			period = period.substring(0, period.lastIndexOf('-')).replace("-", "_");
 		return "_" + period;
 	}
 
