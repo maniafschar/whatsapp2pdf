@@ -43,6 +43,7 @@ error {
 attributes {
     display: none;
     position: relative;
+    padding-top: 2em;
 }
 
 attributes id {
@@ -53,10 +54,11 @@ attributes period,
 attributes user {
     display: block;
     position: relative;
+    margin-bottom: 2em;
 }
 
 attributes div {
-    padding: 2em 0 0.3em 0;
+    padding-bottom: 0.3em;
     font-weight: bold;
 }
 
