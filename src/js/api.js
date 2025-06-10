@@ -64,8 +64,11 @@ class api {
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period td').forEach(td => {
 			td.addEventListener('click', () => {
-				document.querySelector('period .selected').classList.remove('selected');
-				td.parentElement.classList.add('selected');
+				if (td.parentElement.classList.contains('selected')) {
+					if (document.querySelectorAll('period .selected').length > 1)
+						td.parentElement.classList.remove('selected');
+				} else
+					td.parentElement.classList.add('selected');
 			});
 		});
 		s = '<table><tr><th>User</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
