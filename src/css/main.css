@@ -53,7 +53,7 @@ attributes id {
 
 attributes period,
 attributes user {
-    display: block;
+    display: inline-block;
     position: relative;
     margin-bottom: 2em;
 }
