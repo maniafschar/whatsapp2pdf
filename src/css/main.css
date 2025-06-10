@@ -88,14 +88,34 @@ table tr.selected {
     background-color: rgba(255, 100, 50, 0.1);
 }
 
-table tr.download td:first-child::before {
-    content: 'Click to download';
-    position: absolute;
+table tr.spinner {
+    background-color: rgba(255, 150, 50, 0.2);
+}
+
+table tr.spinner td:first-child::before {
+    content: '🗲 downloading...';
+	position: absolute;
 	right: -15.5em;
     width: 15em;
     text-align: left;
     font-size: 0.75em;
     font-weight: bold;
+	color: rgba(255, 150, 50, 0.2);
+}
+
+table tr.download {
+    background-color: rgba(255, 150, 50, 0.6);
+}
+
+table tr.download td:first-child::before {
+    content: '✓ click to download';
+    position: absolute;
+    right: -15.5em;
+    width: 15em;
+    text-align: left;
+    font-size: 0.75em;
+    font-weight: bold;
+    color: rgba(255, 150, 50, 0.6);
 }
 
 progressbar {
