@@ -47,10 +47,10 @@ public class ApplicationApi {
 		pdfService.create(id, period, user, false);
 	}
 
-	@GetMapping("pdf/{id}")
-	public void pdf(@PathVariable final String id, final HttpServletResponse response)
+	@GetMapping("pdf/{id}/{period}")
+	public void pdf(@PathVariable final String id, @PathVariable final String period, final HttpServletResponse response)
 			throws IOException {
-		final Path file = pdfService.get(id);
+		final Path file = pdfService.get(id, period);
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
