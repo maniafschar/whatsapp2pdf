@@ -72,7 +72,7 @@ class api {
 				} else if (td.parentElement.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						td.parentElement.classList.remove('selected');
-				} else
+				} else if (!td.parentElement.classList.contains('spinner'))
 					td.parentElement.classList.add('selected');
 			});
 		});
@@ -90,10 +90,13 @@ class api {
 	static download(period) {
 		var download = function () {
 			api.ajax({
-				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/' + (period ? period : ''),
+				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
 					if (period) {
+						var tr = document.querySelectorAll('period tr[value="' + period + '"]');
+						tr.classList.remve('spinner');
+						tr.classList.remve('download');
 					} else {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						var link = document.createElement('a');
