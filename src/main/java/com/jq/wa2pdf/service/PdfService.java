@@ -129,11 +129,11 @@ public class PdfService {
 			FontFactory.register(getClass().getResource("/font/Apple Color Emoji.ttc").toExternalForm());
 			fontEmoji = new Font(FontFactory.getFont("Apple Color Emoji").getBaseFont(), 40f, Font.NORMAL);
 
-			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
-			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
+			Files.deleteIfExists(dir.resolve(getFilename() + ".tmp"));
+			Files.deleteIfExists(dir.resolve(getFilename() + ".pdf"));
 			writer = PdfWriter.getInstance(document,
 					new FileOutputStream(
-							dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
+							dir.resolve(getFilename() + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
 			writer.setPageEvent(new PdfPageEventHelper() {
 				@Override
 				public void onEndPage(PdfWriter writer, Document document) {
@@ -155,6 +155,10 @@ public class PdfService {
 		private class UsersPerDay {
 			private final List<Statistics> users = new ArrayList<>();
 			private String date = null;
+		}
+
+		private String getFilename() {
+			return filename + (period == null ? "" : "_" + period);
 		}
 
 		private void create() throws IOException, DocumentException {
@@ -231,7 +235,7 @@ public class PdfService {
 				document.close();
 				filenamePeriod.write(period.getBytes(StandardCharsets.UTF_8));
 			}
-			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
+			Files.move(dir.resolve(getFilename() + ".tmp"), dir.resolve(getFilename() + ".pdf"));
 		}
 
 		private void addPreviewInfo() throws DocumentException {
