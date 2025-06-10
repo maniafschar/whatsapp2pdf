@@ -44,12 +44,19 @@ public class ApplicationApi {
 	@PostMapping("preview/{id}")
 	public void preview(@PathVariable String id, @RequestParam final String period, @RequestParam final String user)
 			throws Exception {
-		pdfService.create(id, period, user, false);
+		pdfService.create(id, period, user, true);
+	}
+
+	@PostMapping("buy/{id}")
+	public void buy(@PathVariable String id, @RequestParam final String[] periods, @RequestParam final String user)
+			throws Exception {
+		for (String period : periods)
+			pdfService.create(id, period, user, false);
 	}
 
 	@GetMapping("pdf/{id}")
-	public void pdf(@PathVariable final String id, @RequestParam final String period, final HttpServletResponse response)
-			throws IOException {
+	public void pdf(@PathVariable final String id, @RequestParam(required = false) final String period,
+			final HttpServletResponse response) throws IOException {
 		final Path file = pdfService.get(id, period);
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
@@ -77,6 +84,8 @@ public class ApplicationApi {
 	}
 
 	private String sanatizePeriod(String period) {
+		if (period == null)
+			return "";
 		if (period.contains("/"))
 			period = period.replace("/\\d\\d", "").replace("/", "_");
 		else if (period.contains("."))

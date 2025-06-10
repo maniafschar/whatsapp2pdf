@@ -24,14 +24,37 @@ class api {
 			document.getElementsByTagName('error')[0].innerHTML = 'Please select a file to convert.';
 	}
 
-	static preview() {
+	static preview(event, period) {
+		event.preventDefault();
+		event.stopPropagation();
 		var file = document.getElementById('chatFile');
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
-			url: api.url + '/rest/api/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(document.querySelector('period .selected').getAttribute('value')) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
+			error: xhr => {
+				document.getElementsByTagName('progressbar')[0].style.display = null;
+				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Please try again later.';
+			}
+		});
+	}
+
+	static buy() {
+		var file = document.getElementById('chatFile');
+		document.getElementsByTagName('error')[0].innerHTML = '';
+		document.getElementsByTagName('progressbar')[0].style.display = 'block';
+		var period = '';
+		var periods = document.querySelectorAll('period .selected');
+		if (periods.length < 1)
+			return;
+		for (var i = 0; i < periods.length; i++)
+			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
+		api.ajax({
+			url: api.url + '/rest/api/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			method: 'POST',
+			success: api.postBuy,
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Please try again later.';
@@ -58,17 +81,20 @@ class api {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('attributes')[0].querySelector('id').innerText = data.id;
-		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
+		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
-			s += '<tr value="' + data.periods[i].period + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.periods[i].period.replace('-\\d\\d', '').replace('/\\d\\d', '').replace('\\d\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td></tr>';
+			s += '<tr value="' + data.periods[i].period + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.periods[i].period.replace('-\\d\\d', '').replace('/\\d\\d', '').replace('\\d\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td><td><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
 			tr.addEventListener('click', () => {
 				if (tr.classList.contains('download')) {
 					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '?period=' + encodeURIComponent(tr.getAttribute('value'));
+					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(tr.getAttribute('value')));
 					link.setAttribute('target', '_blank');
 					link.click();
+					tr.classList.remove('download');
+					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
+						tr.classList.add('selected');
 				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						tr.classList.remove('selected');
@@ -87,18 +113,29 @@ class api {
 			});
 		});
 	}
+
+	static postBuy() {
+		var periods = document.querySelectorAll('period .selected');
+		for (var i = 0; i < periods.length; i++) {
+			api.download(periods[i].getAttribute('value'));
+			var tr = document.querySelector('period tr[value="' + periods[i].getAttribute('value').replaceAll('\\', '\\\\') + '"]');
+			tr.classList.remove('selected');
+			tr.classList.add('spinner');
+		}
+	}
+
 	static download(period) {
 		var download = function () {
 			api.ajax({
 				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
+					document.getElementsByTagName('progressbar')[0].style.display = null;
 					if (period) {
-						var tr = document.querySelectorAll('period tr[value="' + period + '"]');
-						tr.classList.remve('spinner');
-						tr.classList.remve('download');
+						var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]');
+						tr.classList.remove('spinner');
+						tr.classList.add('download');
 					} else {
-						document.getElementsByTagName('progressbar')[0].style.display = null;
 						var link = document.createElement('a');
 						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText);
 						link.setAttribute('target', '_blank');
@@ -108,7 +145,7 @@ class api {
 				error: xhr => {
 					var error = xhr.responseText || 'Unknown error';
 					if (error.indexOf('"status":566,') > -1)
-						setTimeout(function() {  download(period); }, 1000);
+						setTimeout(function () { download(period); }, 1000);
 					else {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						if (xhr.status < 500)

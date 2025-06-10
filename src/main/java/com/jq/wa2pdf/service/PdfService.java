@@ -48,8 +48,7 @@ public class PdfService {
 	private ExtractService extractService;
 
 	@Async
-	public void create(final String id, final String period, final String user, boolean preview)
-			throws Exception {
+	public void create(final String id, final String period, final String user, boolean preview) throws Exception {
 		final Path error = ExtractService.getTempDir(id).resolve(PdfService.filename + "Error");
 		try {
 			Files.deleteIfExists(error);
@@ -62,11 +61,17 @@ public class PdfService {
 		}
 	}
 
-	public Path get(final String id) throws IOException {
-		final Path pdfPath = ExtractService.getTempDir(id).resolve(filename + ".pdf");
+	public Path get(final String id, String period) throws IOException {
+		final Path pdfPath = ExtractService.getTempDir(id)
+				.resolve(getFilename(period) + ".pdf");
 		if (Files.exists(pdfPath))
 			return pdfPath;
 		return null;
+	}
+
+	private String getFilename(String period) {
+		return filename + (period == null ? ""
+				: "_" + period.replace("-\\d\\d", "").replace("/\\d\\d", "").replace("\\d\\d.", ""));
 	}
 
 	public static class Statistics {
@@ -102,7 +107,7 @@ public class PdfService {
 		private static Font fontMessage = new Font(Font.FontFamily.HELVETICA, 11f, Font.NORMAL);
 		private static Font fontTime = new Font(Font.FontFamily.HELVETICA, 8.5f, Font.NORMAL);
 		private final Path dir;
-		private final PdfWriter writer;
+		private PdfWriter writer;
 		private final Document document;
 		private final UsersPerDay usersPerDay = new UsersPerDay();
 		private final List<String> outline = new ArrayList<>();
@@ -123,12 +128,19 @@ public class PdfService {
 			this.document = new Document();
 			FontFactory.register(getClass().getResource("/font/Apple Color Emoji.ttc").toExternalForm());
 			fontEmoji = new Font(FontFactory.getFont("Apple Color Emoji").getBaseFont(), 40f, Font.NORMAL);
+		}
 
-			Files.deleteIfExists(dir.resolve(getFilename() + ".tmp"));
-			Files.deleteIfExists(dir.resolve(getFilename() + ".pdf"));
+		private class UsersPerDay {
+			private final List<Statistics> users = new ArrayList<>();
+			private String date = null;
+		}
+
+		private void create() throws IOException, DocumentException {
+			final String filename = getFilename(preview ? null : period);
+			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
+			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
 			writer = PdfWriter.getInstance(document,
-					new FileOutputStream(
-							dir.resolve(getFilename() + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
+					new FileOutputStream(dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile()));
 			writer.setPageEvent(new PdfPageEventHelper() {
 				@Override
 				public void onEndPage(PdfWriter writer, Document document) {
@@ -145,18 +157,6 @@ public class PdfService {
 					}
 				}
 			});
-		}
-
-		private class UsersPerDay {
-			private final List<Statistics> users = new ArrayList<>();
-			private String date = null;
-		}
-
-		private String getFilename() {
-			return filename + (period == null ? "" : "_" + period.replace("-\\d\\d", "").replace("/\\d\\d", "").replace("\\d\\d.", ""));
-		}
-
-		private void create() throws IOException, DocumentException {
 			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
 				document.open();
 				boolean foundMonth = false;
@@ -227,7 +227,7 @@ public class PdfService {
 					addPreviewInfo();
 				document.close();
 			}
-			Files.move(dir.resolve(getFilename() + ".tmp"), dir.resolve(getFilename() + ".pdf"));
+			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
 		}
 
 		private void addPreviewInfo() throws DocumentException {
