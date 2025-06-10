@@ -157,9 +157,7 @@ public class PdfService {
 		}
 
 		private void create() throws IOException, DocumentException {
-			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()));
-					final FileOutputStream filenamePeriod = new FileOutputStream(
-							ExtractService.getTempDir(id).resolve(PdfService.filename + "Period").toFile())) {
+			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
 				document.open();
 				boolean foundMonth = false;
 				final Pattern patternStart = Pattern
@@ -228,7 +226,6 @@ public class PdfService {
 				if (preview)
 					addPreviewInfo();
 				document.close();
-				filenamePeriod.write(period.getBytes(StandardCharsets.UTF_8));
 			}
 			Files.move(dir.resolve(getFilename() + ".tmp"), dir.resolve(getFilename() + ".pdf"));
 		}
