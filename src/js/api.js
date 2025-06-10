@@ -90,14 +90,17 @@ class api {
 	static download(period) {
 		var download = function () {
 			api.ajax({
-				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText,
+				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/' + (period ? period : ''),
 				method: 'GET',
 				success: () => {
-					document.getElementsByTagName('progressbar')[0].style.display = null;
-					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + (period ? period : '');
-					link.setAttribute('target', '_blank');
-					link.click();
+					if (period) {
+					} else {
+						document.getElementsByTagName('progressbar')[0].style.display = null;
+						var link = document.createElement('a');
+						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + (period ? period : '');
+						link.setAttribute('target', '_blank');
+						link.click();
+					}
 				},
 				error: xhr => {
 					var error = xhr.responseText || 'Unknown error';
