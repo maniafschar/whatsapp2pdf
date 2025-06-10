@@ -64,9 +64,12 @@ class api {
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period td').forEach(td => {
 			td.addEventListener('click', () => {
-				if (td.parentElement.classList.contains('download'))
-					alert('download');
-				else if (td.parentElement.classList.contains('selected')) {
+				if (td.parentElement.classList.contains('download')) {
+					var link = document.createElement('a');
+					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + period;
+					link.setAttribute('target', '_blank');
+					link.click();
+				} else if (td.parentElement.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						td.parentElement.classList.remove('selected');
 				} else
@@ -84,7 +87,7 @@ class api {
 			});
 		});
 	}
-	static download() {
+	static download(period) {
 		var download = function () {
 			api.ajax({
 				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText,
@@ -92,7 +95,7 @@ class api {
 				success: () => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
 					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText);
+					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + (period ? period : '');
 					link.setAttribute('target', '_blank');
 					link.click();
 				},
