@@ -62,11 +62,6 @@ public class PdfService {
 		}
 	}
 
-	public String getPeriod(final String id) throws IOException {
-		return IOUtils.toString(ExtractService.getTempDir(id).resolve(filename + "Period").toUri().toURL(),
-				StandardCharsets.UTF_8);
-	}
-
 	public Path get(final String id) throws IOException {
 		final Path pdfPath = ExtractService.getTempDir(id).resolve(filename + ".pdf");
 		if (Files.exists(pdfPath))
