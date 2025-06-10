@@ -64,7 +64,9 @@ class api {
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period td').forEach(td => {
 			td.addEventListener('click', () => {
-				if (td.parentElement.classList.contains('selected')) {
+				if (td.parentElement.classList.contains('download'))
+					alert('download');
+				else if (td.parentElement.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						td.parentElement.classList.remove('selected');
 				} else
