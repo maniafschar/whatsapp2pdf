@@ -158,7 +158,7 @@ public class PdfService {
 		}
 
 		private String getFilename() {
-			return filename + (period == null ? "" : "_" + period);
+			return filename + (period == null ? "" : "_" + period.replace("-\\d\\d", "").replace("/\\d\\d", "").replace("\\d\\d.", ""));
 		}
 
 		private void create() throws IOException, DocumentException {
