@@ -88,6 +88,14 @@ table tr.selected {
     background-color: rgba(255, 100, 50, 0.1);
 }
 
+table tr.download td:first-child::before {
+    content: 'Click to download';
+    position: absolute;
+    right: -10.5em
+    width: 10em;
+    text-align: left;
+}
+
 progressbar {
     position: absolute;
     left: 0;
