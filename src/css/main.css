@@ -91,9 +91,11 @@ table tr.selected {
 table tr.download td:first-child::before {
     content: 'Click to download';
     position: absolute;
-    right: -10.5em
-    width: 10em;
+	right: -15.5em;
+    width: 15em;
     text-align: left;
+    font-size: 0.75em;
+    font-weight: bold;
 }
 
 progressbar {
