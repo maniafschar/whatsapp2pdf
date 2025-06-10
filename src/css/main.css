@@ -1,198 +1,197 @@
 @font-face {
-    font-family: 'Comfortaa';
-    font-style: regular;
-    font-weight: 400;
-    src: url(../font/Comfortaa-Regular.ttf) format('truetype');
+	font-family: 'Comfortaa';
+	font-style: regular;
+	font-weight: 400;
+	src: url(../font/Comfortaa-Regular.ttf) format('truetype');
 }
 
 html {
-    height: 100%;
+	height: 100%;
 }
 
-
 body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    text-align: center;
-    background: linear-gradient(135deg, #fff, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9) 50% fixed;
-    font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	overflow-x: hidden;
+	text-align: center;
+	background: linear-gradient(135deg, #fff, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9) 50% fixed;
+	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 button {
-    background: rgba(255, 255, 255, 0.6);
-    border: solid 1px rgba(0, 0, 0, 0.2);
-    padding: 0.5em 1em;
-    border-radius: 1em;
-    outline: none;
-    cursor: pointer;
-    margin-top: 1.5em;
-    font-size: 1em;
+	background: rgba(255, 255, 255, 0.6);
+	border: solid 1px rgba(0, 0, 0, 0.2);
+	padding: 0.5em 1em;
+	border-radius: 1em;
+	outline: none;
+	cursor: pointer;
+	margin-top: 1.5em;
+	font-size: 1em;
 }
 
 h1 {
-    font-weight: normal;
-    margin-top: 1em;
+	font-weight: normal;
+	margin-top: 1em;
 }
 
 error {
-    position: relative;
-    display: block;
-    color: rgb(255, 100, 50);
+	position: relative;
+	display: block;
+	color: rgb(255, 100, 50);
 }
 
 attributes {
-    display: none;
-    position: relative;
-    padding-top: 2em;
+	display: none;
+	position: relative;
+	padding-top: 2em;
 }
 
 attributes id {
-    display: none;
+	display: none;
 }
 
 attributes period,
 attributes user {
-    display: inline-block;
-    position: relative;
-    margin-bottom: 2em;
+	display: inline-block;
+	position: relative;
+	margin-bottom: 2em;
 }
 
 attributes div {
-    padding-bottom: 0.3em;
-    font-weight: bold;
+	padding-bottom: 0.3em;
+	font-weight: bold;
 }
 
 table {
-    display: inline-block;
-    border-spacing: 0;
-    border: solid 1px rgba(0, 0, 0, 0.1);
+	display: inline-block;
+	border-spacing: 0;
+	border: solid 1px rgba(0, 0, 0, 0.1);
 }
 
 table th,
 table td {
-    text-align: right;
-    padding: 0.75em 1.5em;
+	text-align: right;
+	padding: 0.75em 1.5em;
 }
 
 table td {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 table th {
-    font-weight: bold;
-    background-color: rgba(0, 0, 255, .05);
+	font-weight: bold;
+	background-color: rgba(0, 0, 255, .05);
 }
 
 table tr.selected {
-    background-color: rgba(255, 100, 50, 0.1);
+	background-color: rgba(255, 100, 50, 0.1);
 }
 
 table tr.spinner {
-    background-color: rgba(255, 150, 50, 0.2);
+	background-color: rgba(255, 150, 50, 0.2);
 }
 
 table tr.spinner td:first-child::before {
-    content: '🗲 downloading...';
+	content: '⌛ preparing...';
 	position: absolute;
 	right: -15.5em;
-    width: 15em;
-    text-align: left;
-    font-size: 0.75em;
-    font-weight: bold;
+	width: 15em;
+	text-align: left;
+	font-size: 0.75em;
+	font-weight: bold;
 	color: rgba(255, 150, 50, 0.2);
 }
 
 table tr.download {
-    background-color: rgba(255, 150, 50, 0.6);
+	background-color: rgba(255, 150, 50, 0.6);
 }
 
 table tr.download td:first-child::before {
-    content: '✓ click to download';
-    position: absolute;
-    right: -15.5em;
-    width: 15em;
-    text-align: left;
-    font-size: 0.75em;
-    font-weight: bold;
-    color: rgba(255, 150, 50, 0.6);
+	content: '✓ click to download';
+	position: absolute;
+	right: -15.5em;
+	width: 15em;
+	text-align: left;
+	font-size: 0.75em;
+	font-weight: bold;
+	color: rgba(255, 150, 50, 0.6);
 }
 
 progressbar {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.4);
-    display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.4);
+	display: none;
 }
 
 progressbar loader {
-    position: absolute;
-    top: calc(50% - 32px);
-    left: calc(50% - 32px);
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    perspective: 800px;
+	position: absolute;
+	top: calc(50% - 32px);
+	left: calc(50% - 32px);
+	width: 64px;
+	height: 64px;
+	border-radius: 50%;
+	perspective: 800px;
 }
 
 progressbar loader div {
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+	position: absolute;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
 }
 
 progressbar loader .one {
-    left: 0%;
-    top: 0%;
-    animation: rotate-one 1s linear infinite;
-    border-bottom: 3px solid #b55;
+	left: 0%;
+	top: 0%;
+	animation: rotate-one 1s linear infinite;
+	border-bottom: 3px solid #b55;
 }
 
 progressbar loader .two {
-    right: 0%;
-    top: 0%;
-    animation: rotate-two 1s linear infinite;
-    border-right: 3px solid #8d8;
+	right: 0%;
+	top: 0%;
+	animation: rotate-two 1s linear infinite;
+	border-right: 3px solid #8d8;
 }
 
 progressbar loader .three {
-    right: 0%;
-    bottom: 0%;
-    animation: rotate-three 1s linear infinite;
-    border-top: 3px solid #aaf;
+	right: 0%;
+	bottom: 0%;
+	animation: rotate-three 1s linear infinite;
+	border-top: 3px solid #aaf;
 }
 
 @keyframes rotate-one {
-    0% {
-        transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
-    }
+	0% {
+		transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+	}
 
-    100% {
-        transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
-    }
+	100% {
+		transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+	}
 }
 
 @keyframes rotate-two {
-    0% {
-        transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
-    }
+	0% {
+		transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+	}
 
-    100% {
-        transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
-    }
+	100% {
+		transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+	}
 }
 
 @keyframes rotate-three {
-    0% {
-        transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
-    }
+	0% {
+		transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+	}
 
-    100% {
-        transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
-    }
+	100% {
+		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+	}
 }
