@@ -27,6 +27,7 @@ button {
     outline: none;
     cursor: pointer;
     margin-top: 1.5em;
+    font-size: 1em;
 }
 
 h1 {
