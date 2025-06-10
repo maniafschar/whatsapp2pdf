@@ -62,28 +62,28 @@ class api {
 		for (var i = 0; i < data.periods.length; i++)
 			s += '<tr value="' + data.periods[i].period + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.periods[i].period.replace('-\\d\\d', '').replace('/\\d\\d', '').replace('\\d\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
-		document.getElementsByTagName('attributes')[0].querySelectorAll('period td').forEach(td => {
-			td.addEventListener('click', () => {
-				if (td.parentElement.classList.contains('download')) {
+		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
+			tr.addEventListener('click', () => {
+				if (tr.classList.contains('download')) {
 					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + period;
+					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '?period=' + encodeURIComponent(tr.getAttribute('value'));
 					link.setAttribute('target', '_blank');
 					link.click();
-				} else if (td.parentElement.classList.contains('selected')) {
+				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
-						td.parentElement.classList.remove('selected');
-				} else if (!td.parentElement.classList.contains('spinner'))
-					td.parentElement.classList.add('selected');
+						tr.classList.remove('selected');
+				} else if (!tr.classList.contains('spinner'))
+					tr.classList.add('selected');
 			});
 		});
 		s = '<table><tr><th>User</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
 		for (var i = 0; i < data.users.length; i++)
 			s += '<tr value="' + data.users[i].user + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.users[i].user + '</td><td>' + data.users[i].chats.toLocaleString() + '</td><td>' + data.users[i].words.toLocaleString() + '</td><td>' + data.users[i].letters.toLocaleString() + '</td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('user').innerHTML = s + '</table>';
-		document.getElementsByTagName('attributes')[0].querySelectorAll('user td').forEach(td => {
-			td.addEventListener('click', () => {
+		document.getElementsByTagName('attributes')[0].querySelectorAll('user tr').forEach(tr => {
+			tr.addEventListener('click', () => {
 				document.querySelector('user .selected').classList.remove('selected');
-				td.parentElement.classList.add('selected');
+				tr.classList.add('selected');
 			});
 		});
 	}
@@ -100,7 +100,7 @@ class api {
 					} else {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						var link = document.createElement('a');
-						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/' + (period ? period : '');
+						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText);
 						link.setAttribute('target', '_blank');
 						link.click();
 					}
@@ -108,7 +108,7 @@ class api {
 				error: xhr => {
 					var error = xhr.responseText || 'Unknown error';
 					if (error.indexOf('"status":566,') > -1)
-						setTimeout(download, 1000);
+						setTimeout(function() {  download(period); }, 1000);
 					else {
 						document.getElementsByTagName('progressbar')[0].style.display = null;
 						if (xhr.status < 500)
