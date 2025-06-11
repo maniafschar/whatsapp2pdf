@@ -77,6 +77,20 @@ class api {
 		});
 	}
 
+	static saveFeedback() {
+		api.ajax({
+			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
+			method: 'POST',
+			success: xhr => {
+				document.querySelector('popup content').innerHTML = xhr;
+			},
+			error: xhr => {
+				document.getElementsByTagName('progressbar')[0].style.display = null;
+				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+			}
+		});
+	}
+
 	static postAnalyse(data) {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
