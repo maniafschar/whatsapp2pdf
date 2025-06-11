@@ -159,6 +159,7 @@ description {
 	border-radius: 2em;
 	background: var(--borderColor);
 	margin-bottom: 5em;
+	border: solid 2em transparent;
 }
 
 description container {
@@ -177,7 +178,6 @@ description info {
 	width: 33.333%;
 	min-height: 10em;
 	left: 0;
-	padding: 1em;
 	box-sizing: border-box;
 	overflow-y: auto;
 	height: 100%;
