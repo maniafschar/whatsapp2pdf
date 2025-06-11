@@ -145,7 +145,7 @@ description {
 	overflow-x:hidden;
 	height: 20em;
 	margin-bottom: 5em;
-	border-top: solid 1px lightblue;
+	border-top: solid 1px rgba(170, 170, 255, 0.1);
 	border-radius: 2em;
 	background: rgba(255, 255, 255, 0.3);
 	margin-bottom: 5em;
@@ -182,7 +182,7 @@ tab {
 }
 
 tab.selected {
-	background: lightblue;
+	background: rgba(170, 170, 255, 0.1);
 }
 
 popup {
