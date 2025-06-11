@@ -195,6 +195,19 @@ popup {
 	transition: all ease-out .4s;
 }
 
+popup close {
+	position: absolute;
+	padding: 1em;
+	top: 0;
+	right: 0;
+	cursor: pointer;
+	color: rgba(0, 0, 0, 0.3);
+}
+
+popup close::before {
+	content: 'x';
+}
+
 progressbar {
 	position: absolute;
 	left: 0;
