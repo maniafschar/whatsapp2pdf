@@ -121,6 +121,41 @@ table td button {
 	margin: 0;
 }
 
+description {
+	display: inline-block;
+	width: 20em;
+	position: relative;
+	overflow-x:hidden;
+	height: 20em;
+}
+
+description container {
+	width: 200%;
+	display: inline-block;
+	position: absolute;
+	height: 100%;
+    transition: all ease-out .4s;
+    left: 0;
+}
+
+description info {
+	display: inline-block;
+	position: absolute;
+	width: 50%;
+	min-height: 10em;
+	left: 0;
+}
+
+tab {
+	margin: 2em 1em;
+	position: relative;
+	display: inline-block;
+}
+
+tab.selected {
+	text-decoration: underline;
+}
+
 progressbar {
 	position: absolute;
 	left: 0;
