@@ -13,7 +13,7 @@
 	<h1>WhatsApp to PDF Converter</h1>
 
 	<div style="margin-bottom:0.5em;">Upload exported WhatsApp chat file</div>
-	<input type="file" id="chatFile" accept=".zip" required />
+	<input type="file" id="chatFile" accept=".zip" style="max-width: 30em;" />
 	<error style="margin-top:0.3em;"></error>
 
 	<separator></separator>
@@ -32,7 +32,7 @@
 	<separator></separator>
 
 	<tab onclick="ui.showDescription(0)" class="selected">Description</tab>
-	<tab onclick="ui.showDescription(1)" class="selected">Feedback</tab>
+	<tab onclick="ui.showDescription(1)">Feedback</tab>
 	<tab onclick="ui.showDescription(2)">Imprint</tab><br />
 	<description>
 		<container>
@@ -62,16 +62,12 @@
 	<popup>
 		<close onclick="ui.feedbackClose()"></close>
 		<content>
-			<br /><br />
-			<input name="rating"></input>
-			<br /><br />Feedback<br />
-			<textarea name="note"></textarea>
-			<br /><br />Name<br />
-			<input name="name"></input>
-			<br /><br />Email<br />
-			<input name="email"></input>
-			<br /><br />Image<br />
-			<input name="image" type="file"></input>
+			<br />
+			<input-rating ui="dialog"></input-rating>
+			<label>Feedback<textarea name="note"></textarea></label>
+			<label>Name<input name="name"></input></label>
+			<label>Email<input name="email"></input></label>
+			<label>Image<input name="image" type="file"></input></label>
 			<br /><br />
 			<button onclick="api.saveFeedback()">Save</button>
 		</content>

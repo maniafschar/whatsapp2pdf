@@ -1,3 +1,8 @@
+:root {
+	--borderColor: rgba(170, 170, 255, 0.2);
+	--border: solid 1px var(--borderColor);
+}
+
 @font-face {
 	font-family: 'Comfortaa';
 	font-style: regular;
@@ -36,7 +41,7 @@ body {
 
 button {
 	background: rgba(255, 255, 255, 0.6);
-	border: solid 1px rgba(0, 0, 0, 0.2);
+	border: var(--border);
 	padding: 0.5em 1em;
 	border-radius: 1em;
 	outline: none;
@@ -48,6 +53,7 @@ button {
 h1 {
 	font-weight: normal;
 	margin-top: 1em;
+	font-size: 1.6em;
 }
 
 error {
@@ -80,7 +86,7 @@ attributes div {
 table {
 	display: inline-block;
 	border-spacing: 0;
-	border: solid 1px rgba(0, 0, 0, 0.1);
+	border: var(--border);
 }
 
 table th,
@@ -144,13 +150,13 @@ separator {
 
 description {
 	display: inline-block;
-	width: 80%;
+	width: 94%;
 	max-width: 50em;
 	position: relative;
 	overflow-x: hidden;
-	height: 20em;
+	height: 45em;
 	margin-bottom: 5em;
-	border: solid 1px rgba(170, 170, 255, 0.1);
+	border: var(--border);
 	border-radius: 2em;
 	background: rgba(255, 255, 255, 0.3);
 	margin-bottom: 5em;
@@ -182,23 +188,22 @@ tab {
 	position: relative;
 	display: inline-block;
 	cursor: pointer;
-	padding: 0.5em 1em;
+	padding: 0.75em 1em;
 	border-radius: 1em 1em 0 0;
 }
 
 tab.selected {
-	background: rgba(170, 170, 255, 0.1);
+	background: rgba(170, 170, 255, 0.2);
 }
 
 popup {
 	transform: scale(0);
-	position: absolute;
-	width: 20em;
-	height: 40em;
+	position: fixed;
+	width: 30em;
 	background-color: aliceblue;
-	top: 5em;
+	top: 2em;
 	left: 50%;
-	margin-left: -10em;
+	margin-left: -15em;
 	z-index: 2;
 	border-radius: 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
@@ -212,10 +217,62 @@ popup close {
 	right: 0;
 	cursor: pointer;
 	color: rgba(0, 0, 0, 0.3);
+	z-index: 2;
 }
 
 popup close::before {
 	content: 'x';
+}
+
+popup content {
+	position: relative;
+	display: block;
+	padding: 1em;
+}
+
+textarea,
+input {
+	appearance: none;
+	position: relative;
+	font-size: 1em;
+	font-weight: normal;
+	width: 100%;
+	outline: none !important;
+	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+	height: 2em;
+	padding: 0em 0.75em;
+	border-radius: 0.5em;
+	background: rgba(255, 255, 255, 0.85);
+	vertical-align: top;
+	border: none;
+	color: black;
+}
+
+input,
+textarea {
+	user-select: text;
+}
+
+input[type="file"] {
+	opacity: 0;
+	cursor: pointer;
+}
+
+textarea {
+	height: 5em;
+	padding-top: 0.5em;
+	overflow-y: auto;
+	resize: none;
+}
+
+label {
+	display: block;
+	position: relative;
+	text-align: left;
+	margin-bottom: 1em;
+	text-indent: 1em;
+	font-style: italic;
+	color: rgba(0, 0, 100, 0.5);
 }
 
 progressbar {
@@ -230,10 +287,10 @@ progressbar {
 
 progressbar loader {
 	position: absolute;
-	top: calc(50% - 32px);
-	left: calc(50% - 32px);
-	width: 64px;
-	height: 64px;
+	top: calc(50% - 6em);
+	left: calc(50% - 6em);
+	width: 12em;
+	height: 12em;
 	border-radius: 50%;
 	perspective: 800px;
 }

@@ -5,6 +5,12 @@ document.getElementById('chatFile').onchange = () => {
 	api.analyse();
 };
 
+window.onresize = function () {
+	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
+	document.body.style.fontSize = Math.min(10 + diagonal / 100, 26) + 'px';
+}
+
+
 export { ui };
 
 class ui {
@@ -38,7 +44,7 @@ class InputRating extends HTMLElement {
 	}
 	connectedCallback() {
 		const style = document.createElement('style');
-		style.textContent = `${initialisation.elementsCss}
+		style.textContent = `
 detailRating {
 	font-size: 1.5em;
 	margin: 1em 0 0.75em 0;
@@ -102,12 +108,6 @@ ratingSelection span {
 	display: inline-block;
 	position: relative;
 	cursor: pointer;
-}
-
-input-image {
-	position: relative;
-	display: block;
-	margin: 1em 0;
 }`;
 		this._root.appendChild(style);
 		var element, id = this.getAttribute('id');

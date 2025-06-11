@@ -42,6 +42,8 @@ class api {
 	}
 
 	static buy() {
+		if (document.querySelector('period .spinner,period .download'))
+			return;
 		var file = document.getElementById('chatFile');
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
@@ -94,6 +96,7 @@ class api {
 	static postAnalyse(data) {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
+		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 		document.getElementsByTagName('attributes')[0].querySelector('id').innerText = data.id;
 		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
@@ -107,6 +110,8 @@ class api {
 					link.setAttribute('target', '_blank');
 					link.click();
 					tr.classList.remove('download');
+					if (document.querySelectorAll('period .spinner,period .download').length == 0)
+						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
 				} else if (tr.classList.contains('selected')) {
@@ -129,6 +134,7 @@ class api {
 	}
 
 	static postBuy() {
+		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = 'none';
 		var periods = document.querySelectorAll('period .selected');
 		for (var i = 0; i < periods.length; i++) {
 			api.download(periods[i].getAttribute('value'));
