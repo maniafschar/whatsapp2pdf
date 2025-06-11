@@ -9,6 +9,8 @@ public class Feedback extends BaseEntity {
 	private String note;
 	@Column(columnDefinition = "TEXT")
 	private String answer;
+	private String name;
+	private String email;
 	private short rating;
 	private short image;
 	private String pin;
@@ -37,6 +39,22 @@ public class Feedback extends BaseEntity {
 		this.image = image;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(final String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(final String email) {
+		this.email = email;
+	}
+
 	public String getPin() {
 		return pin;
 	}
@@ -49,7 +67,7 @@ public class Feedback extends BaseEntity {
 		return rating;
 	}
 
-	public void setNote(final short rating) {
+	public void setRating(final short rating) {
 		this.rating = rating;
 	}
 }
