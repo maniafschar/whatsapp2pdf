@@ -14,4 +14,9 @@ function showDescription(i) {
 }
 
 function feedback() {
+    document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
+}
+
+function feedbackClose() {
+    document.getElementsByTagName('popup')[0].style.transform = '';
 }
