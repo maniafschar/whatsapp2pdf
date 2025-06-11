@@ -1,36 +1,38 @@
 <html>
 
 <head>
-    <title>WhatsApp to PDF Converter</title>
-    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-    <meta http-equiv="Content-Security-Policy"
-        content="default-src * file: https:; child-src * file: https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; script-src * 'unsafe-inline' 'unsafe-eval' file: https:" />
-    <link rel="stylesheet" type="text/css" href="css/main.css" />
-    <script defer type="text/javascript" src="js/main.js"></script>
+		<title>WhatsApp to PDF Converter</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Security-Policy"
+				content="default-src * file: https:; child-src * file: https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; script-src * 'unsafe-inline' 'unsafe-eval' file: https:" />
+		<link rel="stylesheet" type="text/css" href="css/main.css" />
+		<script defer type="text/javascript" src="js/main.js"></script>
 </head>
 
 <body>
-    <h1>WhatsApp to PDF Converter</h1>
+	<h1>WhatsApp to PDF Converter</h1>
 
-    <div style="margin-bottom:0.5em;">Upload exported WhatsApp chat file</div>
-    <input type="file" id="chatFile" accept=".zip" required />
-    <error style="margin-top:0.3em;"></error>
+	<div style="margin-bottom:0.5em;">Upload exported WhatsApp chat file</div>
+	<input type="file" id="chatFile" accept=".zip" required />
+	<error style="margin-top:0.3em;"></error>
 
-    <attributes>
-        <id></id>
-        <div>Choose the viewers perspective</div>
-        <user></user>
-        <div>Choose the period to export as PDF</div>
-        <period></period>
-        <br />
-        <button onclick="api.buy()">Print selected</button>
-        <button onclick="api.cleanUp()">Delete uploaded data</button>
-    </attributes>
+	<attributes>
+			<id></id>
+			<div>Choose the viewers perspective</div>
+			<user></user>
+			<div>Choose the period to export as PDF</div>
+			<period></period>
+			<br />
+			<button onclick="api.buy()">Print selected</button>
+			<button onclick="api.cleanUp()">Delete uploaded data</button>
+	</attributes>
 
 	<tab onclick="showDescription(0)" class="selected">Feedback</tab><tab onclick="showDescription(1)">Imprint</tab><br/>
 	<description>
 		<container>
 			<info>
+				<button onclick="feedback()">Add Feedback</button>
+				<feedbacks></feedbacks>
 			</info>
 			<info style="left: 50%;">
 					JNet Quality Consulting GmbH<br />
@@ -48,13 +50,13 @@
 		</container>
 	</description>
 
-    <progressbar>
-        <loader>
-            <div class="one"></div>
-            <div class="two"></div>
-            <div class="three"></div>
-        </loader>
-    </progressbar>
+	<progressbar>
+			<loader>
+					<div class="one"></div>
+					<div class="two"></div>
+					<div class="three"></div>
+			</loader>
+	</progressbar>
 </body>
 
 </html>
