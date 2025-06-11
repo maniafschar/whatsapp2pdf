@@ -50,7 +50,23 @@
 		</container>
 	</description>
 
-	<popup></popup>
+	<popup>
+		<close onclick="feedbackClose()"></close>
+		<content>
+			<br/><br/>
+			<input name="rating"></input>
+			<br/><br/>Feedback<br/>
+			<textarea name="note"></textarea>
+			<br/><br/>Name<br/>
+			<input name="name"></input>
+			<br/><br/>Email<br/>
+			<input name="email"></input>
+			<br/><br/>Image<br />
+			<input name="image" type="file"></input>
+			<br /><br />
+			<button onclick="api.saveFeedback()">Save</button>
+		</content>
+	</popup>
 
 	<progressbar>
 			<loader>
