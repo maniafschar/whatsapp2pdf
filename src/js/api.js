@@ -132,6 +132,7 @@ class api {
 		var periods = document.querySelectorAll('period .selected');
 		for (var i = 0; i < periods.length; i++) {
 			api.download(periods[i].getAttribute('value'));
+			document.querySelector('description button').style.display = '';
 			var tr = document.querySelector('period tr[value="' + periods[i].getAttribute('value').replaceAll('\\', '\\\\') + '"]');
 			tr.classList.remove('selected');
 			tr.classList.add('spinner');
