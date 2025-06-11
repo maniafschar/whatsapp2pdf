@@ -12,3 +12,6 @@ function showDescription(i) {
     document.querySelector('tab.selected')?.classList.remove('selected');
     document.querySelectorAll('tab')[i].classList.add('selected');
 }
+
+function feedback() {
+}
