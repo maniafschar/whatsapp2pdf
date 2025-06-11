@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,15 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.jq.wa2pdf.entity.Feedback;
+import com.jq.wa2pdf.repository.Repository;
 import com.jq.wa2pdf.service.ExtractService;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.PdfService;
@@ -33,6 +37,9 @@ public class ApplicationApi {
 
 	@Autowired
 	private ExtractService extractService;
+
+	@Autowired
+	private Repository repository;
 
 	@PostMapping("analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file)
@@ -77,6 +84,23 @@ public class ApplicationApi {
 		}
 	}
 
+	@DeleteMapping("cleanUp/{id}")
+	public void cleanUp(@PathVariable final String id) throws IOException {
+		extractService.cleanUp(id);
+	}
+
+	@GetMapping("feedback/{id}/{pin}")
+	public Feedback feedback(@PathVariable final String id, @PathVariable final String pin) throws IOException {
+	}
+
+	@PutMapping("feedback")
+	public Feedback feedbackSave() throws IOException {
+	}
+
+	@GetMapping("feedback/list")
+	public List<Feedback> feedbackList() throws IOException {
+	}
+
 	private String sanatizeFilename(String filename) {
 		if (filename.contains("."))
 			filename = filename.substring(0, filename.lastIndexOf('.'));
@@ -93,10 +117,5 @@ public class ApplicationApi {
 		else if (period.contains("-"))
 			period = period.substring(0, period.lastIndexOf('-')).replace("-", "_");
 		return "_" + period;
-	}
-
-	@DeleteMapping("cleanUp/{id}")
-	public void cleanUp(@PathVariable final String id) throws IOException {
-		extractService.cleanUp(id);
 	}
 }
