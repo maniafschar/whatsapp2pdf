@@ -114,6 +114,7 @@ class api {
 						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
+					document.querySelector('description button').style.display = '';
 				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						tr.classList.remove('selected');
@@ -138,7 +139,6 @@ class api {
 		var periods = document.querySelectorAll('period .selected');
 		for (var i = 0; i < periods.length; i++) {
 			api.download(periods[i].getAttribute('value'));
-			document.querySelector('description button').style.display = '';
 			var tr = document.querySelector('period tr[value="' + periods[i].getAttribute('value').replaceAll('\\', '\\\\') + '"]');
 			tr.classList.remove('selected');
 			tr.classList.add('spinner');
