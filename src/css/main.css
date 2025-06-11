@@ -230,7 +230,8 @@ popup content {
 }
 
 textarea,
-input {
+input,
+imageupload {
 	appearance: none;
 	position: relative;
 	font-size: 1em;
@@ -254,7 +255,6 @@ textarea {
 
 input[type="file"] {
 	opacity: 0;
-	cursor: pointer;
 }
 
 textarea {
@@ -262,6 +262,23 @@ textarea {
 	padding-top: 0.5em;
 	overflow-y: auto;
 	resize: none;
+}
+
+imageupload {
+	position: relative;
+	display: inline-block;
+}
+
+imageupload span {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	line-height: 1.8;
+	cursor: pointer;
+	border-radius: 0.5em;
+	border: var(--border);
 }
 
 label {

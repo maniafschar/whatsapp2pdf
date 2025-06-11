@@ -13,7 +13,10 @@
 	<h1>WhatsApp to PDF Converter</h1>
 
 	<div style="margin-bottom:0.5em;">Upload exported WhatsApp chat file</div>
-	<input type="file" id="chatFile" accept=".zip" style="max-width: 30em;" />
+	<imageupload style="max-width: 30em;">
+		<span>Click to upload...</span>
+		<input type="file" id="chatFile" accept=".zip" />
+	</imageupload>
 	<error style="margin-top:0.3em;"></error>
 
 	<separator></separator>
@@ -43,7 +46,7 @@
 				<button onclick="ui.feedback()" style="display: none;">Add Feedback</button>
 				<feedbacks></feedbacks>
 			</info>
-			<info style="left: 66.666%; padding-top: 2em;">
+			<info style="left: 66.666%; padding-top: 1em;">
 				JNet Quality Consulting GmbH<br />
 				Whistlerweg 27b<br />
 				81479 Munich<br />
@@ -67,7 +70,12 @@
 			<label>Feedback<textarea name="note"></textarea></label>
 			<label>Name<input name="name"></input></label>
 			<label>Email<input name="email"></input></label>
-			<label>Image<input name="image" type="file"></input></label>
+			<label>Image
+				<imageupload>
+					<span>Click to upload...</span>
+					<input type="file" id="chatFile" accept=".zip" style="max-width: 30em;" />
+				</imageupload>
+			</label>
 			<br /><br />
 			<button onclick="api.saveFeedback()">Save</button>
 		</content>
