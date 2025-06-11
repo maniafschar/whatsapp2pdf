@@ -180,6 +180,21 @@ tab.selected {
 	text-decoration: underline;
 }
 
+popup {
+	transform: scale(0);
+	position: absolute;
+	width: 20em;
+	height: 40em;
+	background-color: aliceblue;
+	top: 5em;
+	left: 50%;
+	margin-left: -10em;
+	z-index: 2;
+	border-radius: 1em;
+	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
+	transition: all ease-out .4s;
+}
+
 progressbar {
 	position: absolute;
 	left: 0;
