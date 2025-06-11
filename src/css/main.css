@@ -101,7 +101,7 @@ table td {
 
 table th {
 	font-weight: bold;
-	background-color: rgba(0, 0, 255, .05);
+	background-color: var(--borderColor);
 }
 
 table tr.selected {
