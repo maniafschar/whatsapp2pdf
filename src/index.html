@@ -1,12 +1,12 @@
 <html>
 
 <head>
-		<title>WhatsApp to PDF Converter</title>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<meta http-equiv="Content-Security-Policy"
-				content="default-src * file: https:; child-src * file: https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; script-src * 'unsafe-inline' 'unsafe-eval' file: https:" />
-		<link rel="stylesheet" type="text/css" href="css/main.css" />
-		<script defer type="text/javascript" src="js/main.js"></script>
+	<title>WhatsApp to PDF Converter</title>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Security-Policy"
+		content="default-src * file: https:; child-src * file: https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' blob: data: https:; media-src 'self' blob: data: https:; font-src 'self' data: https:; script-src * 'unsafe-inline' 'unsafe-eval' file: https:" />
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<script defer type="text/javascript" src="js/main.js"></script>
 </head>
 
 <body>
@@ -16,52 +16,61 @@
 	<input type="file" id="chatFile" accept=".zip" required />
 	<error style="margin-top:0.3em;"></error>
 
+	<separator></separator>
+
 	<attributes>
-			<id></id>
-			<div>Choose the viewers perspective</div>
-			<user></user>
-			<div>Choose the period to export as PDF</div>
-			<period></period>
-			<br />
-			<button onclick="api.buy()">Print selected</button>
-			<button onclick="api.cleanUp()">Delete uploaded data</button>
+		<id></id>
+		<div>Choose the viewers perspective</div>
+		<user></user>
+		<div>Choose the period to export as PDF</div>
+		<period></period>
+		<br />
+		<button onclick="api.buy()">Print selected</button>
+		<button onclick="api.cleanUp()">Delete uploaded data</button>
 	</attributes>
 
-	<tab onclick="showDescription(0)" class="selected">Feedback</tab><tab onclick="showDescription(1)">Imprint</tab><br/>
+	<separator></separator>
+
+	<tab onclick="ui.showDescription(0)" class="selected">Description</tab>
+	<tab onclick="ui.showDescription(1)" class="selected">Feedback</tab>
+	<tab onclick="ui.showDescription(2)">Imprint</tab><br />
 	<description>
 		<container>
 			<info>
-				<button onclick="feedback()">Add Feedback</button>
+				Description
+			</info>
+			<info style="left: 33.333%;">
+				<button onclick="ui.feedback()">Add Feedback</button>
 				<feedbacks></feedbacks>
 			</info>
-			<info style="left: 50%;">
-					JNet Quality Consulting GmbH<br />
-					Whistlerweg 27b<br />
-					81479 Munich<br />
-					Germany<br />
-					E-Mail: support@wa2pdf.com<br />
-					Internet: https://wa2pdf.com<br /><br />
-					Managing Director: Mani Afschar Yazdi<br />
-					Registration court: District Court Munich<br />
-					Registration number: HRB 135182<br /><br />
-					© 2025 JNet Quality Consulting GmbH<br />
-					All rights reserved
+			<info style="left: 66.666%;">
+				JNet Quality Consulting GmbH<br />
+				Whistlerweg 27b<br />
+				81479 Munich<br />
+				Germany<br />
+				E-Mail: support@wa2pdf.com<br />
+				Internet: https://wa2pdf.com<br /><br />
+				Managing Director: Mani Afschar Yazdi<br />
+				Registration court: District Court Munich<br />
+				Registration number: HRB 135182<br /><br />
+				© 2025 JNet Quality Consulting GmbH<br />
+				All rights reserved
 			</info>
 		</container>
 	</description>
 
 	<popup>
-		<close onclick="feedbackClose()"></close>
+		<close onclick="ui.feedbackClose()"></close>
 		<content>
-			<br/><br/>
+			<br /><br />
 			<input name="rating"></input>
-			<br/><br/>Feedback<br/>
+			<br /><br />Feedback<br />
 			<textarea name="note"></textarea>
-			<br/><br/>Name<br/>
+			<br /><br />Name<br />
 			<input name="name"></input>
-			<br/><br/>Email<br/>
+			<br /><br />Email<br />
 			<input name="email"></input>
-			<br/><br/>Image<br />
+			<br /><br />Image<br />
 			<input name="image" type="file"></input>
 			<br /><br />
 			<button onclick="api.saveFeedback()">Save</button>
@@ -69,11 +78,11 @@
 	</popup>
 
 	<progressbar>
-			<loader>
-					<div class="one"></div>
-					<div class="two"></div>
-					<div class="three"></div>
-			</loader>
+		<loader>
+			<div class="one"></div>
+			<div class="two"></div>
+			<div class="three"></div>
+		</loader>
 	</progressbar>
 </body>
 

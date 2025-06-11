@@ -11,9 +11,9 @@ public class Feedback extends BaseEntity {
 	private String answer;
 	private String name;
 	private String email;
-	private short rating;
-	private short image;
+	private String image;
 	private String pin;
+	private short rating;
 
 	public String getNote() {
 		return note;

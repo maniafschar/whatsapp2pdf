@@ -1,24 +1,26 @@
 import { api } from "./api";
 
-window.api = api;
-
 document.getElementById('chatFile').onchange = () => {
-    document.getElementsByTagName('attributes')[0].style.display = 'none';
-    api.analyse();
+	document.getElementsByTagName('attributes')[0].style.display = 'none';
+	api.analyse();
 };
 
-function showDescription(i) {
-    document.querySelector('description container').style.marginLeft = -(i * 100) + '%';
-    document.querySelector('tab.selected')?.classList.remove('selected');
-    document.querySelectorAll('tab')[i].classList.add('selected');
-}
+export { ui };
 
-function feedback() {
-    document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
-}
+class ui {
+	static showDescription(i) {
+		document.querySelector('description container').style.marginLeft = -(i * 100) + '%';
+		document.querySelector('tab.selected')?.classList.remove('selected');
+		document.querySelectorAll('tab')[i].classList.add('selected');
+	}
 
-function feedbackClose() {
-    document.getElementsByTagName('popup')[0].style.transform = '';
+	static feedback() {
+		document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
+	}
+
+	static feedbackClose() {
+		document.getElementsByTagName('popup')[0].style.transform = '';
+	}
 }
 
 class InputRating extends HTMLElement {
@@ -262,3 +264,5 @@ input-image {
 }
 
 customElements.define('input-rating', InputRating);
+window.api = api;
+window.ui = ui;

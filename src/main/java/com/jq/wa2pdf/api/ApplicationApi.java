@@ -91,14 +91,17 @@ public class ApplicationApi {
 
 	@GetMapping("feedback/{id}/{pin}")
 	public Feedback feedback(@PathVariable final String id, @PathVariable final String pin) throws IOException {
+		return null;
 	}
 
 	@PutMapping("feedback")
 	public Feedback feedbackSave() throws IOException {
+		return null;
 	}
 
 	@GetMapping("feedback/list")
 	public List<Feedback> feedbackList() throws IOException {
+		return null;
 	}
 
 	private String sanatizeFilename(String filename) {
