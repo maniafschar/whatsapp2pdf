@@ -150,6 +150,7 @@ tab {
 	margin: 2em 1em;
 	position: relative;
 	display: inline-block;
+	cursor: pointer;
 }
 
 tab.selected {
