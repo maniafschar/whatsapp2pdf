@@ -147,7 +147,8 @@ description info {
 }
 
 tab {
-	margin: 2em 1em;
+	margin: 1em;
+	padding: 0.5em;
 	position: relative;
 	display: inline-block;
 	cursor: pointer;
