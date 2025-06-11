@@ -255,6 +255,7 @@ textarea {
 
 input[type="file"] {
 	opacity: 0;
+	cursor: pointer;
 }
 
 textarea {
@@ -276,7 +277,6 @@ imageupload span {
 	bottom: 0;
 	right: 0;
 	line-height: 1.8;
-	cursor: pointer;
 	border-radius: 0.5em;
 	border: var(--border);
 }
