@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jq.wa2pdf.service.PdfService.Statistics;
+import com.vdurmont.emoji.EmojiParser;
 
 @Service
 public class WordCloudService {
@@ -48,6 +49,9 @@ public class WordCloudService {
 		String s = text.replaceAll("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)0-9]", " ");
 		while (s.contains("  "))
 			s = s.replaceAll("  ", " ");
+		final List<String> emojis = EmojiParser.extractEmojis(text);
+		for (String emoji : emojis)
+			s = s.substring(0, s.indexOf(emoji)) + s.substring(s.indexOf(emoji) + emoji.length());
 		final List<String> stopWords = Arrays.asList(IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
 		final List<Token> list = new ArrayList<>();
 		for (s : s.toLowerCase().split(" ")) {
