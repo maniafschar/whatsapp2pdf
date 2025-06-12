@@ -91,17 +91,19 @@ public class ApplicationApi {
 
 	@GetMapping("feedback/{id}/{pin}")
 	public Feedback feedback(@PathVariable final String id, @PathVariable final String pin) throws IOException {
-		return null;
+		final List<Feedback> list = repository.list("");
+		return list.size() == 1 ? list.get(0) : null;
 	}
 
 	@PutMapping("feedback")
-	public Feedback feedbackSave() throws IOException {
-		return null;
+	public String feedbackSave(final Feedback feedback) throws IOException {
+		repository.save(feedback);
+		return "An email has been sent to you. Please confirm to publish your feedback.";
 	}
 
 	@GetMapping("feedback/list")
 	public List<Feedback> feedbackList() throws IOException {
-		return null;
+		return repository.list("");
 	}
 
 	private String sanatizeFilename(String filename) {
