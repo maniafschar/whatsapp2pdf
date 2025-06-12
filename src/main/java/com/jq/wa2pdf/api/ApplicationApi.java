@@ -42,10 +42,8 @@ public class ApplicationApi {
 	private FeedbackService feedbackService;
 
 	@PostMapping("analyse")
-	public Attributes analyse(@RequestParam("file") final MultipartFile file)
-			throws Exception {
-		final String id = "" + System.currentTimeMillis() + Math.random();
-		return extractService.unzip(file, id);
+	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws Exception {
+		return extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
 	}
 
 	@PostMapping("preview/{id}")
