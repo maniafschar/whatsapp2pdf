@@ -70,6 +70,7 @@ public class WordCloudService {
 			g.setColor(Color.blue);
 			g.drawString(token.getToken(), 10, (i + 1) * 20);
 		});
-		ImageIO.write(image, "jpg", file.toAbsolutePath().toFile());
+		final String filename = file.toAbsolutePath().toFile();
+		ImageIO.write(image, filename.substring(filename.lastIndexOf('.') + 1), filename);
 	}
 }
