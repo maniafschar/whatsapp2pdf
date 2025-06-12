@@ -39,12 +39,13 @@ public class WordCloudService {
 		final List<Token> list = new ArrayList<>();
 		final List<String> stopWords = Arrays.asList(IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
 		for (s : s.toLowerCase().split(" ")) {
-			Token t = list.stream().filter(e -> e.token.equals(s)).findFirst().orElse(null);
+			final Token t = list.stream().filter(e -> e.token.equals(s)).findFirst().orElse(null);
 			if (t != null)
 				t.count++;
 			else if (!stopWords.contains(s))
 				list.add(new Token(s));
 		}
 		list.sort((e, e2) -> (int) Math.signum(e2.count - e.count));
+		return list;
 	}
 }
