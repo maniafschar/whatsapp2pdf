@@ -363,7 +363,7 @@ public class PdfService {
 			final Table tableWordCloud = new Table(wordCloud.size(), 2);
 			tableWordCloud.setKeepTogether(true);
 			for (Statistics wordCloud : wordClouds) {
-				final String id = filename + UUID.randomUUID().toString() + ".jpg";
+				final String id = filename + UUID.randomUUID().toString() + ".png";
 				wordCloudService.createImage(wordCloudService.extract(wordCloud.getPeriod()), dir.resolve(id));
 				tableWordCloud.addCell(createCell(id, true));
 			}
