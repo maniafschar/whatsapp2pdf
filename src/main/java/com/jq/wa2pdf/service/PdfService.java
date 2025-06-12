@@ -324,6 +324,13 @@ public class PdfService {
 			table.complete();
 			content.add(table);
 			addEmptyLine();
+			Statistics wordCloud =  wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst().orElse(null);
+			if (wordCloud == null) {
+				wordCloud = new Statistics();
+				wordCloud.user = user;
+				wordClouds.add(wordCloud);
+			}
+			wordCloud.period += message;
 		}
 
 		private void addEmptyLine() {
@@ -440,23 +447,21 @@ public class PdfService {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
 			for (String emoji : emojis) {
-				if (text.indexOf(emoji) > 0) {
-					final Text t = new Text(text.substring(0, text.indexOf(emoji)));
-					t.setFont(fontMessage);
-					paragraph.add(t);
-				}
-				final Text t = new Text(emoji);
-				t.setFont(fontEmoji);
-				paragraph.add(t);
+				if (text.indexOf(emoji) > 0)
+					paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontMessage));
+				paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontEmoji));
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
-			if (text.length() > 0) {
-				final Text t = new Text(text);
-				t.setFont(fontMessage);
-				paragraph.add(t);
-			}
+			if (text.length() > 0)
+				paragraph.add(createText(text, fontMessage));
 			paragraph.setTextAlignment(alignment);
 			cell.add(paragraph);
+		}
+
+		private Text createText(final String text, final PdfFont font) {
+			final Text t = new Text(text);
+			t.setFont(font);
+			return t;
 		}
 	}
 }
