@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
@@ -58,6 +59,9 @@ public class PdfService {
 
 	@Autowired
 	private ExtractService extractService;
+
+	@Autowired
+	private WordCloudService wordCloudService;
 
 	@Async
 	public void create(final String id, final String period, final String user, boolean preview) throws Exception {
@@ -123,6 +127,7 @@ public class PdfService {
 		private final UsersPerDay usersPerDay = new UsersPerDay();
 		private final List<String> outline = new ArrayList<>();
 		private final List<Statistics> total = new ArrayList<>();
+		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
 		private final String period;
 		private final String user;
@@ -354,6 +359,18 @@ public class PdfService {
 			table.setMarginBottom(20f);
 			table.complete();
 			document.add(table);
+
+			final Table tableWordCloud = new Table(wordCloud.size(), 2);
+			tableWordCloud.setKeepTogether(true);
+			for (Statistics wordCloud : wordClouds) {
+				final String id = filename + UUID.randomUUID().toString() + ".jpg";
+				wordCloudService.createImage(wordCloudService.extract(wordCloud.getPeriod()), dir.resolve(id));
+				tableWordCloud.addCell(createCell(id, true));
+			}
+			for (Statistics wordCloud : wordClouds)
+				tableWordCloud.addCell(createCell(wordCloud.getUser(), TextAlignment.CENTER));
+			tableWordCloud.complete();
+			document.add(tableWordCloud);
 		}
 
 		private Cell createCell(final String text, final boolean... media) {
@@ -410,12 +427,9 @@ public class PdfService {
 						image.flush();
 						g.dispose();
 						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.jpg";
-						ImageIO.write(image, "jpg",
-								ExtractService.getTempDir(id).resolve(mediaId).toAbsolutePath().toFile());
+						ImageIO.write(image, "jpg", dir.resolve(mediaId).toAbsolutePath().toFile());
 					}
-					cell.add(new Image(ImageDataFactory.create(
-							ExtractService.getTempDir(id).resolve(mediaId).toAbsolutePath().toFile()
-									.getAbsolutePath())));
+					cell.add(new Image(ImageDataFactory.create(dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath())));
 				}
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);
