@@ -324,13 +324,15 @@ public class PdfService {
 			table.complete();
 			content.add(table);
 			addEmptyLine();
-			Statistics wordCloud =  wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst().orElse(null);
-			if (wordCloud == null) {
-				wordCloud = new Statistics();
-				wordCloud.user = user;
-				wordClouds.add(wordCloud);
+			if (media == null || media.length == 0 || !media[0]) {
+				Statistics wordCloud =  wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst().orElse(null);
+				if (wordCloud == null) {
+					wordCloud = new Statistics();
+					wordCloud.user = user;
+					wordClouds.add(wordCloud);
+				}
+				wordCloud.period += message;
 			}
-			wordCloud.period += message;
 		}
 
 		private void addEmptyLine() {
