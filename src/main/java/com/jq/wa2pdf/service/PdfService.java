@@ -1,5 +1,6 @@
 package com.jq.wa2pdf.service;
 
+import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
@@ -18,18 +19,18 @@ import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.itextpdf.io.font.constants.FontStyles;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageDataFactory;
+import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.PatternColor;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.font.PdfFontFactory.EmbeddingStrategy;
-import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfCatalog;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfName;
@@ -41,7 +42,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
-import com.itextpdf.kernel.pdf.navigation.PdfDestination;
+import com.itextpdf.kernel.pdf.navigation.PdfExplicitDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
@@ -49,6 +50,9 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.layout.LayoutArea;
+import com.itextpdf.layout.layout.LayoutContext;
+import com.itextpdf.layout.layout.LayoutResult;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.vdurmont.emoji.EmojiParser;
@@ -70,6 +74,7 @@ public class PdfService {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			try (final FileOutputStream filename = new FileOutputStream(error.toFile())) {
 				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
 			}
@@ -96,6 +101,7 @@ public class PdfService {
 		int chats = 0;
 		int words = 0;
 		int letters = 0;
+		StringBuilder text;
 
 		public int getChats() {
 			return chats;
@@ -129,6 +135,9 @@ public class PdfService {
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
+		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.78f, 0.78f, 0.78f });
+		private final Color colorChatUser = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.9f, 1f });
+		private final Color colorChatOther = PatternColor.createColorWithColorSpace(new float[] { 1f, 0.9f, 0.7f });
 		private final String period;
 		private final String user;
 		private final String id;
@@ -141,11 +150,10 @@ public class PdfService {
 			this.user = user;
 			this.id = id;
 			this.preview = preview;
-			fontMessage = PdfFontFactory.createRegisteredFont(StandardFonts.HELVETICA,
-					StandardCharsets.UTF_8.name(), EmbeddingStrategy.FORCE_EMBEDDED, FontStyles.NORMAL, true);
-			PdfFontFactory.register(getClass().getResource("/font/NotoEmoji.ttf").toExternalForm());
-			fontEmoji = PdfFontFactory.createRegisteredFont("NotoEmoji",
-					StandardCharsets.UTF_8.name(), EmbeddingStrategy.FORCE_EMBEDDED, FontStyles.NORMAL, true);
+			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			fontEmoji = PdfFontFactory.createFont(
+					IOUtils.toByteArray(getClass().getResourceAsStream("/font/NotoEmoji.ttf")),
+					EmbeddingStrategy.FORCE_EMBEDDED);
 		}
 
 		private class UsersPerDay {
@@ -153,7 +161,7 @@ public class PdfService {
 			private String date = null;
 		}
 
-		private void create() throws IOException {
+		private void create() throws IOException, FontFormatException {
 			final String filename = getFilename(preview ? null : period);
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
@@ -167,10 +175,9 @@ public class PdfService {
 								final PdfPage page = document.getPdfDocument()
 										.getPage(document.getPdfDocument().getNumberOfPages());
 								final PdfCanvas canvas = new PdfCanvas(page);
-								final Rectangle rect = page.getPageSize();
-								canvas.addImageAt(ImageDataFactory.create(getClass()
+								canvas.addImageFittedIntoRectangle(ImageDataFactory.create(getClass()
 										.getResource("/background/000001.png").toExternalForm()),
-										0f, 0f, true);
+										page.getPageSize(), false);
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
@@ -231,18 +238,37 @@ public class PdfService {
 				addDate(null);
 				addMetaData();
 				int i = 0;
+				final PdfOutline root = document.getPdfDocument().getOutlines(true);
 				for (Table e : content) {
 					document.add(e);
-					if (e.getNumberOfColumns() == 1 && e.getCell(0, 0).getHeight().getValue() == 5f)
-						writer.getRootOutline().addKid(new PdfOutline(writer.getRootOutline(),
-								new PdfDestination(PdfDestination.XYZ, 0,
-										writer.getCurrentPos() + e.getHeight().getValue(), 0),
-								new Paragraph(outline.get(i++))));
+					if (e.getNumberOfColumns() == 1
+							&& ((UnitValue) e.getCell(0, 0)
+									.getProperty(com.itextpdf.layout.properties.Property.FONT_SIZE)).getValue() < 9) {
+						document.getPdfDocument().getWriter().flush();
+						final LayoutResult pLayoutResult = e.createRendererSubTree().setParent(document.getRenderer())
+								.layout(new LayoutContext(
+										new LayoutArea(document.getPdfDocument().getNumberOfPages(),
+												document.getPdfDocument().getLastPage().getPageSize())));
+						System.out.println();
+						System.out.println(document.getPdfDocument().getWriter().getCurrentPos());
+						System.out.println();
+						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getX());
+						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getY());
+						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getTop());
+						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getBottom());
+						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getWidth());
+						System.out.println();
+						root.addOutline(outline.get(i++)).addDestination(PdfExplicitDestination
+								.createXYZ(document.getPdfDocument().getLastPage(), 0f,
+										pLayoutResult.getOccupiedArea().getBBox().getY(),
+										1f));
+					}
 					if (preview && document.getPdfDocument().getNumberOfPages() > 4)
 						break;
 				}
 				if (preview)
 					addPreviewInfo();
+				document.flush();
 				document.close();
 			}
 			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
@@ -282,12 +308,11 @@ public class PdfService {
 
 				final Cell cell = createCell(date, TextAlignment.CENTER, 1.5f, 0, 10, 0);
 				cell.setFontSize(8.5f);
-				cell.setBackgroundColor(PatternColor.createColorWithColorSpace(new float[] { 200, 200, 200, 200 }));
+				cell.setBackgroundColor(colorDate, 0.3f);
 
 				final Table table = new Table(1);
 				table.setWidth(UnitValue.createPercentValue(100.0f));
 				table.addCell(cell);
-				table.complete();
 				content.add(table);
 				addEmptyLine();
 			}
@@ -298,40 +323,40 @@ public class PdfService {
 
 			final Cell cellTime = createCell(time);
 			cellTime.setPaddingBottom(2);
-			((Text) cellTime.getChildren().get(0)).setFontSize(8.5f);
 
 			final Cell empty = createCell("");
 			empty.setPadding(0);
 
-			final Table table = new Table(2);
-			table.setWidth(UnitValue.createPercentValue(100f));
+			final Table table;
 			if (user.equals(this.user)) {
-				table.setTotalWidth(new float[] { 20f, 80f });
-				cellMessage.setBackgroundColor(PatternColor.createColorWithColorSpace(new float[] { 0, 200, 255, 20 }));
+				table = new Table(UnitValue.createPercentArray(new float[] { 20f, 80f }));
+				cellMessage.setBackgroundColor(colorChatUser, 0.3f);
 				table.addCell(empty);
 				table.addCell(cellTime);
 				table.addCell(empty);
 				table.addCell(cellMessage);
 			} else {
-				table.setTotalWidth(new float[] { 80f, 20f });
-				cellMessage.setBackgroundColor(PatternColor.createColorWithColorSpace(new float[] { 255, 200, 0, 20 }));
+				table = new Table(UnitValue.createPercentArray(new float[] { 80f, 20f }));
+				cellMessage.setBackgroundColor(colorChatOther, 0.3f);
 				table.addCell(cellTime);
 				table.addCell(empty);
 				table.addCell(cellMessage);
 				table.addCell(empty);
 			}
+			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
-			table.complete();
 			content.add(table);
 			addEmptyLine();
 			if (media == null || media.length == 0 || !media[0]) {
-				Statistics wordCloud =  wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst().orElse(null);
+				Statistics wordCloud = wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()
+						.orElse(null);
 				if (wordCloud == null) {
 					wordCloud = new Statistics();
 					wordCloud.user = user;
+					wordCloud.text = new StringBuilder();
 					wordClouds.add(wordCloud);
 				}
-				wordCloud.period += message;
+				wordCloud.text.append(message).append(" ");
 			}
 		}
 
@@ -344,16 +369,18 @@ public class PdfService {
 			content.add(empty);
 		}
 
-		private void addMetaData() throws IOException {
+		private void addMetaData() throws IOException, FontFormatException {
 			final PdfCatalog catalog = document.getPdfDocument().getCatalog();
 			catalog.put(PdfName.Title, new PdfString("PDF of exported WhatsApp Conversation"));
-			catalog.put(PdfName.Subject, new PdfString(extractService.getFilename(id));
+			catalog.put(PdfName.Subject, new PdfString(extractService.getFilename(id)));
 			catalog.put(PdfName.Keywords, new PdfString("WhatsApp PDF Converter"));
 			catalog.put(PdfName.Author, new PdfString(user));
 			catalog.put(PdfName.Creator, new PdfString("https://wa2pdf.com"));
-			catalog.put(PdfName.CreationDate, new PdfString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+			catalog.put(PdfName.CreationDate,
+					new PdfString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
 
 			final Table table = new Table(4);
+			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			table.addCell(createCell(""));
 			table.addCell(createCell("Chats", TextAlignment.RIGHT, 0, 0, 0, 0));
@@ -366,19 +393,18 @@ public class PdfService {
 				table.addCell(createCell(String.format("%,d", e.letters), TextAlignment.RIGHT, 0, 0, 0, 0));
 			});
 			table.setMarginBottom(20f);
-			table.complete();
 			document.add(table);
 
-			final Table tableWordCloud = new Table(wordCloud.size(), 2);
+			final Table tableWordCloud = new Table(wordClouds.size());
+			tableWordCloud.setWidth(UnitValue.createPercentValue(100f));
 			tableWordCloud.setKeepTogether(true);
 			for (Statistics wordCloud : wordClouds) {
 				final String id = filename + UUID.randomUUID().toString() + ".png";
-				wordCloudService.createImage(wordCloudService.extract(wordCloud.getPeriod()), dir.resolve(id));
+				wordCloudService.createImage(wordCloudService.extract(wordCloud.text.toString()), dir.resolve(id));
 				tableWordCloud.addCell(createCell(id, true));
 			}
 			for (Statistics wordCloud : wordClouds)
 				tableWordCloud.addCell(createCell(wordCloud.getUser(), TextAlignment.CENTER));
-			tableWordCloud.complete();
 			document.add(tableWordCloud);
 		}
 
@@ -438,7 +464,8 @@ public class PdfService {
 						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.jpg";
 						ImageIO.write(image, "jpg", dir.resolve(mediaId).toAbsolutePath().toFile());
 					}
-					cell.add(new Image(ImageDataFactory.create(dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath())));
+					cell.add(new Image(
+							ImageDataFactory.create(dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath())));
 				}
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);
@@ -451,12 +478,13 @@ public class PdfService {
 			for (String emoji : emojis) {
 				if (text.indexOf(emoji) > 0)
 					paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontMessage));
-				paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontEmoji));
+				paragraph.add(createText(emoji, fontEmoji));
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 0)
 				paragraph.add(createText(text, fontMessage));
 			paragraph.setTextAlignment(alignment);
+			cell.setFontSize(11f);
 			cell.add(paragraph);
 		}
 

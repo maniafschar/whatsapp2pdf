@@ -87,6 +87,7 @@ table {
 	display: inline-block;
 	border-spacing: 0;
 	border: var(--border);
+	font-size: 0.8em;
 }
 
 table th,

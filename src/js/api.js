@@ -178,7 +178,7 @@ class api {
 						} else {
 							if (error.indexOf(' ') < 5)
 								error = error.substring(error.indexOf(' ')).trim();
-							error = 'Creation failed: ' + error + '!';
+							error = 'Creation failed: ' + error;
 						}
 						document.getElementsByTagName('error')[0].innerHTML = error;
 					}
