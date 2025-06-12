@@ -1,5 +1,8 @@
 package com.jq.wa2pdf.service;
 
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -55,5 +58,14 @@ public class WordCloudService {
 		}
 		list.sort((e, e2) -> e2.count - e.count);
 		return list;
+	}
+
+	public String createImage(final List<Token>, final Path file) throws IOException {
+		final BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+		final Graphics2D g = image.createGraphics();
+		g.setBackground(Color.black);
+		g.setColor(Color.blue);
+		g.fillRect(0, 0, 10, 10);
+		ImageIO.write(image, "jpg", file.toAbsolutePath().toFile());
 	}
 }
