@@ -50,9 +50,6 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.layout.LayoutArea;
-import com.itextpdf.layout.layout.LayoutContext;
-import com.itextpdf.layout.layout.LayoutResult;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.vdurmont.emoji.EmojiParser;
@@ -183,6 +180,15 @@ public class PdfService {
 							}
 						}
 					});
+			parseChats();
+			addMetaData();
+			writeContent();
+			document.flush();
+			document.close();
+			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
+		}
+
+		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(new FileReader(dir.resolve("_chat.txt").toFile()))) {
 				boolean foundMonth = false;
 				final Pattern patternStart = Pattern
@@ -236,42 +242,28 @@ public class PdfService {
 				}
 				addMessage(user, time, lastChat);
 				addDate(null);
-				addMetaData();
-				int i = 0;
-				final PdfOutline root = document.getPdfDocument().getOutlines(true);
-				for (Table e : content) {
-					document.add(e);
-					if (e.getNumberOfColumns() == 1
-							&& ((UnitValue) e.getCell(0, 0)
-									.getProperty(com.itextpdf.layout.properties.Property.FONT_SIZE)).getValue() < 9) {
-						document.getPdfDocument().getWriter().flush();
-						final LayoutResult pLayoutResult = e.createRendererSubTree().setParent(document.getRenderer())
-								.layout(new LayoutContext(
-										new LayoutArea(document.getPdfDocument().getNumberOfPages(),
-												document.getPdfDocument().getLastPage().getPageSize())));
-						System.out.println();
-						System.out.println(document.getPdfDocument().getWriter().getCurrentPos());
-						System.out.println();
-						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getX());
-						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getY());
-						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getTop());
-						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getBottom());
-						System.out.println(pLayoutResult.getOccupiedArea().getBBox().getWidth());
-						System.out.println();
-						root.addOutline(outline.get(i++)).addDestination(PdfExplicitDestination
-								.createXYZ(document.getPdfDocument().getLastPage(), 0f,
-										pLayoutResult.getOccupiedArea().getBBox().getY(),
-										1f));
-					}
-					if (preview && document.getPdfDocument().getNumberOfPages() > 4)
-						break;
-				}
-				if (preview)
-					addPreviewInfo();
-				document.flush();
-				document.close();
 			}
-			Files.move(dir.resolve(filename + ".tmp"), dir.resolve(filename + ".pdf"));
+		}
+
+		private void writeContent() throws IOException {
+			int i = 0;
+			final PdfOutline root = document.getPdfDocument().getOutlines(true);
+			for (Table e : content) {
+				document.add(e);
+				if (e.getNumberOfColumns() == 1
+						&& ((UnitValue) e.getCell(0, 0)
+								.getProperty(com.itextpdf.layout.properties.Property.FONT_SIZE)).getValue() < 9) {
+					final int h = (int) document.getPdfDocument().getLastPage().getPageSize().getHeight();
+					root.addOutline(outline.get(i++)).addDestination(PdfExplicitDestination
+							.createXYZ(document.getPdfDocument().getFirstPage(), 0f,
+									document.getPdfDocument().getWriter().getCurrentPos() % h,
+									1f));
+				}
+				if (preview && document.getPdfDocument().getNumberOfPages() > 4)
+					break;
+			}
+			if (preview)
+				addPreviewInfo();
 		}
 
 		private void addPreviewInfo() {
@@ -464,8 +456,10 @@ public class PdfService {
 						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.jpg";
 						ImageIO.write(image, "jpg", dir.resolve(mediaId).toAbsolutePath().toFile());
 					}
-					cell.add(new Image(
-							ImageDataFactory.create(dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath())));
+					final Image image = new Image(
+							ImageDataFactory.create(dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
+					image.setAutoScaleWidth(true);
+					cell.add(image);
 				}
 			} catch (IOException ex) {
 				throw new RuntimeException(ex);

@@ -23,7 +23,7 @@ import com.vdurmont.emoji.EmojiParser;
 
 @Service
 public class WordCloudService {
-	private final Pattern sanatize = Pattern.compile("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)0-9]");
+	private final Pattern sanatize = Pattern.compile("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)…0-9]");
 
 	public static class Token {
 		private int count = 1;
@@ -54,18 +54,19 @@ public class WordCloudService {
 			final Token t = list.stream().filter(e -> e.token.equals(s2)).findFirst().orElse(null);
 			if (t != null)
 				t.count++;
-			else if (!stopWords.contains(s))
-				list.add(new Token(s));
+			else if (!stopWords.contains(s2))
+				list.add(new Token(s2));
 		}
 		list.sort((e, e2) -> e2.count - e.count);
 		return list;
 	}
 
 	public void createImage(final List<Token> tokens, final Path file) throws IOException, FontFormatException {
-		final BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf")));
-		for (int i = 0; i < tokens.size() && i < 10; i++) {
+		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
+				.deriveFont(20f));
+		for (int i = 0; i < tokens.size() && i < 35; i++) {
 			final Token token = tokens.get(i);
 			g.setColor(Color.blue);
 			g.drawString(token.getToken(), 10, (i + 1) * 20);
