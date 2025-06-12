@@ -39,7 +39,7 @@ public class ApplicationApi {
 	private ExtractService extractService;
 
 	@Autowired
-	private Repository repository;
+	private FeedbackService feedbackService;
 
 	@PostMapping("analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file)
@@ -90,20 +90,18 @@ public class ApplicationApi {
 	}
 
 	@GetMapping("feedback/{id}/{pin}")
-	public Feedback feedback(@PathVariable final String id, @PathVariable final String pin) throws IOException {
-		final List<Feedback> list = repository.list("");
-		return list.size() == 1 ? list.get(0) : null;
+	public Feedback feedback(@PathVariable final BigInteger id, @PathVariable final String pin) throws IOException {
+		return feedbackService.one(id, pin);
 	}
 
 	@PutMapping("feedback")
 	public String feedbackSave(final Feedback feedback) throws IOException {
-		repository.save(feedback);
-		return "An email has been sent to you. Please confirm to publish your feedback.";
+		return feedbackService.save(feedback);
 	}
 
 	@GetMapping("feedback/list")
 	public List<Feedback> feedbackList() throws IOException {
-		return repository.list("");
+		return feedbackService.list();
 	}
 
 	private String sanatizeFilename(String filename) {
