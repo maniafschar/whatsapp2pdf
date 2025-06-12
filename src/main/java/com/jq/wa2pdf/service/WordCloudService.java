@@ -24,11 +24,19 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 @Service
 public class WordCloudService {
 	public static class Token {
-		int count = 1;
-		final String token;
+		private int count = 1;
+		private final String token;
 
 		private Token(String s) {
 			token = s;
+		}
+
+		public String getToken() {
+			return token;
+		}
+
+		public int getCount() {
+			return count;
 		}
 	}
 
