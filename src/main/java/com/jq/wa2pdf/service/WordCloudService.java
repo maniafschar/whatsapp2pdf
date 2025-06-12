@@ -34,10 +34,10 @@ public class WordCloudService {
 
 	public List<Token> extract(final String text) {
 		String s = text.replaceAll("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)0-9]", " ");
-		while (s.contains("	"))
-			s = s.replaceAll("	", " ");
-		final List<Token> list = new ArrayList<>();
+		while (s.contains("  "))
+			s = s.replaceAll("  ", " ");
 		final List<String> stopWords = Arrays.asList(IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
+		final List<Token> list = new ArrayList<>();
 		for (s : s.toLowerCase().split(" ")) {
 			final Token t = list.stream().filter(e -> e.token.equals(s)).findFirst().orElse(null);
 			if (t != null)
@@ -45,7 +45,7 @@ public class WordCloudService {
 			else if (!stopWords.contains(s))
 				list.add(new Token(s));
 		}
-		list.sort((e, e2) -> (int) Math.signum(e2.count - e.count));
+		list.sort((e, e2) -> e2.count - e.count);
 		return list;
 	}
 }
