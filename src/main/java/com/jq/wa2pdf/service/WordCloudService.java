@@ -23,7 +23,16 @@ import com.vdurmont.emoji.EmojiParser;
 
 @Service
 public class WordCloudService {
+	private final static List<String> STOP_WORDS;
 	private final Pattern sanatize = Pattern.compile("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)…0-9]");
+
+	static {
+		try {
+			STOP_WORDS = Arrays.asList(IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+	}
 
 	public static class Token {
 		private int count = 1;
@@ -42,20 +51,22 @@ public class WordCloudService {
 		}
 	}
 
-	public List<Token> extract(final String text) throws IOException {
-		String s = sanatize.matcher(text).replaceAll(" ").replaceAll("  ", " ").trim();
-		final List<String> emojis = EmojiParser.extractEmojis(text);
+	public List<Token> extract(String text) {
+		final StringBuilder s = new StringBuilder(sanatize.matcher(text).replaceAll(" "));
+		s.trimToSize();
+		final List<String> emojis = EmojiParser.extractEmojis(s.toString());
+		int i;
 		for (String emoji : emojis)
-			s = s.substring(0, s.indexOf(emoji)) + s.substring(s.indexOf(emoji) + emoji.length());
-		final List<String> stopWords = Arrays.asList(
-				IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
+			s.delete(i = s.indexOf(emoji), i + emoji.length());
 		final List<Token> list = new ArrayList<>();
-		for (String s2 : s.toLowerCase().split(" ")) {
-			final Token t = list.stream().filter(e -> e.token.equals(s2)).findFirst().orElse(null);
-			if (t != null)
-				t.count++;
-			else if (!stopWords.contains(s2))
-				list.add(new Token(s2));
+		for (String candidate : s.toLowerCase().split(" ")) {
+			if (candidate.trim().length() > 0) {
+				final Token token = list.stream().filter(e -> e.token.equals(candidate)).findFirst().orElse(null);
+				if (token != null)
+					token.count++;
+				else if (!STOP_WORDS.contains(candidate))
+					list.add(new Token(candidate));
+			}
 		}
 		list.sort((e, e2) -> e2.count - e.count);
 		return list;
