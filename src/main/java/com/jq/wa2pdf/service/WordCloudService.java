@@ -66,7 +66,7 @@ public class WordCloudService {
 		final Graphics2D g = image.createGraphics();
 		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
 				.deriveFont(20f));
-		for (int i = 0; i < tokens.size() && i < 35; i++) {
+		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
 			g.setColor(Color.blue);
 			g.drawString(token.getToken(), 10, (i + 1) * 20);
