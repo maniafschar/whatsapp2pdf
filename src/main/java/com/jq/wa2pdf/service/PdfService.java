@@ -390,9 +390,20 @@ public class PdfService {
 			final Table tableWordCloud = new Table(wordClouds.size());
 			tableWordCloud.setWidth(UnitValue.createPercentValue(100f));
 			tableWordCloud.setKeepTogether(true);
+			final List<List<Token>> tokens = new ArrayList<>();
+			int max = 0, min = Integer.MAX_VALUE;
 			for (Statistics wordCloud : wordClouds) {
+				final List<Token> token = wordCloudService.extract(wordCloud.text.substring(0, wordCloud.text.length() *
+						(preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700 ? wordCloud.text.lastIndexOf(" ", (int) (0.1 * wordCloud.text.length())) : 1)));
+				if (max < token.getCount())
+					max = token.getCount();
+				if (min > token.getCount())
+					min = token.getCount();
+				tokens.add(token);
+			}
+			for (Statistics token : tokens) {
 				final String id = filename + UUID.randomUUID().toString() + ".png";
-				wordCloudService.createImage(wordCloudService.extract(wordCloud.text.toString()), dir.resolve(id));
+				wordCloudService.createImage(token, max, min, dir.resolve(id));
 				tableWordCloud.addCell(createCell(id, true));
 			}
 			for (Statistics wordCloud : wordClouds)
