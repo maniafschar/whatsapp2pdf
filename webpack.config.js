@@ -43,6 +43,16 @@ module.exports = (env) => {
 						var file = 'dist/js/main.js';
 						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
 							.replace('{placeholderServer}', env.server));
+						if (env.emoji) {
+							fs.mkdirSync('main/resources/emoji');
+							const fontkit = require('fontkit');
+							const emoji = require('node-emoji');
+							const font = fontkit.openSync('./Apple Color Emoji.ttc').fonts[0];
+							let x = '100';
+							let run = font.layout(emoji.get(x));
+							let glyph = run.glyphs[0].getImageForSize(128);
+							fs.writeFileSync('main/resources/emoji/' + x + '.png', glyph.data);
+						}
 					})
 				}
 			}
