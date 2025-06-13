@@ -42,7 +42,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
-import com.itextpdf.kernel.pdf.navigation.PdfExplicitDestination;
+import com.itextpdf.kernel.pdf.navigation.PdfNamedDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.Cell;
@@ -247,20 +247,23 @@ public class PdfService {
 			final PdfOutline root = document.getPdfDocument().getOutlines(true);
 			for (Table e : content) {
 				document.add(e);
-				if (e.getNumberOfColumns() == 1
-						&& ((UnitValue) e.getCell(0, 0)
-								.getProperty(com.itextpdf.layout.properties.Property.FONT_SIZE)).getValue() < 9) {
+				if (e.getNumberOfColumns() == 1 && e.getHeight() == null) {
 					final int h = (int) document.getPdfDocument().getLastPage().getPageSize().getHeight();
-					root.addOutline(outline.get(i++)).addDestination(PdfExplicitDestination
-							.createXYZ(document.getPdfDocument().getFirstPage(), 0f,
-									document.getPdfDocument().getWriter().getCurrentPos() % h,
-									1f));
+					root.addOutline(outline.get(i++))
+							.addDestination(new PdfNamedDestination(
+									sanitizeDestination(((Text) ((Paragraph) e.getCell(0, 0).getChildren().get(0))
+											.getChildren().get(0))
+											.getText())));
 				}
 				if (preview && document.getPdfDocument().getNumberOfPages() > 4)
 					break;
 			}
 			if (preview)
 				addPreviewInfo();
+		}
+
+		private String sanitizeDestination(String id) {
+			return id.replaceAll("[\\.\\-/]", "_");
 		}
 
 		private void addPreviewInfo() {
@@ -299,6 +302,7 @@ public class PdfService {
 				cell.setBackgroundColor(colorDate, 0.5f);
 
 				final Table table = new Table(1);
+				table.setDestination(sanitizeDestination(date));
 				table.setWidth(UnitValue.createPercentValue(100.0f));
 				table.addCell(cell);
 				content.add(table);
@@ -352,9 +356,8 @@ public class PdfService {
 		private void addEmptyLine() {
 			final Table empty = new Table(1);
 			empty.setWidth(UnitValue.createPercentValue(100f));
-			final Cell cell = createCell("");
-			cell.setHeight(5f);
-			empty.addCell(cell);
+			empty.setHeight(UnitValue.createPointValue(3));
+			empty.addCell(createCell(""));
 			content.add(empty);
 		}
 
