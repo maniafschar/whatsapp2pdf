@@ -252,14 +252,11 @@ public class PdfService {
 			final PdfOutline root = document.getPdfDocument().getOutlines(true);
 			for (Table e : content) {
 				document.add(e);
-				if (e.getNumberOfColumns() == 1 && e.getHeight() == null) {
-					final int h = (int) document.getPdfDocument().getLastPage().getPageSize().getHeight();
+				if (e.getNumberOfColumns() == 1 && e.getHeight() == null)
 					root.addOutline(outline.get(i++))
 							.addDestination(new PdfNamedDestination(
 									sanitizeDestination(((Text) ((Paragraph) e.getCell(0, 0).getChildren().get(0))
-											.getChildren().get(0))
-											.getText())));
-				}
+											.getChildren().get(0)).getText())));
 				if (preview && document.getPdfDocument().getNumberOfPages() > 4)
 					break;
 			}
@@ -490,7 +487,7 @@ public class PdfService {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
 			for (String emoji : emojis) {
-				if (text.indexOf(emoji) > 0)
+				if (text.substring(0, text.indexOf(emoji)).trim().length() > 0)
 					paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontMessage));
 				String id = "";
 				for (int i = 0; i < emoji.length(); i++)
@@ -517,14 +514,15 @@ public class PdfService {
 				}
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
-			if (text.length() > 0)
+			if (text.length() > 0 && (text.length() != 1 || text.codePointAt(0) != 65039))
 				paragraph.add(createText(text, fontMessage));
-			paragraph.setTextAlignment(alignment);
-			if (paragraph.getChildren().size() == 1 && paragraph.getChildren().get(0) instanceof Image) {
+			else if (paragraph.getChildren().size() == 1 && paragraph.getChildren().get(0) instanceof Image) {
 				final Image image = (Image) paragraph.getChildren().get(0);
 				image.setHeight(36);
+				image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
 				image.setMarginBottom(0);
 			}
+			paragraph.setTextAlignment(alignment);
 			cell.add(paragraph);
 		}
 
