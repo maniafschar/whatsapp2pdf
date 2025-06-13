@@ -28,7 +28,9 @@ public class WordCloudService {
 
 	static {
 		try {
-			STOP_WORDS = Arrays.asList(IOUtils.toString(getClass().getResourceAsStream("/stopWords.txt"), StandardCharsets.UTF_8).split("\n"));
+			STOP_WORDS = Arrays.asList(
+					IOUtils.toString(WordCloudService.class.getResourceAsStream("/stopWords.txt"),
+							StandardCharsets.UTF_8).split("\n"));
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -59,7 +61,7 @@ public class WordCloudService {
 		for (String emoji : emojis)
 			s.delete(i = s.indexOf(emoji), i + emoji.length());
 		final List<Token> list = new ArrayList<>();
-		for (String candidate : s.toLowerCase().split(" ")) {
+		for (String candidate : s.toString().toLowerCase().split(" ")) {
 			if (candidate.trim().length() > 0) {
 				final Token token = list.stream().filter(e -> e.token.equals(candidate)).findFirst().orElse(null);
 				if (token != null)
@@ -72,7 +74,8 @@ public class WordCloudService {
 		return list;
 	}
 
-	public void createImage(final List<Token> tokens, final int max, final int min, final Path file) throws IOException, FontFormatException {
+	public void createImage(final List<Token> tokens, final int max, final int min, final Path file)
+			throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
