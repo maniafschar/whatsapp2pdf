@@ -395,10 +395,12 @@ public class PdfService {
 			for (Statistics wordCloud : wordClouds) {
 				final List<Token> token = wordCloudService.extract(wordCloud.text.substring(0, wordCloud.text.length() *
 						(preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700 ? wordCloud.text.lastIndexOf(" ", (int) (0.1 * wordCloud.text.length())) : 1)));
+				while (token.size() > 40)
+					token.remove(40);
 				if (max < token.getCount())
-					max = token.getCount();
-				if (min > token.getCount())
-					min = token.getCount();
+					max = token.get(0).getCount();
+				if (min > token.get(token.getLength() - 1).getCount())
+					min = token.get(token.getLength() - 1).getCount();
 				tokens.add(token);
 			}
 			for (Statistics token : tokens) {
