@@ -61,7 +61,7 @@ public class WordCloudService {
 		return list;
 	}
 
-	public void createImage(final List<Token> tokens, final Path file) throws IOException, FontFormatException {
+	public void createImage(final List<Token> tokens, final int max, final int min, final Path file) throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
