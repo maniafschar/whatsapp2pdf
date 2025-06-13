@@ -78,7 +78,7 @@ public class WordCloudService {
 			throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/Comfortaa-Regular.ttf"))
+		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Comfortaa-Regular.ttf"))
 				.deriveFont(20f));
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);

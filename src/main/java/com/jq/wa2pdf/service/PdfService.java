@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +31,6 @@ import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.PatternColor;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.font.PdfFontFactory.EmbeddingStrategy;
 import com.itextpdf.kernel.pdf.PdfCatalog;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfName;
@@ -123,7 +123,6 @@ public class PdfService {
 	}
 
 	private class PDF {
-		private static PdfFont fontEmoji;
 		private static PdfFont fontMessage;
 		private final Path dir;
 		private PdfWriter writer;
@@ -149,9 +148,6 @@ public class PdfService {
 			this.id = id;
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-			fontEmoji = PdfFontFactory.createFont(
-					IOUtils.toByteArray(getClass().getResourceAsStream("/font/NotoEmoji.ttf")),
-					EmbeddingStrategy.FORCE_EMBEDDED);
 		}
 
 		private class UsersPerDay {
@@ -299,9 +295,8 @@ public class PdfService {
 				usersPerDay.date = date;
 				usersPerDay.users.clear();
 
-				final Cell cell = createCell(date, TextAlignment.CENTER, 1.5f, 0, 10, 0);
-				cell.setFontSize(8.5f);
-				cell.setBackgroundColor(colorDate, 0.3f);
+				final Cell cell = createCell(date, TextAlignment.CENTER);
+				cell.setBackgroundColor(colorDate, 0.5f);
 
 				final Table table = new Table(1);
 				table.setWidth(UnitValue.createPercentValue(100.0f));
@@ -315,7 +310,8 @@ public class PdfService {
 			final Cell cellMessage = createCell(message, media);
 
 			final Cell cellTime = createCell(time);
-			cellTime.setPaddingBottom(2);
+			cellTime.setFontSize(8.5f);
+			cellTime.setPaddingBottom(0);
 
 			final Cell empty = createCell("");
 			empty.setPadding(0);
@@ -394,10 +390,10 @@ public class PdfService {
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
 			for (Statistics wordCloud : wordClouds) {
-				final List<Token> token = wordCloudService.extract(wordCloud.text.substring(0, wordCloud.text.length() *
-						(preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
+				final List<Token> token = wordCloudService.extract(wordCloud.text.substring(0,
+						preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
 								? wordCloud.text.lastIndexOf(" ", (int) (0.1 * wordCloud.text.length()))
-								: 1)));
+								: wordCloud.text.length()));
 				while (token.size() > 40)
 					token.remove(40);
 				if (max < token.get(0).getCount())
@@ -430,9 +426,9 @@ public class PdfService {
 			final int defaultPadding = 10;
 			cell.setBorder(Border.NO_BORDER);
 			cell.setFontSize(11f);
-			cell.setPaddingTop(media ? defaultPadding : padding != null && padding.length > 0 ? padding[0] : 0);
+			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : defaultPadding / 2);
 			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
-			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding);
+			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding / 2);
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
 			if (media)
 				fillMedia(cell, text);
@@ -488,13 +484,37 @@ public class PdfService {
 			for (String emoji : emojis) {
 				if (text.indexOf(emoji) > 0)
 					paragraph.add(createText(text.substring(0, text.indexOf(emoji)), fontMessage));
-				paragraph.add(createText(emoji, fontEmoji));
+				String id = "";
+				for (int i = 0; i < emoji.length(); i++)
+					id += "_" + Integer.toHexString(emoji.codePointAt(i));
+				id = id.substring(1);
+				InputStream s = PdfService.class.getResourceAsStream("/emoji/" + id + ".png");
+				if (s == null && id.contains("_"))
+					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
+				if (s == null && !id.contains("_"))
+					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
+				if (s != null) {
+					try {
+						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
+						image.setHeight(15f);
+						image.setMarginBottom(-2f);
+						paragraph.add(image);
+					} catch (IOException e) {
+						System.out.println(id);
+						e.printStackTrace();
+					}
+				} else
+					System.out.println(id);
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 0)
 				paragraph.add(createText(text, fontMessage));
 			paragraph.setTextAlignment(alignment);
-			cell.setFontSize(11f);
+			if (paragraph.getChildren().size() == 1 && paragraph.getChildren().get(0) instanceof Image) {
+				final Image image = (Image) paragraph.getChildren().get(0);
+				image.setHeight(36);
+				image.setMarginBottom(0);
+			}
 			cell.add(paragraph);
 		}
 

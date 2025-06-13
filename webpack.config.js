@@ -44,15 +44,25 @@ module.exports = (env) => {
 						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
 							.replace('{placeholderServer}', env.server));
 						if (env.emoji) {
-							const fontkit = require('fontkit');
-							const font = fontkit.openSync('src/main/resources/font/Apple Color Emoji.ttc').fonts[0];
+							var save = function (e) {
+								const fontkit = require('fontkit');
+								const font = fontkit.openSync('Apple Color Emoji.ttc').fonts[0];
+								var s = '', eSplitted = e.split(' ');
+								for (var i2 = 0; i2 < eSplitted.length; i2++)
+									s += String.fromCodePoint(parseInt(eSplitted[i2], 16));
+								var img = font.layout(s).glyphs[0].getImageForSize(160);
+								if (img)
+									fs.writeFileSync('src/main/resources/emoji/' + e.replace(/ /g, '_') + '.png', img.data);
+								else
+									console.log(e + ' ' + s);
+							}
 							for (var i = 0; i < emojis.length; i++) {
-								if (emojis[i].char.indexOf('.') < 0) {
-									var img = font.layout(emojis[i].char).glyphs[0].getImageForSize(160);
-									if (img)
-										fs.writeFileSync('src/main/resources/emoji/' + emojis[i].code + '.png', img.data);
-									else
-										console.log(emojis[i].char);
+								if (emojis[i].code.indexOf('.') < 0)
+									save(emojis[i].code.toLowerCase());
+								else {
+									var c = emojis[i].code.split('..');
+									for (var i2 = parseInt(c[0], 16); i2 <= parseInt(c[1], 16); i2++)
+										save(i2.toString(16));
 								}
 							}
 						}
