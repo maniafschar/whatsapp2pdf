@@ -7,7 +7,7 @@ document.getElementById('chatFile').onchange = () => {
 
 window.onresize = function () {
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
-	document.body.style.fontSize = Math.min(10 + diagonal / 100, 26) + 'px';
+	document.body.style.fontSize = Math.min(10 + diagonal / 160, 26) + 'px';
 }
 
 
@@ -266,3 +266,4 @@ ratingSelection span {
 customElements.define('input-rating', InputRating);
 window.api = api;
 window.ui = ui;
+window.onresize();

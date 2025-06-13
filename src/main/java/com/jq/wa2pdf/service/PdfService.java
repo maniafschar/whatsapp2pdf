@@ -52,6 +52,8 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.jq.wa2pdf.entity.Ticket;
+import com.jq.wa2pdf.repository.Repository;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -64,6 +66,9 @@ public class PdfService {
 
 	@Autowired
 	private WordCloudService wordCloudService;
+
+	@Autowired
+	private Repository repository;
 
 	@Async
 	public void create(final String id, final String period, final String user, boolean preview) throws Exception {
@@ -299,7 +304,7 @@ public class PdfService {
 				usersPerDay.users.clear();
 
 				final Cell cell = createCell(date, TextAlignment.CENTER);
-				cell.setBackgroundColor(colorDate, 0.5f);
+				cell.setBackgroundColor(colorDate, 0.8f);
 
 				final Table table = new Table(1);
 				table.setDestination(sanitizeDestination(date));
@@ -496,18 +501,20 @@ public class PdfService {
 					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
 				if (s == null && !id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
-				if (s != null) {
+				if (s == null) {
+					final Ticket ticket = new Ticket();
+					ticket.setNote("Emoji " + emoji + " (" + id + ") not found!");
+					repository.save(ticket);
+				} else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
 						image.setHeight(15f);
 						image.setMarginBottom(-2f);
 						paragraph.add(image);
 					} catch (IOException e) {
-						System.out.println(id);
-						e.printStackTrace();
+						throw new RuntimeException(e);
 					}
-				} else
-					System.out.println(id);
+				}
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 0)
