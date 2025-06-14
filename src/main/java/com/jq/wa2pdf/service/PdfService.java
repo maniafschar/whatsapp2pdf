@@ -137,7 +137,7 @@ public class PdfService {
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
-		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.7f, 0.7f });
+		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.53f, 0.53f, 0.53f });
 		private final Color colorChatUser = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.9f, 1f });
 		private final Color colorChatOther = PatternColor.createColorWithColorSpace(new float[] { 1f, 0.9f, 0.7f });
 		private final String period;
@@ -301,7 +301,7 @@ public class PdfService {
 				usersPerDay.users.clear();
 
 				final Cell cell = createCell(date, TextAlignment.CENTER);
-				cell.setBackgroundColor(colorDate, 0.4f);
+				cell.setBackgroundColor(colorDate, 0.2f);
 
 				final Table table = new Table(1);
 				table.setDestination(sanitizeDestination(date));
@@ -317,6 +317,7 @@ public class PdfService {
 
 			final Cell cellTime = createCell(time);
 			cellTime.setFontSize(8.5f);
+			cellTime.setFontColor(colorDate);
 			cellTime.setPaddingBottom(0);
 
 			final Cell empty = createCell("");
@@ -415,8 +416,11 @@ public class PdfService {
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				tableWordCloud.addCell(cell);
 			}
-			for (Statistics wordCloud : wordClouds)
-				tableWordCloud.addCell(createCell(wordCloud.getUser(), TextAlignment.CENTER));
+			for (Statistics wordCloud : wordClouds) {
+				final Cell cell = createCell(wordCloud.getUser(), TextAlignment.CENTER);
+				cell.setPaddingTop(0);
+				tableWordCloud.addCell(cell);
+			}
 			document.add(tableWordCloud);
 		}
 

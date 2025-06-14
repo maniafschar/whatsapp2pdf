@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -81,15 +83,49 @@ public class WordCloudService {
 			throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
+		final List<Rectangle> occupied = new ArrayList<>();
+		int x = 0, y = 0;
+		double rotate = 0;
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
-			g.setColor(createColor(token.getCount(), max, min));
 			final double percent = ((double) token.getCount() - min) / (max - min);
 			g.setFont(FONT.deriveFont((float) ((percent + 1) * 20f)));
-			// if (percent < 0.5)
-			// g.setTransform(AffineTransform.getRotateInstance(Math.PI / 2));
 			final int width = g.getFontMetrics().stringWidth(token.getToken());
-			g.drawString(token.getToken() + " (" + token.getCount() + ")", 10, (i + 1) * 20);
+			if (i == 0) {
+				x = (image.getWidth() - width) / 2;
+				y = (g.getFontMetrics().getHeight() + image.getHeight()) / 2;
+			} else {
+				Rectangle o = occupied.get(occupied.size() - 1);
+				if (i % 4 == 0) {
+					rotate = 0;
+					x = o.x;
+					o = occupied.get(occupied.size() - 4);
+					y = o.y - g.getFontMetrics().getAscent();
+				} else if (i % 4 == 1) {
+					rotate = Math.PI * 0.5;
+					x = o.x + o.width + 2 * g.getFontMetrics().getDescent();
+					y = o.y - (int) (0.8 * o.height);
+				} else if (i % 4 == 2) {
+					rotate = Math.PI;
+					o = occupied.get(occupied.size() - 2);
+					x = o.x + o.width;
+					y = o.y + 2 * g.getFontMetrics().getDescent();
+				} else {
+					rotate = Math.PI * 1.5;
+					x = o.x - o.width - 2 * g.getFontMetrics().getDescent();
+					y = o.y - o.height;
+					o = occupied.get(occupied.size() - 3);
+					if (x > o.x - 2 * g.getFontMetrics().getDescent())
+						x = o.x - 2 * g.getFontMetrics().getDescent();
+				}
+			}
+			if (rotate > 0)
+				g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(rotate)));
+			System.out
+					.println(x + " - " + y + " - " + rotate + " - " + token.getToken() + " (" + token.getCount() + ")");
+			g.setColor(createColor(token.getCount(), max, min));
+			g.drawString(token.getToken(), x, y);
+			occupied.add(new Rectangle(x, y, width, g.getFontMetrics().getHeight()));
 		}
 		g.dispose();
 		image.flush();
