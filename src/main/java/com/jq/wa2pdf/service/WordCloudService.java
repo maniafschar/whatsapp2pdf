@@ -24,6 +24,7 @@ import com.vdurmont.emoji.EmojiParser;
 @Service
 public class WordCloudService {
 	private final static List<String> STOP_WORDS;
+	private final static Font FONT;
 	private final Pattern sanatize = Pattern.compile("[ \t\r\n\\,\\.\\-\\!\\?\\[\\]\\{\\}';:/\\(\\)…0-9]");
 
 	static {
@@ -31,7 +32,9 @@ public class WordCloudService {
 			STOP_WORDS = Arrays.asList(
 					IOUtils.toString(WordCloudService.class.getResourceAsStream("/stopWords.txt"),
 							StandardCharsets.UTF_8).split("\n"));
-		} catch (IOException ex) {
+			FONT = Font.createFont(Font.TRUETYPE_FONT,
+					WordCloudService.class.getResourceAsStream("/font/Comfortaa-Regular.ttf"));
+		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -62,7 +65,7 @@ public class WordCloudService {
 			s.delete(i = s.indexOf(emoji), i + emoji.length());
 		final List<Token> list = new ArrayList<>();
 		for (String candidate : s.toString().toLowerCase().split(" ")) {
-			if (candidate.trim().length() > 0) {
+			if (candidate.trim().length() > 1) {
 				final Token token = list.stream().filter(e -> e.token.equals(candidate)).findFirst().orElse(null);
 				if (token != null)
 					token.count++;
@@ -78,14 +81,28 @@ public class WordCloudService {
 			throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		g.setFont(Font.createFont(Font.TRUETYPE_FONT, getClass().getResourceAsStream("/font/Comfortaa-Regular.ttf"))
-				.deriveFont(20f));
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
-			g.setColor(Color.blue);
-			g.drawString(token.getToken(), 10, (i + 1) * 20);
+			g.setColor(createColor(token.getCount(), max, min));
+			final double percent = ((double) token.getCount() - min) / (max - min);
+			g.setFont(FONT.deriveFont((float) ((percent + 1) * 20f)));
+			// if (percent < 0.5)
+			// g.setTransform(AffineTransform.getRotateInstance(Math.PI / 2));
+			final int width = g.getFontMetrics().stringWidth(token.getToken());
+			g.drawString(token.getToken() + " (" + token.getCount() + ")", 10, (i + 1) * 20);
 		}
+		g.dispose();
+		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
+	}
+
+	private Color createColor(final int count, final int max, final int min) {
+		final double percent = ((double) count - min) / (max - min);
+		if (percent > 0.666)
+			return new Color(0, 0, 255 - (int) (percent * 200));
+		if (percent > 0.333)
+			return new Color(0, 255 - (int) (percent * 200), 0);
+		return new Color(255 - (int) (percent * 200), 0, 0);
 	}
 }

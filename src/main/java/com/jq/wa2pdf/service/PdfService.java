@@ -137,7 +137,7 @@ public class PdfService {
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
-		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.78f, 0.78f, 0.78f });
+		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.7f, 0.7f });
 		private final Color colorChatUser = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.9f, 1f });
 		private final Color colorChatOther = PatternColor.createColorWithColorSpace(new float[] { 1f, 0.9f, 0.7f });
 		private final String period;
@@ -301,7 +301,7 @@ public class PdfService {
 				usersPerDay.users.clear();
 
 				final Cell cell = createCell(date, TextAlignment.CENTER);
-				cell.setBackgroundColor(colorDate, 0.8f);
+				cell.setBackgroundColor(colorDate, 0.4f);
 
 				final Table table = new Table(1);
 				table.setDestination(sanitizeDestination(date));
@@ -324,14 +324,14 @@ public class PdfService {
 
 			final Table table;
 			if (user.equals(this.user)) {
-				table = new Table(UnitValue.createPercentArray(new float[] { 20f, 80f }));
+				table = new Table(UnitValue.createPercentArray(new float[] { 15f, 85f }));
 				cellMessage.setBackgroundColor(colorChatUser, 0.3f);
 				table.addCell(empty);
 				table.addCell(cellTime);
 				table.addCell(empty);
 				table.addCell(cellMessage);
 			} else {
-				table = new Table(UnitValue.createPercentArray(new float[] { 80f, 20f }));
+				table = new Table(UnitValue.createPercentArray(new float[] { 85f, 15f }));
 				cellMessage.setBackgroundColor(colorChatOther, 0.3f);
 				table.addCell(cellTime);
 				table.addCell(empty);
@@ -374,7 +374,7 @@ public class PdfService {
 					new PdfString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
 
 			final Table table = new Table(4);
-			table.setWidth(UnitValue.createPercentValue(100f));
+			table.setWidth(UnitValue.createPercentValue(80f));
 			table.setKeepTogether(true);
 			table.addCell(createCell(""));
 			table.addCell(createCell("Chats", TextAlignment.RIGHT, 0, 0, 0, 0));
@@ -410,7 +410,10 @@ public class PdfService {
 			for (List<Token> token : tokens) {
 				final String id = filename + UUID.randomUUID().toString() + ".png";
 				wordCloudService.createImage(token, max, min, dir.resolve(id));
-				tableWordCloud.addCell(createCell(id, true));
+				final Cell cell = createCell(id, true);
+				cell.setPadding(0);
+				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
+				tableWordCloud.addCell(cell);
 			}
 			for (Statistics wordCloud : wordClouds)
 				tableWordCloud.addCell(createCell(wordCloud.getUser(), TextAlignment.CENTER));
@@ -431,6 +434,7 @@ public class PdfService {
 			final int defaultPadding = 10;
 			cell.setBorder(Border.NO_BORDER);
 			cell.setFontSize(11f);
+			cell.setMargin(0);
 			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : defaultPadding / 2);
 			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
 			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding / 2);
