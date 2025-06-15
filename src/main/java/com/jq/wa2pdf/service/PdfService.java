@@ -31,6 +31,7 @@ import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.PatternColor;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfCatalog;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfName;
@@ -38,10 +39,13 @@ import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfString;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.annot.PdfLinkAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
 import com.itextpdf.kernel.pdf.event.PdfDocumentEvent;
+import com.itextpdf.kernel.pdf.filespec.PdfFileSpec;
 import com.itextpdf.kernel.pdf.navigation.PdfNamedDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
@@ -454,17 +458,17 @@ public class PdfService {
 			try {
 				System.out.println(ExtractService.getTempDir(id).resolve(mediaId).toUri().toURL());
 				if (mediaId.endsWith(".mp4")) {
-					final Text chunk = new Text("");
-					// chunk.setAnnotation(PdfAnnotation
-					// .makeAnnotation(
-					// writer, cell, "",
-					// PdfFileSpec.createEmbeddedFileSpec(document.getPdfDocument(),
-					// IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(mediaId)
-					// .toUri().toURL()),
-					// "", null),
-					// "video/mp4", true));
+					final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(document.getPdfDocument(),
+							IOUtils.toByteArray(ExtractService.getTempDir(id).resolve(mediaId)
+									.toUri().toURL()),
+							"", null);
+					document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
+					final Paragraph paragraph = new Paragraph("");
+					paragraph.setDestination(mediaId);
+					paragraph.setAction(PdfAction.createRendition(mediaId, pdfFileSpec, "video/mp4",
+							new PdfLinkAnnotation(new Rectangle(200, 200))));
 					cell.setMinHeight(200f);
-					cell.add(new Paragraph(chunk));
+					cell.add(paragraph);
 				} else {
 					final BufferedImage originalImage = ImageIO
 							.read(ExtractService.getTempDir(id).resolve(mediaId).toUri().toURL());

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -42,15 +41,15 @@ public class WordCloudService {
 	}
 
 	public static class Token {
-		private int count = 1;
-		private final String token;
+		int count = 1;
+		private final String text;
 
-		private Token(String s) {
-			token = s;
+		Token(String s) {
+			text = s;
 		}
 
-		public String getToken() {
-			return token;
+		public String getText() {
+			return text;
 		}
 
 		public int getCount() {
@@ -68,7 +67,7 @@ public class WordCloudService {
 		final List<Token> list = new ArrayList<>();
 		for (String candidate : s.toString().toLowerCase().split(" ")) {
 			if (candidate.trim().length() > 1) {
-				final Token token = list.stream().filter(e -> e.token.equals(candidate)).findFirst().orElse(null);
+				final Token token = list.stream().filter(e -> e.text.equals(candidate)).findFirst().orElse(null);
 				if (token != null)
 					token.count++;
 				else if (!STOP_WORDS.contains(candidate))
@@ -83,49 +82,14 @@ public class WordCloudService {
 			throws IOException, FontFormatException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		final List<Rectangle> occupied = new ArrayList<>();
-		int x = 0, y = 0;
-		double rotate = 0;
-		for (int i = 0; i < tokens.size(); i++) {
-			final Token token = tokens.get(i);
-			final double percent = ((double) token.getCount() - min) / (max - min);
-			g.setFont(FONT.deriveFont((float) ((percent + 1) * 20f)));
-			final int width = g.getFontMetrics().stringWidth(token.getToken());
-			if (i == 0) {
-				x = (image.getWidth() - width) / 2;
-				y = (g.getFontMetrics().getHeight() + image.getHeight()) / 2;
-			} else {
-				Rectangle o = occupied.get(occupied.size() - 1);
-				if (i % 4 == 0) {
-					rotate = 0;
-					x = o.x;
-					o = occupied.get(occupied.size() - 4);
-					y = o.y - g.getFontMetrics().getAscent();
-				} else if (i % 4 == 1) {
-					rotate = Math.PI * 0.5;
-					x = o.x + o.width + 2 * g.getFontMetrics().getDescent();
-					y = o.y - (int) (0.8 * o.height);
-				} else if (i % 4 == 2) {
-					rotate = Math.PI;
-					o = occupied.get(occupied.size() - 2);
-					x = o.x + o.width;
-					y = o.y + 2 * g.getFontMetrics().getDescent();
-				} else {
-					rotate = Math.PI * 1.5;
-					x = o.x - o.width - 2 * g.getFontMetrics().getDescent();
-					y = o.y - o.height;
-					o = occupied.get(occupied.size() - 3);
-					if (x > o.x - 2 * g.getFontMetrics().getDescent())
-						x = o.x - 2 * g.getFontMetrics().getDescent();
-				}
-			}
-			if (rotate > 0)
-				g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(rotate)));
-			System.out
-					.println(x + " - " + y + " - " + rotate + " - " + token.getToken() + " (" + token.getCount() + ")");
-			g.setColor(createColor(token.getCount(), max, min));
-			g.drawString(token.getToken(), x, y);
-			occupied.add(new Rectangle(x, y, width, g.getFontMetrics().getHeight()));
+		final List<Position> positions = createPositions(tokens, min, max, image, 20.0f);
+		System.out.println(positions);
+		for (Position position : positions) {
+			g.setFont(position.font);
+			g.setColor(createColor(position.percent));
+			if (position.vertical)
+				g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5)));
+			g.drawString(position.token.getText(), position.x, position.y);
 		}
 		g.dispose();
 		image.flush();
@@ -133,12 +97,79 @@ public class WordCloudService {
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private Color createColor(final int count, final int max, final int min) {
-		final double percent = ((double) count - min) / (max - min);
+	private Color createColor(final double percent) {
 		if (percent > 0.666)
 			return new Color(0, 0, 255 - (int) (percent * 200));
 		if (percent > 0.333)
 			return new Color(0, 255 - (int) (percent * 200), 0);
 		return new Color(255 - (int) (percent * 200), 0, 0);
+	}
+
+	private List<Position> createPositions(final List<Token> tokens, final int min, final int max,
+			final BufferedImage image, final float fontSize) {
+		final Graphics2D g = image.createGraphics();
+		final List<Position> positions = new ArrayList<>();
+		for (int i = 0; i < tokens.size(); i++) {
+			final Token token = tokens.get(i);
+			final double percent = ((double) token.getCount() - min) / (max - min);
+			g.setFont(FONT.deriveFont((float) ((percent + 1) * fontSize)));
+			final Position next = new Position(token, g.getFontMetrics().stringWidth(token.getText()),
+					g.getFontMetrics().getHeight(), percent, g.getFont());
+			if (i == 0)
+				calculateCenter(next, new Position(null, image.getWidth(), image.getHeight(), 0, null));
+			else if (i == 1)
+				calculateVerticalTopLeft(next, positions.get(positions.size() - 1));
+			else if (i == 2)
+				calculateVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
+			else
+				calculateVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
+			positions.add(next);
+		}
+		return positions;
+	}
+
+	private void calculateCenter(final Position position, final Position relative) {
+		position.x = relative.x + (relative.width - position.width) / 2;
+		position.y = relative.y + (relative.height - position.height) / 2;
+	}
+
+	private void calculateVerticalTopLeft(final Position position, final Position relative) {
+		position.x = relative.x + (int) (0.2 * position.height);
+		position.y = relative.y - desendent(position.height);
+		position.vertical = true;
+	}
+
+	private int desendent(int height) {
+		return (int) (0.8 * height);
+	}
+
+	private void calculateVerticalLeftAlignEnd(final Position position, final Position relative) {
+		position.x = relative.x - desendent(position.height);
+		position.y = relative.y - position.height + position.width;
+		position.vertical = true;
+	}
+
+	private class Position {
+		private int x = 0;
+		private int y = 0;
+		private final int width;
+		private final int height;
+		private final Token token;
+		private final double percent;
+		private boolean vertical = false;
+		private Font font = null;
+
+		private Position(final Token token, final int width, final int height, final double percent, final Font font) {
+			this.token = token;
+			this.width = width;
+			this.height = height;
+			this.percent = percent;
+			this.font = font;
+		}
+
+		@Override
+		public String toString() {
+			return "{" + token.getText() + ": " + x + ", " + y + ", " + width + ", " + height + ", " + vertical + "}";
+		}
 	}
 }
