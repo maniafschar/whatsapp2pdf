@@ -90,6 +90,7 @@ public class WordCloudService {
 			if (position.vertical)
 				g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5)));
 			g.drawString(position.token.getText(), position.x, position.y);
+			g.drawLine(position.x, position.y, position.x + 10, position.y);
 		}
 		g.dispose();
 		image.flush();
@@ -107,46 +108,50 @@ public class WordCloudService {
 
 	private List<Position> createPositions(final List<Token> tokens, final int min, final int max,
 			final BufferedImage image, final float fontSize) {
-		final Graphics2D g = image.createGraphics();
 		final List<Position> positions = new ArrayList<>();
+		if (tokens.size() == 0)
+			return positions;
+		final Graphics2D g = image.createGraphics();
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
 			final double percent = ((double) token.getCount() - min) / (max - min);
 			g.setFont(FONT.deriveFont((float) ((percent + 1) * fontSize)));
 			final Position next = new Position(token, g.getFontMetrics().stringWidth(token.getText()),
 					g.getFontMetrics().getHeight(), percent, g.getFont());
-			if (i == 0)
-				calculateCenter(next, new Position(null, image.getWidth(), image.getHeight(), 0, null));
-			else if (i == 1)
-				calculateVerticalTopLeft(next, positions.get(positions.size() - 1));
+			if (i == 0) {
+				next.x = (image.getWidth() - next.width) / 2;
+				next.y = (image.getHeight() - next.height) / 2;
+			} else if (i == 1)
+				positionVerticalTopLeft(next, positions.get(positions.size() - 1));
 			else if (i == 2)
-				calculateVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
+				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
 			else
-				calculateVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
+				positionArround(next, positions);
 			positions.add(next);
 		}
 		return positions;
 	}
 
-	private void calculateCenter(final Position position, final Position relative) {
-		position.x = relative.x + (relative.width - position.width) / 2;
-		position.y = relative.y + (relative.height - position.height) / 2;
+	private void positionVerticalTopLeft(final Position position, final Position relative) {
+		position.x = relative.x + desendent(position.height);
+		position.y = relative.y - desendent(relative.height);
+		position.vertical = true;
 	}
 
-	private void calculateVerticalTopLeft(final Position position, final Position relative) {
-		position.x = relative.x + (int) (0.2 * position.height);
-		position.y = relative.y - desendent(position.height);
+	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
+		position.x = relative.x - position.height;
+		position.y = relative.y - desendent(position.height) + position.width;
+		position.vertical = true;
+	}
+
+	private void positionArround(final Position position, final List<Position> positions) {
+		position.x = position.height;
+		position.y = desendent(position.height) + position.width;
 		position.vertical = true;
 	}
 
 	private int desendent(int height) {
-		return (int) (0.8 * height);
-	}
-
-	private void calculateVerticalLeftAlignEnd(final Position position, final Position relative) {
-		position.x = relative.x - desendent(position.height);
-		position.y = relative.y - position.height + position.width;
-		position.vertical = true;
+		return (int) (0.784 * height);
 	}
 
 	private class Position {
