@@ -69,6 +69,9 @@ public class PdfService {
 	private ExtractService extractService;
 
 	@Autowired
+	private ChartService chartService;
+
+	@Autowired
 	private WordCloudService wordCloudService;
 
 	@Autowired
@@ -407,9 +410,19 @@ public class PdfService {
 			table.setMarginBottom(20f);
 			document.add(table);
 
+			final Table tableChart = new Table(1);
+			tableChart.setWidth(UnitValue.createPercentValue(100f));
+			tableChart.setKeepTogether(true);
+			final String id = filename + UUID.randomUUID().toString() + ".png";
+			chartService.createImage(total, dir.resolve(id));
+			final Cell cell = createCell(id, true);
+			cell.setPadding(0);
+			cell.setWidth(UnitValue.createPercentValue(100f));
+			tableChart.addCell(cell);
+			document.add(tableChart);
+
 			final Table tableWordCloud = new Table(wordClouds.size());
-			tableWordCloud.setWidth(UnitValue.createPercentValue(100f));
-			tableWordCloud.setKeepTogether(true);
+			
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
 			for (Statistics wordCloud : wordClouds) {
