@@ -10,56 +10,58 @@
 </head>
 
 <body>
-	<header>
-		<h1>For Lovers only!</h1>
-		<br />
-		<span>Convert your WhatsApp chat to PDF. Click to start...</span>
-		<input type="file" id="chatFile" accept=".zip" />
-		<error></error>
-	</header>
-
-	<separator></separator>
-
-	<attributes>
-		<id></id>
-		<div>Choose the viewers perspective</div>
-		<user></user>
-		<div>Choose the period to export as PDF</div>
-		<period></period>
-		<br />
-		<button onclick="api.buy()">Print selected</button>
-		<button onclick="api.cleanUp()">Delete uploaded data</button>
-	</attributes>
-
-	<separator></separator>
-
-	<tab onclick="ui.showDescription(0)" class="selected">Description</tab>
-	<tab onclick="ui.showDescription(1)">Feedback</tab>
-	<tab onclick="ui.showDescription(2)">Imprint</tab><br />
-	<description>
-		<container>
-			<info>
-				Description
-			</info>
-			<info style="left: 33.333%;">
-				<button onclick="ui.feedback()" style="display: none;">Add Feedback</button>
-				<feedbacks></feedbacks>
-			</info>
-			<info style="left: 66.666%; padding-top: 1em;">
-				JNet Quality Consulting GmbH<br />
-				Whistlerweg 27b<br />
-				81479 Munich<br />
-				Germany<br />
-				E-Mail: support@wa2pdf.com<br />
-				Internet: https://wa2pdf.com<br /><br />
-				Managing Director: Mani Afschar Yazdi<br />
-				Registration court: District Court Munich<br />
-				Registration number: HRB 135182<br /><br />
-				© 2025 JNet Quality Consulting GmbH<br />
-				All rights reserved
-			</info>
-		</container>
-	</description>
+	<container>
+		<element>
+			<header>
+				<h1>For Lovers only!</h1>
+				<br />
+				<span>Convert your WhatsApp chat to PDF. Click to start...</span>
+				<input type="file" id="chatFile" accept=".zip" />
+				<error></error>
+			</header>
+		</element>
+		<element>
+			<attributes>
+				<id></id>
+				<div>Choose the viewers perspective</div>
+				<user></user>
+				<div>Choose the period to export as PDF</div>
+				<period></period>
+				<br />
+				<button onclick="api.buy()">Print selected</button>
+				<button onclick="api.cleanUp()">Delete uploaded data</button>
+			</attributes>
+		</element>
+		<element>
+			<tab onclick="ui.showDescription(0)" class="selected">Description</tab>
+			<tab onclick="ui.showDescription(1)">Feedback</tab>
+			<tab onclick="ui.showDescription(2)">Imprint</tab><br />
+			<description>
+				<container>
+					<info>
+						Description
+					</info>
+					<info style="left: 33.333%;">
+						<button onclick="ui.feedback()" style="display: none;">Add Feedback</button>
+						<feedbacks></feedbacks>
+					</info>
+					<info style="left: 66.666%; padding-top: 1em;">
+						JNet Quality Consulting GmbH<br />
+						Whistlerweg 27b<br />
+						81479 Munich<br />
+						Germany<br />
+						E-Mail: support@wa2pdf.com<br />
+						Internet: https://wa2pdf.com<br /><br />
+						Managing Director: Mani Afschar Yazdi<br />
+						Registration court: District Court Munich<br />
+						Registration number: HRB 135182<br /><br />
+						© 2025 JNet Quality Consulting GmbH<br />
+						All rights reserved
+					</info>
+				</container>
+			</description>
+		</element>
+	</container>
 
 	<popup>
 		<close onclick="ui.feedbackClose()"></close>
