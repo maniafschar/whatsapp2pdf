@@ -287,11 +287,12 @@ public class PdfService {
 				String s = usersPerDay.date;
 				for (final Statistics statistics : usersPerDay.users) {
 					s += " · " + statistics.user + " " + statistics.chats;
-					Statistics statisticsTotal = total.stream().filter(e -> e.user.equals(statistics.user)).findFirst()
-							.orElse(null);
+					Statistics statisticsTotal = total.stream().filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
+							.findFirst().orElse(null);
 					if (statisticsTotal == null) {
 						statisticsTotal = new Statistics();
 						statisticsTotal.user = statistics.user;
+						statisticsTotal.period = period;
 						total.add(statisticsTotal);
 					}
 					statisticsTotal.chats += statistics.chats;
@@ -385,7 +386,19 @@ public class PdfService {
 			table.addCell(createCell("Chats", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(createCell("Words", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(createCell("Letters", TextAlignment.RIGHT, 0, 0, 0, 0));
+			final List<Statistics> totalSumUp = new ArrayList<>();
 			total.stream().forEach(e -> {
+				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(e.user)).findFirst().orElse(null);
+				if (statisticsTotal == null) {
+					statisticsTotal = new Statistics();
+					statisticsTotal.user = statistics.user;
+					totalSumUp.add(statisticsTotal);
+				}
+				statisticsTotal.chats += e.chats;
+				statisticsTotal.words += e.words;
+				statisticsTotal.letters += e.letters;
+			});
+			totalSumUp.stream().forEach(e -> {
 				table.addCell(createCell(e.user, TextAlignment.RIGHT, 0, 0, 0, 0));
 				table.addCell(createCell(String.format("%,d", e.chats), TextAlignment.RIGHT, 0, 0, 0, 0));
 				table.addCell(createCell(String.format("%,d", e.words), TextAlignment.RIGHT, 0, 0, 0, 0));
