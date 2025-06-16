@@ -290,7 +290,8 @@ public class PdfService {
 				String s = usersPerDay.date;
 				for (final Statistics statistics : usersPerDay.users) {
 					s += " · " + statistics.user + " " + statistics.chats;
-					Statistics statisticsTotal = total.stream().filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
+					Statistics statisticsTotal = total.stream()
+							.filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
 							.findFirst().orElse(null);
 					if (statisticsTotal == null) {
 						statisticsTotal = new Statistics();
@@ -391,10 +392,11 @@ public class PdfService {
 			table.addCell(createCell("Letters", TextAlignment.RIGHT, 0, 0, 0, 0));
 			final List<Statistics> totalSumUp = new ArrayList<>();
 			total.stream().forEach(e -> {
-				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(e.user)).findFirst().orElse(null);
+				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(e.user)).findFirst()
+						.orElse(null);
 				if (statisticsTotal == null) {
 					statisticsTotal = new Statistics();
-					statisticsTotal.user = statistics.user;
+					statisticsTotal.user = e.user;
 					totalSumUp.add(statisticsTotal);
 				}
 				statisticsTotal.chats += e.chats;
@@ -413,16 +415,15 @@ public class PdfService {
 			final Table tableChart = new Table(1);
 			tableChart.setWidth(UnitValue.createPercentValue(100f));
 			tableChart.setKeepTogether(true);
-			final String id = filename + UUID.randomUUID().toString() + ".png";
-			chartService.createImage(total, dir.resolve(id));
-			final Cell cell = createCell(id, true);
-			cell.setPadding(0);
-			cell.setWidth(UnitValue.createPercentValue(100f));
-			tableChart.addCell(cell);
+			final String idChart = filename + UUID.randomUUID().toString() + ".png";
+			chartService.createImage(total, dir.resolve(idChart));
+			final Cell cellChart = createCell(idChart, true);
+			cellChart.setPadding(0);
+			cellChart.setWidth(UnitValue.createPercentValue(100f));
+			tableChart.addCell(cellChart);
 			document.add(tableChart);
 
 			final Table tableWordCloud = new Table(wordClouds.size());
-			
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
 			for (Statistics wordCloud : wordClouds) {
@@ -439,9 +440,9 @@ public class PdfService {
 				tokens.add(token);
 			}
 			for (List<Token> token : tokens) {
-				final String id = filename + UUID.randomUUID().toString() + ".png";
-				wordCloudService.createImage(token, max, min, dir.resolve(id));
-				final Cell cell = createCell(id, true);
+				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
+				wordCloudService.createImage(token, max, min, dir.resolve(idWordCloud));
+				final Cell cell = createCell(idWordCloud, true);
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				tableWordCloud.addCell(cell);

@@ -18,7 +18,7 @@ class api {
 				success: api.postAnalyse,
 				error: xhr => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
-					document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is that a WhatsApp exported chat file?';
+					document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
 				}
 			});
 		} else
@@ -72,7 +72,8 @@ class api {
 			success: () => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
-				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '' );
+				document.getElementsByTagName('upload')[0].style.display = null;
+				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '');
 			}
 		});
 	}
@@ -114,7 +115,7 @@ class api {
 						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
-					document.querySelector('description button').style.display = '';
+					document.querySelector('description button[onclick*="feedback"]').style.display = '';
 				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						tr.classList.remove('selected');

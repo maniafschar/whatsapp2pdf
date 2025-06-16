@@ -2,9 +2,9 @@ package com.jq.wa2pdf.service;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontFormatException;
 import java.awt.Graphics2D;
-import java.awt.Plygon;
+import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -44,7 +45,6 @@ public class WordCloudService {
 	static class Token {
 		int count = 1;
 		private final String text;
-		private boolean fringe = false;
 
 		Token(String s) {
 			text = s;
@@ -113,6 +113,7 @@ public class WordCloudService {
 		final List<Position> positions = new ArrayList<>();
 		if (tokens.size() == 0)
 			return positions;
+		final Polygon surrounding = new Polygon();
 		final Graphics2D g = image.createGraphics();
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
@@ -139,26 +140,26 @@ public class WordCloudService {
 	}
 
 	private void positionVerticalTopLeft(final Position position, final Position relative) {
-		position.x = relative.x + desendent(position.height);
-		position.y = relative.y - desendent(relative.height);
+		position.x = relative.x + decendent(position.height);
+		position.y = relative.y - decendent(relative.height);
 		position.vertical = true;
 	}
 
 	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
 		position.x = relative.x - position.height;
-		position.y = relative.y - desendent(position.height) + position.width;
+		position.y = relative.y - decendent(position.height) + position.width;
 		position.vertical = true;
 	}
 
 	private boolean positionFringe(final Position position, final List<Position> positions, final Polygon surrounding) {
-		final Position[] p = positions.stream().filter(e -> !e.fringe).toArray();
-		final int offset = (int) (Math.random() * p.length);
+		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
+		final int offset = (int) (Math.random() * p.size());
 		final Rectangle box = surrounding.getBounds();
-		for (int i = 0; i < p.length; i++) {
-			final Position candidate = p[(i + offset) % p.length];
+		for (int i = 0; i < p.size(); i++) {
+			final Position candidate = p.get((i + offset) % p.size());
 			if (candidate.vertical) {
 				int x = candidate.x;
-				int y = candidate.y - dendent(candidate.height);
+				int y = candidate.y - decendent(candidate.height);
 				if (candidate.x < box.getWidth() / 2)
 					x -= position.width;
 				while (x < candidate.x + candidate.width) {
@@ -172,7 +173,7 @@ public class WordCloudService {
 				}
 			} else {
 				int x = candidate.x;
-				int y = candidate.y - dendent(candidate.height);
+				int y = candidate.y - decendent(candidate.height);
 				if (candidate.y > box.getHeight() / 2)
 					y += position.height;
 				while (x < candidate.x + candidate.width) {
@@ -190,7 +191,7 @@ public class WordCloudService {
 		return false;
 	}
 
-	private int desendent(int height) {
+	private int decendent(int height) {
 		return (int) (0.784 * height);
 	}
 
@@ -202,6 +203,7 @@ public class WordCloudService {
 		private final Token token;
 		private final double percent;
 		private boolean vertical = false;
+		private boolean fringe = false;
 		private Font font = null;
 
 		private Position(final Token token, final int width, final int height, final double percent, final Font font) {

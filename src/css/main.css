@@ -40,14 +40,14 @@ body {
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-body > container > container {
+body>container {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	overflow: hidden;
 }
 
-body > container > element {
+body>container>element {
 	display: block;
 	position: relative;
 }
@@ -59,22 +59,13 @@ body header {
 	position: relative;
 	overflow-x: hidden;
 	border-radius: 0 0 2em 2em;
-	background: url(/image/heartBG.jpg);
+	background: url("/image/heartBG.jpg");
 	background-size: 100% auto;
 	background-position: 0 72%;
 }
 
-body header input {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	display: block;
-	height: 100%;
-}
-
-body header span {
+body header span,
+description upload span {
 	position: relative;
 	display: inline-block;
 	background: var(--headerLabelBG);
@@ -92,28 +83,36 @@ button {
 	cursor: pointer;
 	margin: 0 0.5em 0.5em 0.5em;
 	font-size: 1em;
+	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 h1 {
-	font-weight: normal;
 	margin-top: 1em;
-	font-size: 1.6em;
+	font-size: 1.5em;
 	background: var(--headerLabelBG);
+	display: inline-block;
+	padding: 0.5em 2em;
+	border-radius: 2em;
+	font-weight: bold;
 }
 
 error {
 	position: relative;
 	display: block;
-	color: rgb(255, 100, 50);
-	padding-top: 0.1em;
-	height: 1.8em;
+	color: rgb(0, 255, 0);
+	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.6);
+	margin-top: -0.6em;
+	height: 3.3em;
 	text-overflow: ellipsis;
 	overflow: hidden;
+	font-size: 0.8em;
+	line-height: 3;
 }
 
 attributes {
 	display: none;
 	position: relative;
+	padding-bottom: 3em;
 }
 
 attributes id {
@@ -198,13 +197,13 @@ description {
 	max-width: 50em;
 	position: relative;
 	overflow-x: hidden;
-	height: 45em;
+	height: 100%;
 	border-radius: 2em 2em 0 0;
 	background: var(--borderColor);
 	border: solid 2em transparent;
 }
 
-description > container {
+description>container {
 	width: 400%;
 	display: inline-block;
 	position: absolute;
@@ -217,7 +216,7 @@ description > container {
 description element {
 	display: inline-block;
 	position: absolute;
-	width: 33.333%;
+	width: 25%;
 	min-height: 10em;
 	left: 0;
 	box-sizing: border-box;
@@ -297,6 +296,13 @@ textarea {
 input[type="file"] {
 	opacity: 0;
 	cursor: pointer;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: block;
+	height: 100%;
 }
 
 textarea {

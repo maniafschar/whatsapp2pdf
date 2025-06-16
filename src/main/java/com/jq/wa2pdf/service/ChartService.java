@@ -1,40 +1,47 @@
 package com.jq.wa2pdf.service;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+
 import javax.imageio.ImageIO;
 
-import org.apache.commons.io.IOUtils;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.event.ChartChangeEvent;
-import org.jfree.chart.event.ChartChangeListener;
-import org.jfree.chart.labels.CategoryToolTipGenerator;
-import org.jfree.chart.labels.StandardCategoryToolTipGenerator;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.renderer.category.CategoryItemRenderer;
-import org.jfree.chart.urls.CategoryURLGenerator;
-import org.jfree.chart.urls.StandardCategoryURLGenerator;
-import org.jfree.data.Range;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.UnknownKeyException;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtils;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.springframework.stereotype.Service;
 
+import com.jq.wa2pdf.service.PdfService.Statistics;
+
 @Service
 public class ChartService {
 	public void createImage(final List<Statistics> data, final Path file) throws IOException {
-		final XYSeriesCollection data = new XYSeriesCollection();
+		final XYSeriesCollection data2 = new XYSeriesCollection();
 		data.stream().forEach(e -> {
-			if (data.getSeries(e.user) == null)
-				data.addSeries(new XYSeries(e.user));
-			final XYSeries series = data.getSeries(e.user);
+			try {
+				data2.getSeries(e.user);
+			} catch (UnknownKeyException ex) {
+				data2.addSeries(new XYSeries(e.user));
+			}
+			final XYSeries series = data2.getSeries(e.user);
 		});
-		final CategoryDataset dataset = DatasetUtils.createCategoryDataset("S", "C", data);
+		final CategoryDataset dataset = DatasetUtils.createCategoryDataset("S", "C",
+				new Number[][] { { 1, 2 }, { 2, 8 }, { 3, -6 } });
 		final JFreeChart chart = ChartFactory.createLineChart("Line Chart", "Domain", "Range", dataset);
-		decorate(chat);
-		final BufferedImage image = new BufferedImage(800 , 500, BufferedImage.TYPE_4BYTE_ABGR);
+		// decorate(chart);
+		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g2 = image.createGraphics();
 		chart.draw(g2, new Rectangle2D.Double(0, 0, image.getWidth(), image.getHeight()), null, null);
 		g2.dispose();
