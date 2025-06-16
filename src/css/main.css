@@ -93,6 +93,7 @@ error {
 	position: relative;
 	display: block;
 	color: rgb(255, 100, 50);
+	margin-top: 0.1em;
 }
 
 attributes {
