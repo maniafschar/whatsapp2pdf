@@ -47,7 +47,7 @@ body header {
 	position: relative;
 	overflow-x: hidden;
 	border-radius: 0 0 2em 2em;
-	background: url(heartBG.jpg);
+	background: url(/image/heartBG.jpg);
 	background-size: 100% auto;
 	background-position: 0 -12em;
 }
