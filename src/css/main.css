@@ -40,6 +40,18 @@ body {
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+body > container > container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+}
+
+body > container > element {
+	display: block;
+	position: relative;
+}
+
 body header {
 	display: inline-block;
 	width: 94%;
@@ -198,7 +210,7 @@ description {
 	border: solid 2em transparent;
 }
 
-description container {
+description > container {
 	width: 300%;
 	display: inline-block;
 	position: absolute;
