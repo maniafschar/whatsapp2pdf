@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics2D;
+import java.awt.Plygon;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -40,9 +41,10 @@ public class WordCloudService {
 		}
 	}
 
-	public static class Token {
+	static class Token {
 		int count = 1;
 		private final String text;
+		private boolean fringe = false;
 
 		Token(String s) {
 			text = s;
@@ -126,8 +128,12 @@ public class WordCloudService {
 			else if (i == 2)
 				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
 			else
-				positionArround(next, positions);
+				positionArround(next, positions, surrounding);
 			positions.add(next);
+			surrounding.addPoint(next.x, next.y);
+			surrounding.addPoint(next.x + next.width, next.y);
+			surrounding.addPoint(next.x + next.width, next.y + next.height);
+			surrounding.addPoint(next.x, next.y + next.height);
 		}
 		return positions;
 	}
@@ -144,10 +150,45 @@ public class WordCloudService {
 		position.vertical = true;
 	}
 
-	private void positionArround(final Position position, final List<Position> positions) {
-		position.x = position.height;
-		position.y = desendent(position.height) + position.width;
-		position.vertical = true;
+	private void positionFringe(final Position position, final List<Position> positions, final Polygon surrounding) {
+		final Position[] p = positions.stream().filter(e -> !e.fringe).toArray();
+		final int offset = (int) (Math.random() * p.length);
+		final Rectangle box = surrounding.getBounds();
+		for (int i = 0; i < p.length; i++) {
+			final Position candidate = p[(i + offset) % p.length];
+			if (candidate.vertical) {
+				int x = candidate.x;
+				int y = candidate.y - dendent(candidate.height);
+				if (candidate.x < box.getWidth() / 2)
+					x -= position.width;
+				while (x < candidate.x + candidate.width) {
+					if (!surrounding.intersects(x, y, position.width, position.height)) {
+						position.x = x;
+						position.y = y;
+						position.fringe = true;
+						break;
+					}
+					y += position.height;
+				}
+			} else {
+				int x = candidate.x;
+				int y = candidate.y - dendent(candidate.height);
+				if (candidate.y > box.getHeight() / 2)
+					y += position.height;
+				while (x < candidate.x + candidate.width) {
+					if (!surrounding.intersects(x, y, position.height, position.width)) {
+						position.x = x;
+						position.y = y;
+						position.fringe = true;
+						position.vertical = true;
+						break;
+					}
+					x += position.height;
+				}
+			}
+			if (position.fringe)
+				break;
+		}
 	}
 
 	private int desendent(int height) {
