@@ -49,7 +49,7 @@ body header {
 	border-radius: 0 0 2em 2em;
 	background: url(/image/heartBG.jpg);
 	background-size: 100% auto;
-	background-position: 0 -12em;
+	background-position: 0 72%;
 }
 
 body header input {
