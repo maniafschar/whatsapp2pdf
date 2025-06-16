@@ -50,7 +50,6 @@ body header {
 	background: url(heartBG.jpg);
 	background-size: 100% auto;
 	background-position: 0 -12em;
-	padding-bottom: 1.5em;
 }
 
 body header input {
@@ -93,7 +92,10 @@ error {
 	position: relative;
 	display: block;
 	color: rgb(255, 100, 50);
-	margin-top: 0.1em;
+	padding-top: 0.1em;
+	height: 1.8em;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 attributes {
