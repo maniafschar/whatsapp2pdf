@@ -1,8 +1,6 @@
 import { api } from "./api";
 
-document.getElementById('chatFile').onchange = () => {
-	api.analyse();
-};
+document.querySelectorAll('input[type="file"]').forEach(e => e.onchange = api.analyse );
 
 window.onresize = function () {
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
