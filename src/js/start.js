@@ -1,7 +1,6 @@
 import { api } from "./api";
 
 document.getElementById('chatFile').onchange = () => {
-	document.getElementsByTagName('attributes')[0].style.display = 'none';
 	api.analyse();
 };
 
