@@ -127,8 +127,8 @@ public class WordCloudService {
 				positionVerticalTopLeft(next, positions.get(positions.size() - 1));
 			else if (i == 2)
 				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
-			else
-				positionArround(next, positions, surrounding);
+			else if (!positionFringe(next, positions, surrounding))
+				break;
 			positions.add(next);
 			surrounding.addPoint(next.x, next.y);
 			surrounding.addPoint(next.x + next.width, next.y);
@@ -150,7 +150,7 @@ public class WordCloudService {
 		position.vertical = true;
 	}
 
-	private void positionFringe(final Position position, final List<Position> positions, final Polygon surrounding) {
+	private boolean positionFringe(final Position position, final List<Position> positions, final Polygon surrounding) {
 		final Position[] p = positions.stream().filter(e -> !e.fringe).toArray();
 		final int offset = (int) (Math.random() * p.length);
 		final Rectangle box = surrounding.getBounds();
@@ -166,7 +166,7 @@ public class WordCloudService {
 						position.x = x;
 						position.y = y;
 						position.fringe = true;
-						break;
+						return true;
 					}
 					y += position.height;
 				}
@@ -181,14 +181,13 @@ public class WordCloudService {
 						position.y = y;
 						position.fringe = true;
 						position.vertical = true;
-						break;
+						return true;
 					}
 					x += position.height;
 				}
 			}
-			if (position.fringe)
-				break;
 		}
+		return false;
 	}
 
 	private int desendent(int height) {
