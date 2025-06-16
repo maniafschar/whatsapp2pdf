@@ -3,15 +3,14 @@ export { api };
 class api {
 	static url = '{placeholderServer}';
 
-	static analyse() {
+	static analyse(event) {
 		document.getElementsByTagName('attributes')[0].style.display = 'none';
 		document.getElementsByTagName('upload')[0].style.display = '';
-		var file = document.getElementById('chatFile');
-		if (file.files[0]) {
+		if (event.target.files[0]) {
 			document.getElementsByTagName('error')[0].innerHTML = '';
 			document.getElementsByTagName('progressbar')[0].style.display = 'block';
 			var formData = new FormData();
-			formData.append('file', file.files[0]);
+			formData.append('file', event.target.files[0]);
 			api.ajax({
 				url: api.url + '/rest/api/analyse',
 				method: 'POST',
@@ -29,7 +28,6 @@ class api {
 	static preview(event, period) {
 		event.preventDefault();
 		event.stopPropagation();
-		var file = document.getElementById('chatFile');
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
@@ -46,7 +44,6 @@ class api {
 	static buy() {
 		if (document.querySelector('period .spinner,period .download'))
 			return;
-		var file = document.getElementById('chatFile');
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		var period = '';
@@ -67,7 +64,6 @@ class api {
 	}
 
 	static cleanUp() {
-		var file = document.getElementById('chatFile');
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
@@ -76,7 +72,7 @@ class api {
 			success: () => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
-				document.getElementById('chatFile').value = '';
+				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '' );
 			}
 		});
 	}
