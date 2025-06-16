@@ -81,7 +81,7 @@ public class WordCloudService {
 	}
 
 	public void createImage(final List<Token> tokens, final int max, final int min, final Path file)
-			throws IOException, FontFormatException {
+			throws IOException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		final List<Position> positions = createPositions(tokens, min, max, image, 20.0f);
