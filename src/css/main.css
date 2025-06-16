@@ -1,6 +1,7 @@
 :root {
 	--borderColor: rgba(170, 170, 255, 0.2);
 	--border: solid 1px var(--borderColor);
+	--headerLabelBG: rgba(255, 255, 255, 0.85);
 }
 
 @font-face {
@@ -39,6 +40,37 @@ body {
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+body header {
+	display: inline-block;
+	width: 94%;
+	max-width: 50em;
+	position: relative;
+	overflow-x: hidden;
+	border-radius: 0 0 2em 2em;
+	background: url(heartBG.jpg);
+	background-size: 100% auto;
+	background-position: 0 -12em;
+	padding-bottom: 2em;
+}
+
+body header input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: block;
+	height: 100%;
+}
+
+body header span {
+	position: relative;
+	display: inline-block;
+	background: var(--headerLabelBG);
+	padding: 0.5em 2em;
+	border-radius: 1em;
+}
+
 button {
 	background: rgba(255, 255, 255, 0.6);
 	border: var(--border);
@@ -54,6 +86,7 @@ h1 {
 	font-weight: normal;
 	margin-top: 1em;
 	font-size: 1.6em;
+	background: var(--headerLabelBG);
 }
 
 error {
@@ -156,10 +189,8 @@ description {
 	position: relative;
 	overflow-x: hidden;
 	height: 45em;
-	margin-bottom: 5em;
-	border-radius: 2em;
+	border-radius: 2em 2em 0 0;
 	background: var(--borderColor);
-	margin-bottom: 5em;
 	border: solid 2em transparent;
 }
 
@@ -231,8 +262,7 @@ popup content {
 }
 
 textarea,
-input,
-imageupload {
+input {
 	appearance: none;
 	position: relative;
 	font-size: 1em;
@@ -264,22 +294,6 @@ textarea {
 	padding-top: 0.5em;
 	overflow-y: auto;
 	resize: none;
-}
-
-imageupload {
-	position: relative;
-	display: inline-block;
-}
-
-imageupload span {
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	line-height: 1.8;
-	border-radius: 0.5em;
-	border: var(--border);
 }
 
 label {
