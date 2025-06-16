@@ -192,12 +192,6 @@ table td button {
 	margin: 0;
 }
 
-separator {
-	position: relative;
-	display: block;
-	height: 2em;
-}
-
 description {
 	display: inline-block;
 	width: 94%;
