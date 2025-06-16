@@ -4,6 +4,8 @@ class api {
 	static url = '{placeholderServer}';
 
 	static analyse() {
+		document.getElementsByTagName('attributes')[0].style.display = 'none';
+		document.getElementsByTagName('upload')[0].style.display = '';
 		var file = document.getElementById('chatFile');
 		if (file.files[0]) {
 			document.getElementsByTagName('error')[0].innerHTML = '';
@@ -96,8 +98,9 @@ class api {
 	static postAnalyse(data) {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
+		document.getElementsByTagName('upload')[0].style.display = 'none';
 		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
-		document.getElementsByTagName('attributes')[0].querySelector('id').innerText = data.id;
+		document.querySelector('attributes id').innerText = data.id;
 		ui.showDescription(1);
 		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
@@ -174,6 +177,7 @@ class api {
 							error = 'The server is unavailable. Please try again later.';
 						else if (error.indexOf('Invalid ID') > -1) {
 							document.getElementsByTagName('attributes')[0].style.display = null;
+							document.getElementsByTagName('upload')[0].style.display = '';
 							document.getElementById('chatFile').value = '';
 							error = 'Uploaded chat already deleted. Please upload new chat.';
 						} else {
