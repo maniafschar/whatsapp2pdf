@@ -296,7 +296,7 @@ public class PdfService {
 					if (statisticsTotal == null) {
 						statisticsTotal = new Statistics();
 						statisticsTotal.user = statistics.user;
-						statisticsTotal.period = period;
+						statisticsTotal.period = date;
 						total.add(statisticsTotal);
 					}
 					statisticsTotal.chats += statistics.chats;
