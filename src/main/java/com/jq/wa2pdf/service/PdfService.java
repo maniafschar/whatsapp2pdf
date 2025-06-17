@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -139,7 +140,6 @@ public class PdfService {
 		private final Path dir;
 		private PdfWriter writer;
 		private Document document;
-		private final UsersPerDay usersPerDay = new UsersPerDay();
 		private final List<String> outline = new ArrayList<>();
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
@@ -160,11 +160,6 @@ public class PdfService {
 			this.id = id;
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-		}
-
-		private class UsersPerDay {
-			private final List<Statistics> users = new ArrayList<>();
-			private String date = null;
 		}
 
 		private void create() throws IOException, FontFormatException {
@@ -205,7 +200,7 @@ public class PdfService {
 								"^.?\\[" + period.replaceAll("[0-9]", "\\\\d") + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				final Pattern patternMonth = Pattern
 						.compile("^.?\\[" + period + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				String lastChat = null, line, user = null, time = null;
+				String lastChat = null, line, user = null, date = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
@@ -215,13 +210,13 @@ public class PdfService {
 						foundMonth = inMonth;
 						if (foundMonth) {
 							if (lastChat != null) {
-								final String s = user;
-								Statistics u = usersPerDay.users.stream().filter(e -> e.user.equals(s)).findFirst()
-										.orElse(null);
+								final String s = user, d = date;
+								Statistics u = total.stream().filter(e -> e.user.equals(s) && e.period.equals(d)).findFirst().orElse(null);
 								if (u == null) {
 									u = new Statistics();
 									u.user = user;
-									usersPerDay.users.add(u);
+									u.period = date;
+									total.add(u);
 								}
 								addMessage(user, time, lastChat);
 								u.chats++;
@@ -235,7 +230,7 @@ public class PdfService {
 									u.letters += lastChat.replaceAll(" ", "").length();
 								}
 							}
-							addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
+							addDate(date = line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
 							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
 							if (line.indexOf("<Anhang: ") < 0 || !line.endsWith(">"))
@@ -286,9 +281,10 @@ public class PdfService {
 		}
 
 		private void addDate(final String date) {
-			if (usersPerDay.date != null && !usersPerDay.date.equals(date)) {
-				String s = usersPerDay.date;
-				for (final Statistics statistics : usersPerDay.users) {
+			final String lastDate = total.size() > 0 ? total.get(total.size() - 1).period : null;
+			if (lastDate != null && !lastDate.equals(date)) {
+				String s = total.get(total.size() - 1).period;
+				for (final Statistics statistics : total.stream().filter(e -> lastDate.equals(e.getPeriod())).collect(Collectors.toList())) {
 					s += " · " + statistics.user + " " + statistics.chats;
 					Statistics statisticsTotal = total.stream()
 							.filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
@@ -305,10 +301,7 @@ public class PdfService {
 				}
 				outline.add(s);
 			}
-			if (date != null && !date.equals(usersPerDay.date)) {
-				usersPerDay.date = date;
-				usersPerDay.users.clear();
-
+			if (date != null && !date.equals(lastDate)) {
 				final Cell cell = createCell(date, TextAlignment.CENTER);
 				cell.setBackgroundColor(colorDate, 0.2f);
 
