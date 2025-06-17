@@ -90,6 +90,7 @@ class api {
 			document.querySelector('popup content error').innerHTML = 'Please enter all fields.';
 			return;
 		}
+		document.querySelector('popup content error').innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
