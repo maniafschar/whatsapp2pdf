@@ -27,7 +27,7 @@ public class EmailService {
 	@Value("${app.mail.password}")
 	private String emailPassword;
 
-	public void sendEmail(final String email, final String text) throws EmailException {
+	public void send(final String email, final String text) throws EmailException {
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
