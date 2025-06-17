@@ -99,14 +99,21 @@ h1 {
 error {
 	position: relative;
 	display: block;
-	color: rgb(0, 255, 0);
-	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.6);
 	margin-top: -0.6em;
 	height: 3.3em;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	font-size: 0.8em;
 	line-height: 3;
+}
+
+header error {
+	color: rgb(0, 255, 0);
+	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.6);
+}
+
+popup error {
+	color: red;
 }
 
 attributes {

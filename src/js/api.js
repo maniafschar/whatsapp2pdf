@@ -84,13 +84,19 @@ class api {
 		api.ajax({
 			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
 			method: 'PUT',
+			body: {
+				id: null,
+				note: document.querySelector('popup textarea[name="note"]').value,
+				name: document.querySelector('popup input[name="name"]').value,
+				email: document.querySelector('popup input[name="email"]').value
+			},
 			success: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content').innerHTML = xhr;
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
-				document.getElementsByTagName('popup content error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+				document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
 			}
 		});
 	}

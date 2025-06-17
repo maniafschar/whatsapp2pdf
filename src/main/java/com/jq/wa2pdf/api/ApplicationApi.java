@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,7 +96,7 @@ public class ApplicationApi {
 	}
 
 	@PutMapping("feedback/{id}")
-	public String feedbackSave(@PathVariable final String id, final Feedback feedback)
+	public String feedbackSave(@PathVariable final String id, @RequestBody final Feedback feedback)
 			throws IOException, EmailException {
 		return feedbackService.save(id, feedback);
 	}

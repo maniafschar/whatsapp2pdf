@@ -37,7 +37,7 @@ public class EmailService {
 		email.setFrom(emailAddress, "WhatsApp PDF Converter");
 		email.addTo(address);
 		email.setSubject("Feedback on WhatsApp PDF Converter");
-		email.setTextMsg(text);
+		email.setMsg(text);
 		email.send();
 	}
 
