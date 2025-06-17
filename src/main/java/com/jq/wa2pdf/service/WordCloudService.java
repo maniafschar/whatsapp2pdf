@@ -3,8 +3,6 @@ package com.jq.wa2pdf.service;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -90,9 +88,10 @@ public class WordCloudService {
 			g.setFont(position.font);
 			g.setColor(createColor(position.percent));
 			if (position.vertical)
-				g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5)));
-			g.drawString(position.token.getText(), position.x, position.y);
-			g.drawLine(position.x, position.y, position.x + 10, position.y);
+				g.setTransform(AffineTransform.getRotateInstance(Math.PI * 1.5, position.x, position.y));
+			g.drawString(position.token.getText(), position.x, position.y - (int) (0.216 * position.height));
+			g.drawRect(position.x, position.y - position.height, position.width, position.height);
+			g.setTransform(AffineTransform.getRotateInstance(0));
 		}
 		g.dispose();
 		image.flush();
@@ -113,7 +112,6 @@ public class WordCloudService {
 		final List<Position> positions = new ArrayList<>();
 		if (tokens.size() == 0)
 			return positions;
-		final Polygon surrounding = new Polygon();
 		final Graphics2D g = image.createGraphics();
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
@@ -128,65 +126,70 @@ public class WordCloudService {
 				positionVerticalTopLeft(next, positions.get(positions.size() - 1));
 			else if (i == 2)
 				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
-			else if (!positionFringe(next, positions, surrounding))
+			else if (!positionFringe(next, positions))
 				break;
 			positions.add(next);
-			surrounding.addPoint(next.x, next.y);
-			surrounding.addPoint(next.x + next.width, next.y);
-			surrounding.addPoint(next.x + next.width, next.y + next.height);
-			surrounding.addPoint(next.x, next.y + next.height);
 		}
 		return positions;
 	}
 
 	private void positionVerticalTopLeft(final Position position, final Position relative) {
-		position.x = relative.x + decendent(position.height);
-		position.y = relative.y - decendent(relative.height);
+		position.x = relative.x + position.height;
+		position.y = relative.y - relative.height;
 		position.vertical = true;
 	}
 
 	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
-		position.x = relative.x - position.height;
-		position.y = relative.y - decendent(position.height) + position.width;
+		position.x = relative.x - relative.height;
+		position.y = relative.y - position.height + position.width;
 		position.vertical = true;
 	}
 
-	private boolean positionFringe(final Position position, final List<Position> positions, final Polygon surrounding) {
+	private boolean positionFringe(final Position position, final List<Position> positions) {
 		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
-		final int offset = (int) (Math.random() * p.size());
-		final Rectangle box = surrounding.getBounds();
+		final int offset = 0;// (int) (Math.random() * p.size());
+		System.out.println(p);
+		System.out.println(offset);
 		for (int i = 0; i < p.size(); i++) {
 			final Position candidate = p.get((i + offset) % p.size());
 			if (candidate.vertical) {
-				int x = candidate.x;
-				int y = candidate.y - decendent(candidate.height);
-				if (candidate.x < box.getWidth() / 2)
-					x -= position.width;
-				while (x < candidate.x + candidate.width) {
-					if (!surrounding.intersects(x, y, position.width, position.height)) {
-						position.x = x;
-						position.y = y;
-						position.fringe = true;
-						return true;
+				position.x = candidate.x;
+				position.y = candidate.y - candidate.height;
+				for (int i2 = 0; i2 < 2; i2++) {
+					if (i2 == 1)
+						position.x -= position.width;
+					while (position.x < candidate.x + candidate.width) {
+						if (!intersects(position, positions)) {
+							position.fringe = true;
+							return true;
+						}
+						position.y += position.height;
 					}
-					y += position.height;
 				}
 			} else {
-				int x = candidate.x;
-				int y = candidate.y - decendent(candidate.height);
-				if (candidate.y > box.getHeight() / 2)
-					y += position.height;
-				while (x < candidate.x + candidate.width) {
-					if (!surrounding.intersects(x, y, position.height, position.width)) {
-						position.x = x;
-						position.y = y;
-						position.fringe = true;
-						position.vertical = true;
-						return true;
+				position.x = candidate.x + position.height;
+				position.y = candidate.y - candidate.height;
+				for (int i2 = 0; i2 < 2; i2++) {
+					if (i2 == 1)
+						position.y += position.height;
+					while (position.x < candidate.x + candidate.width) {
+						if (!intersects(position, positions)) {
+							position.fringe = true;
+							position.vertical = true;
+							return true;
+						}
+						position.x += position.height;
 					}
-					x += position.height;
 				}
 			}
+		}
+		return false;
+	}
+
+	private boolean intersects(final Position position, final List<Position> positions) {
+		for (final Position p : positions) {
+			if (p.intersects(position))
+				return true;
 		}
 		return false;
 	}
@@ -212,6 +215,36 @@ public class WordCloudService {
 			this.height = height;
 			this.percent = percent;
 			this.font = font;
+		}
+
+		private boolean intersects(Position position) {
+			final int x1, y1, w1, h1, x2, y2, w2, h2;
+			if (vertical) {
+				x1 = x - height;
+				y1 = y - width;
+				w1 = height;
+				h1 = width;
+			} else {
+				x1 = x - width;
+				y1 = y - height;
+				w1 = width;
+				h1 = height;
+			}
+			if (position.vertical) {
+				x2 = position.x - position.height;
+				y2 = position.y - position.width;
+				w2 = position.height;
+				h2 = position.width;
+			} else {
+				x2 = position.x - position.width;
+				y2 = position.y - position.height;
+				w2 = position.width;
+				h2 = position.height;
+			}
+			return (x2 + w2 < x2 || x2 + w2 > x1) &&
+					(y2 + h2 < y2 || y2 + h2 > y1) &&
+					(x1 + w1 < x1 || x1 + w1 > x2) &&
+					(y1 + h1 < y1 || y1 + h1 > y2);
 		}
 
 		@Override
