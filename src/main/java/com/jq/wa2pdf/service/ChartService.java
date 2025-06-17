@@ -32,11 +32,13 @@ public class ChartService {
 	public void createImage(final List<Statistics> data, final Path file) throws IOException {
 		final Set<String> users = new HashSet<>();
 		data.stream().forEach(e -> users.add(e.getUser()));
+		final Set<String> periods = new HashSet<>();
+		data.stream().forEach(e -> periods.add(e.getPriod()));
 
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		users.stream().forEach(user -> {
-			draw(g, user, data.stream().filter(e -> user.equals(e.getUser())).collect(Collectors.toList()););
+			draw(g, user, data.stream().filter(e -> user.equals(e.getUser())).collect(Collectors.toList()));
 		});
 		g.dispose();
 		image.flush();
