@@ -2,6 +2,7 @@ package com.jq.wa2pdf.service;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 
 import org.apache.commons.mail.DefaultAuthenticator;
@@ -35,10 +36,13 @@ public class FeedbackService {
 	@Value("${app.mail.password}")
 	private String emailPassword;
 
-	public String save(final Feedback feedback) throws EmailException {
-		repository.save(feedback);
-		sendEmail(feedback);
-		return "An email has been sent to you. Please confirm to publish your feedback.";
+	public String save(final String id, final Feedback feedback) throws EmailException {
+		if (Files.exists(ExtractService.getTempDir(id))) {
+			repository.save(feedback);
+			sendEmail(feedback);
+			return "An email has been sent to you. Please confirm to publish your feedback.";
+		}
+		return "You data has already been deleted. Please leave feedback before deleting you data.";
 	}
 
 	public Feedback one(final BigInteger id, final String pin) {
