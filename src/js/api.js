@@ -73,21 +73,24 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
 				document.getElementsByTagName('upload')[0].style.display = null;
+				document.querySelector('description button[onclick*="feedback"]').style.display = 'none';
 				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '');
 			}
 		});
 	}
 
 	static saveFeedback() {
+		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
-			method: 'POST',
+			method: 'PUT',
 			success: xhr => {
+				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content').innerHTML = xhr;
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
-				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+				document.getElementsByTagName('popup content error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
 			}
 		});
 	}
