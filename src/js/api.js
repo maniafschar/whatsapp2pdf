@@ -80,16 +80,21 @@ class api {
 	}
 
 	static saveFeedback() {
+		var body = {
+			id: null,
+			note: document.querySelector('popup textarea[name="note"]').value,
+			name: document.querySelector('popup input[name="name"]').value,
+			email: document.querySelector('popup input[name="email"]').value
+		};
+		if (!body.email || !body.name || !body.note) {
+			document.querySelector('popup content error').innerHTML = 'Please enter all fields.';
+			return;
+		}
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
 			method: 'PUT',
-			body: {
-				id: null,
-				note: document.querySelector('popup textarea[name="note"]').value,
-				name: document.querySelector('popup input[name="name"]').value,
-				email: document.querySelector('popup input[name="email"]').value
-			},
+			body: body,
 			success: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content').innerHTML = xhr;
