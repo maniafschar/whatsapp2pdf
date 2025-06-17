@@ -27,7 +27,7 @@ public class EmailService {
 	@Value("${app.mail.password}")
 	private String emailPassword;
 
-	public void send(final String email, final String text) throws EmailException {
+	public void send(final String address, final String text) throws EmailException {
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
@@ -35,7 +35,7 @@ public class EmailService {
 		email.setAuthenticator(new DefaultAuthenticator(emailAddress, emailPassword));
 		email.setSSLOnConnect(true);
 		email.setFrom(emailAddress, "WhatsApp PDF Converter");
-		email.addTo(email);
+		email.addTo(address);
 		email.setSubject("Feedback on WhatsApp PDF Converter");
 		email.setTextMsg(text);
 		email.send();

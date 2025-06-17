@@ -95,7 +95,8 @@ public class ApplicationApi {
 	}
 
 	@PutMapping("feedback/{id}")
-	public String feedbackSave(@PathVariable final BigInteger id, final Feedback feedback) throws IOException, EmailException {
+	public String feedbackSave(@PathVariable final String id, final Feedback feedback)
+			throws IOException, EmailException {
 		return feedbackService.save(id, feedback);
 	}
 

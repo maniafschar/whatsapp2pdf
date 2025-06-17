@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,11 +51,13 @@ import com.itextpdf.kernel.pdf.filespec.PdfFileSpec;
 import com.itextpdf.kernel.pdf.navigation.PdfNamedDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
+import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
@@ -162,7 +165,7 @@ public class PdfService {
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		}
 
-		private void create() throws IOException, FontFormatException {
+		private void create() throws IOException, FontFormatException, ParseException {
 			final String filename = getFilename(preview ? null : period);
 			Files.deleteIfExists(dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(dir.resolve(filename + ".pdf"));
@@ -177,8 +180,16 @@ public class PdfService {
 										.getPage(document.getPdfDocument().getNumberOfPages());
 								final PdfCanvas canvas = new PdfCanvas(page);
 								canvas.addImageFittedIntoRectangle(ImageDataFactory.create(getClass()
-										.getResource("/background/000001.png").toExternalForm()),
+										.getResource("/image/background/000001.png").toExternalForm()),
 										page.getPageSize(), false);
+								if (document.getPdfDocument().getNumberOfPages() == 1) {
+									final Rectangle rect = page.getPageSize();
+									rect.setY(0);
+									rect.setHeight(80);
+									canvas.addImageFittedIntoRectangle(ImageDataFactory.create(getClass()
+											.getResource("/image/heartBG.jpg").toExternalForm()),
+											rect, false);
+								}
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
@@ -211,7 +222,8 @@ public class PdfService {
 						if (foundMonth) {
 							if (lastChat != null) {
 								final String s = user, d = date;
-								Statistics u = total.stream().filter(e -> e.user.equals(s) && e.period.equals(d)).findFirst().orElse(null);
+								Statistics u = total.stream().filter(e -> e.user.equals(s) && e.period.equals(d))
+										.findFirst().orElse(null);
 								if (u == null) {
 									u = new Statistics();
 									u.user = user;
@@ -284,7 +296,8 @@ public class PdfService {
 			final String lastDate = total.size() > 0 ? total.get(total.size() - 1).period : null;
 			if (lastDate != null && !lastDate.equals(date)) {
 				String s = total.get(total.size() - 1).period;
-				for (final Statistics statistics : total.stream().filter(e -> lastDate.equals(e.getPeriod())).collect(Collectors.toList())) {
+				for (final Statistics statistics : total.stream().filter(e -> lastDate.equals(e.getPeriod()))
+						.collect(Collectors.toList())) {
 					s += " · " + statistics.user + " " + statistics.chats;
 					Statistics statisticsTotal = total.stream()
 							.filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
@@ -366,7 +379,7 @@ public class PdfService {
 			content.add(empty);
 		}
 
-		private void addMetaData() throws IOException, FontFormatException {
+		private void addMetaData() throws IOException, FontFormatException, ParseException {
 			final PdfCatalog catalog = document.getPdfDocument().getCatalog();
 			catalog.put(PdfName.Title, new PdfString("PDF of exported WhatsApp Conversation"));
 			catalog.put(PdfName.Subject, new PdfString(extractService.getFilename(id)));
@@ -446,6 +459,7 @@ public class PdfService {
 				tableWordCloud.addCell(cell);
 			}
 			document.add(tableWordCloud);
+			document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 		}
 
 		private Cell createCell(final String text, final boolean... media) {

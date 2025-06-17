@@ -1,12 +1,11 @@
 package com.jq.wa2pdf.service;
 
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 
+import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.jq.wa2pdf.entity.Feedback;
