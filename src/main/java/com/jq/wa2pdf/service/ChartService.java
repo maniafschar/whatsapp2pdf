@@ -50,12 +50,13 @@ public class ChartService {
 	}
 
 	private Set<String> expandPeriods(List<String> periods) {
-		final SimpleDateFormat formatter = new SimpleDateFormat(periods.get(0).contains("/") ? "MM/dd/yy" : periods.get(0).contains(".") ? "dd.MM.yy" : "yy-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat(periods.get(0).contains("/") ? "MM/dd/yy" : periods.get(0).contains(".") ? "dd.MM.yy" : "yy-MM-dd");
 	        final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(periods.get(0)));
         	gc.set(Calendar.DATE, 1);
 		final int month = gc.get(Calendar.MONTH);
 		final Set<String> result = new HashSet<>();
+		formatter = new SimpleDateFormat(formatter.toPattern().replace("/yy", "").replace(".yy", "").replace("yy-", ""));
 		while (month == gc.get(Calendar.MONTH)) {
 			result.add(formatter.format(gc.getTime()));
         		gc.add(Calendar.DATE, 1);
