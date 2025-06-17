@@ -39,9 +39,9 @@ public class ChartService {
 
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		drawLegend(g, data, image.getWidth(), image.getHeight());
+		drawLegend(g, data, image.getWidth(), image.getHeight(), periods);
 		users.stream().forEach(user -> {
-			drawChart(g, data.stream().filter(e -> user.equals(e.getUser())).collect(Collectors.toList()), image.getWidth(), image.getHeight(), user);
+			drawChart(g, data.stream().filter(e -> user.equals(e.getUser())).collect(Collectors.toList()), image.getWidth(), image.getHeight(), periods, user);
 		});
 		g.dispose();
 		image.flush();
