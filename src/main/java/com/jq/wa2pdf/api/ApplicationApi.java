@@ -94,9 +94,9 @@ public class ApplicationApi {
 		return feedbackService.one(id, pin);
 	}
 
-	@PutMapping("feedback")
-	public String feedbackSave(final Feedback feedback) throws IOException, EmailException {
-		return feedbackService.save(feedback);
+	@PutMapping("feedback/{id}")
+	public String feedbackSave(@PathVariable final BigInteger id, final Feedback feedback) throws IOException, EmailException {
+		return feedbackService.save(id, feedback);
 	}
 
 	@GetMapping("feedback/list")
