@@ -87,11 +87,13 @@ public class WordCloudService {
 		for (Position position : positions) {
 			g.setFont(position.font);
 			g.setColor(createColor(position.percent));
-			if (position.vertical)
+			if (position.vertical) {
 				g.setTransform(AffineTransform.getRotateInstance(Math.PI * 1.5, position.x, position.y));
-			g.drawString(position.token.getText(), position.x, position.y - (int) (0.216 * position.height));
-			g.drawRect(position.x, position.y - position.height, position.width, position.height);
-			g.setTransform(AffineTransform.getRotateInstance(0));
+				g.drawString(position.token.getText(), position.x + (int) (0.784 * position.height), position.y + position.height);
+			} else
+				g.drawString(position.token.getText(), position.x, position.y + (int) (0.784 * position.height));
+			g.drawRect(position.x, position.y, position.width, position.height);
+			g.setTransform(null);
 		}
 		g.dispose();
 		image.flush();
@@ -134,14 +136,14 @@ public class WordCloudService {
 	}
 
 	private void positionVerticalTopLeft(final Position position, final Position relative) {
-		position.x = relative.x + position.height;
-		position.y = relative.y - relative.height;
+		position.x = relative.x;
+		position.y = relative.y - position.height;
 		position.vertical = true;
 	}
 
 	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
-		position.x = relative.x - relative.height;
-		position.y = relative.y - position.height + position.width;
+		position.x = relative.x - position.height;
+		position.y = relative.y - position.height;
 		position.vertical = true;
 	}
 
@@ -228,30 +230,22 @@ public class WordCloudService {
 		}
 
 		private boolean intersects(Position position) {
-			final int x1, y1, w1, h1, x2, y2, w2, h2;
+			final int w1, h1, w2, h2;
 			if (vertical) {
-				x1 = x - height;
-				y1 = y - width;
 				w1 = height;
 				h1 = width;
 			} else {
-				x1 = x - width;
-				y1 = y - height;
 				w1 = width;
 				h1 = height;
 			}
 			if (position.vertical) {
-				x2 = position.x - position.height;
-				y2 = position.y - position.width;
 				w2 = position.height;
 				h2 = position.width;
 			} else {
-				x2 = position.x - position.width;
-				y2 = position.y - position.height;
 				w2 = position.width;
 				h2 = position.height;
 			}
-			return x1 + w1 > x2 && x1 < x2 + w2 && y1 + h1 > y2 && y1 < y2 + h2;
+			return x + w1 > position.x && x < position.x + w2 && y + h1 > position.y && y < position.y + h2;
 		}
 
 		@Override
