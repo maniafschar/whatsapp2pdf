@@ -156,29 +156,39 @@ public class WordCloudService {
 				position.x = candidate.x;
 				position.y = candidate.y - candidate.height;
 				for (int i2 = 0; i2 < 2; i2++) {
-					if (i2 == 1)
+					if (i2 == 1) {
 						position.x -= position.width;
+						position.y = candidate.y - candidate.height;
+					}
 					while (position.x < candidate.x + candidate.width) {
-						if (!intersects(position, positions)) {
+						final Position intersection = intersects(position, positions);
+						if (intersection == null) {
 							position.fringe = true;
 							return true;
-						}
-						position.y += position.height;
+						} else
+							position.y = intersection.y
+									+ (intersection.vertical ? intersection.width : intersection.height)
+									+ position.width;
 					}
 				}
 			} else {
 				position.x = candidate.x + position.height;
 				position.y = candidate.y - candidate.height;
 				for (int i2 = 0; i2 < 2; i2++) {
-					if (i2 == 1)
+					if (i2 == 1) {
+						position.x = candidate.x + position.height;
 						position.y += position.height;
+					}
 					while (position.x < candidate.x + candidate.width) {
-						if (!intersects(position, positions)) {
+						final Position intersection = intersects(position, positions);
+						if (intersection == null) {
 							position.fringe = true;
 							position.vertical = true;
 							return true;
-						}
-						position.x += position.height;
+						} else
+							position.x = intersection.x
+									+ (intersection.vertical ? intersection.height : intersection.width)
+									+ position.height;
 					}
 				}
 			}
@@ -186,12 +196,12 @@ public class WordCloudService {
 		return false;
 	}
 
-	private boolean intersects(final Position position, final List<Position> positions) {
+	private Position intersects(final Position position, final List<Position> positions) {
 		for (final Position p : positions) {
 			if (p.intersects(position))
-				return true;
+				return p;
 		}
-		return false;
+		return null;
 	}
 
 	private int decendent(int height) {
