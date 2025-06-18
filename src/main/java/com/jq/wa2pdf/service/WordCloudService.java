@@ -150,8 +150,6 @@ public class WordCloudService {
 	private boolean positionFringe(final Position position, final List<Position> positions) {
 		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
 		final int offset = 0;// (int) (Math.random() * p.size());
-		System.out.println(p);
-		System.out.println(offset);
 		for (int i = 0; i < p.size(); i++) {
 			final Position candidate = p.get((i + offset) % p.size());
 			if (candidate.vertical) {
@@ -167,10 +165,10 @@ public class WordCloudService {
 						if (intersection == null) {
 							position.fringe = true;
 							return true;
-						} else
-							position.y = intersection.y
-									+ (intersection.vertical ? intersection.width : intersection.height)
-									+ position.width;
+						}
+						position.y = intersection.y
+								+ (intersection.vertical ? intersection.width : intersection.height)
+								+ position.width;
 					}
 				}
 			} else {
@@ -187,10 +185,10 @@ public class WordCloudService {
 							position.fringe = true;
 							position.vertical = true;
 							return true;
-						} else
-							position.x = intersection.x
-									+ (intersection.vertical ? intersection.height : intersection.width)
-									+ position.height;
+						}
+						position.x = intersection.x
+								+ (intersection.vertical ? intersection.height : intersection.width)
+								+ position.height;
 					}
 				}
 			}
