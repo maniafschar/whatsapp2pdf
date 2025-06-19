@@ -26,6 +26,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.PatternColor;
@@ -179,12 +180,15 @@ public class PdfService {
 										.getResource("/image/background/000001.png").toExternalForm()),
 										page.getPageSize(), false);
 								if (document.getPdfDocument().getNumberOfPages() == 1) {
+									final ImageData image = ImageDataFactory.create(getClass()
+											.getResource("/image/heartBG.jpg").toExternalForm());
+									final int height = 90;
 									final Rectangle rect = page.getPageSize();
-									rect.setY(rect.getHeight() - 80);
-									rect.setHeight(80);
-									canvas.addImageFittedIntoRectangle(ImageDataFactory.create(getClass()
-											.getResource("/image/heartBG.jpg").toExternalForm()),
-											rect, false);
+									rect.setX(0);
+									rect.setY(rect.getHeight() - height);
+									rect.setHeight(height);
+									rect.setWidth(height * image.getWidth() / image.getHeight());
+									canvas.addImageFittedIntoRectangle(image, rect, false);
 								}
 							} catch (Exception e) {
 								throw new RuntimeException(e);
@@ -378,8 +382,11 @@ public class PdfService {
 		private void addMetaData() throws IOException, FontFormatException, ParseException {
 			final Table header = new Table(1);
 			header.setWidth(UnitValue.createPercentValue(100f));
-			header.setHeight(UnitValue.createPointValue(60));
-			header.addCell(createCell(""));
+			header.setHeight(UnitValue.createPointValue(80));
+			header.addCell(createCell("https://wa2pdf.com"));
+			header.getCell(0, 0).setFontColor(colorDate);
+			header.getCell(0, 0).setPaddingTop(32);
+			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
 			document.add(header);
 
 			final PdfDocumentInfo catalog = document.getPdfDocument().getDocumentInfo();
