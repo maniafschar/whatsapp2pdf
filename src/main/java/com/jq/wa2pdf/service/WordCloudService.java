@@ -88,12 +88,14 @@ public class WordCloudService {
 			g.setFont(position.font);
 			g.setColor(createColor(position.percent));
 			if (position.vertical) {
-				g.setTransform(AffineTransform.getRotateInstance(Math.PI * 1.5, position.x, position.y));
-				g.drawString(position.token.getText(), position.x + (int) (0.784 * position.height), position.y + position.height);
-			} else
-				g.drawString(position.token.getText(), position.x, position.y + (int) (0.784 * position.height));
-			g.drawRect(position.x, position.y, position.width, position.height);
-			g.setTransform(null);
+				final AffineTransform t = AffineTransform.getRotateInstance(Math.PI * 1.5, position.x, position.y);
+				t.concatenate(AffineTransform.getTranslateInstance(-position.width, 0));
+				g.setTransform(t);
+			}
+			g.drawString(position.token.getText(), position.x, position.y + (int) (0.784 * position.height));
+			// g.drawRect(position.x, position.y, position.width, position.height);
+			if (position.vertical)
+				g.setTransform(AffineTransform.getRotateInstance(0));
 		}
 		g.dispose();
 		image.flush();
@@ -137,58 +139,57 @@ public class WordCloudService {
 
 	private void positionVerticalTopLeft(final Position position, final Position relative) {
 		position.x = relative.x;
-		position.y = relative.y - position.height;
+		position.y = relative.y - position.width;
 		position.vertical = true;
 	}
 
 	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
 		position.x = relative.x - position.height;
-		position.y = relative.y - position.height;
+		position.y = relative.y + relative.width;
 		position.vertical = true;
 	}
 
 	private boolean positionFringe(final Position position, final List<Position> positions) {
 		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
-		final int offset = 0;// (int) (Math.random() * p.size());
+		final int offset = (int) (Math.random() * p.size());
 		for (int i = 0; i < p.size(); i++) {
 			final Position candidate = p.get((i + offset) % p.size());
 			if (candidate.vertical) {
-				position.x = candidate.x;
-				position.y = candidate.y - candidate.height;
+				position.x = candidate.x - position.width;
+				position.y = candidate.y;
+				position.vertical = false;
 				for (int i2 = 0; i2 < 2; i2++) {
 					if (i2 == 1) {
-						position.x -= position.width;
-						position.y = candidate.y - candidate.height;
+						position.x = candidate.x + candidate.height;
+						position.y = candidate.y;
 					}
-					while (position.x < candidate.x + candidate.width) {
+					while (position.y < candidate.y + candidate.width) {
 						final Position intersection = intersects(position, positions);
 						if (intersection == null) {
 							position.fringe = true;
 							return true;
 						}
 						position.y = intersection.y
-								+ (intersection.vertical ? intersection.width : intersection.height)
-								+ position.width;
+								+ (intersection.vertical ? intersection.width : intersection.height);
 					}
 				}
 			} else {
-				position.x = candidate.x + position.height;
-				position.y = candidate.y - candidate.height;
+				position.x = candidate.x;
+				position.y = candidate.y - position.width;
+				position.vertical = true;
 				for (int i2 = 0; i2 < 2; i2++) {
 					if (i2 == 1) {
-						position.x = candidate.x + position.height;
-						position.y += position.height;
+						position.x = candidate.x;
+						position.y = candidate.y + candidate.height;
 					}
 					while (position.x < candidate.x + candidate.width) {
 						final Position intersection = intersects(position, positions);
 						if (intersection == null) {
 							position.fringe = true;
-							position.vertical = true;
 							return true;
 						}
 						position.x = intersection.x
-								+ (intersection.vertical ? intersection.height : intersection.width)
-								+ position.height;
+								+ (intersection.vertical ? intersection.height : intersection.width);
 					}
 				}
 			}
@@ -204,11 +205,7 @@ public class WordCloudService {
 		return null;
 	}
 
-	private int decendent(int height) {
-		return (int) (0.784 * height);
-	}
-
-	private class Position {
+	private static class Position {
 		private int x = 0;
 		private int y = 0;
 		private final int width;

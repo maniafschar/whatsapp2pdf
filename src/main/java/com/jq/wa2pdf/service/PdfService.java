@@ -12,9 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -34,12 +32,10 @@ import com.itextpdf.kernel.colors.PatternColor;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.geom.Rectangle;
-import com.itextpdf.kernel.pdf.PdfCatalog;
 import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfName;
+import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
-import com.itextpdf.kernel.pdf.PdfString;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.action.PdfAction;
 import com.itextpdf.kernel.pdf.annot.PdfLinkAnnotation;
@@ -184,7 +180,7 @@ public class PdfService {
 										page.getPageSize(), false);
 								if (document.getPdfDocument().getNumberOfPages() == 1) {
 									final Rectangle rect = page.getPageSize();
-									rect.setY(0);
+									rect.setY(rect.getHeight() - 80);
 									rect.setHeight(80);
 									canvas.addImageFittedIntoRectangle(ImageDataFactory.create(getClass()
 											.getResource("/image/heartBG.jpg").toExternalForm()),
@@ -380,14 +376,18 @@ public class PdfService {
 		}
 
 		private void addMetaData() throws IOException, FontFormatException, ParseException {
-			final PdfCatalog catalog = document.getPdfDocument().getCatalog();
-			catalog.put(PdfName.Title, new PdfString("PDF of exported WhatsApp Conversation"));
-			catalog.put(PdfName.Subject, new PdfString(extractService.getFilename(id)));
-			catalog.put(PdfName.Keywords, new PdfString("WhatsApp PDF Converter"));
-			catalog.put(PdfName.Author, new PdfString(user));
-			catalog.put(PdfName.Creator, new PdfString("https://wa2pdf.com"));
-			catalog.put(PdfName.CreationDate,
-					new PdfString(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())));
+			final Table header = new Table(1);
+			header.setWidth(UnitValue.createPercentValue(100f));
+			header.setHeight(UnitValue.createPointValue(60));
+			header.addCell(createCell(""));
+			document.add(header);
+
+			final PdfDocumentInfo catalog = document.getPdfDocument().getDocumentInfo();
+			catalog.setTitle("PDF of exported WhatsApp Conversation");
+			catalog.setSubject(extractService.getFilename(id));
+			catalog.setKeywords("WhatsApp PDF Converter");
+			catalog.setAuthor(user);
+			catalog.setCreator("https://wa2pdf.com");
 
 			final Table table = new Table(4);
 			table.setWidth(UnitValue.createPercentValue(80f));
