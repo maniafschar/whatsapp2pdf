@@ -57,7 +57,7 @@ public class WordCloudService {
 		}
 	}
 
-	public List<Token> extract(String text) {
+	List<Token> extract(String text) {
 		final StringBuilder s = new StringBuilder(sanatize.matcher(text).replaceAll(" "));
 		s.trimToSize();
 		final List<String> emojis = EmojiParser.extractEmojis(s.toString());
@@ -78,7 +78,7 @@ public class WordCloudService {
 		return list;
 	}
 
-	public void createImage(final List<Token> tokens, final int max, final int min, final Path file)
+	void createImage(final List<Token> tokens, final int max, final int min, final Path file)
 			throws IOException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();

@@ -23,7 +23,6 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 
 @Service
 public class ExtractService {
-
 	public static class Attributes {
 		private final List<Statistics> users = new ArrayList<>();
 		private final List<Statistics> periods = new ArrayList<>();

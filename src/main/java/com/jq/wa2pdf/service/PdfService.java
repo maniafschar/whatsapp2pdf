@@ -392,24 +392,31 @@ public class PdfService {
 			table.addCell(createCell("Words", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(createCell("Letters", TextAlignment.RIGHT, 0, 0, 0, 0));
 			final List<Statistics> totalSumUp = new ArrayList<>();
-			total.stream().forEach(e -> {
-				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(e.user)).findFirst()
-						.orElse(null);
+			for (int i = 0; i < total.size() && (!preview || i < 8); i++) {
+				final Statistics statistics = total.get(i);
+				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(statistics.user))
+						.findFirst().orElse(null);
 				if (statisticsTotal == null) {
 					statisticsTotal = new Statistics();
-					statisticsTotal.user = e.user;
+					statisticsTotal.user = statistics.user;
 					totalSumUp.add(statisticsTotal);
 				}
-				statisticsTotal.chats += e.chats;
-				statisticsTotal.words += e.words;
-				statisticsTotal.letters += e.letters;
-			});
-			totalSumUp.stream().forEach(e -> {
-				table.addCell(createCell(e.user, TextAlignment.RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell(String.format("%,d", e.chats), TextAlignment.RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell(String.format("%,d", e.words), TextAlignment.RIGHT, 0, 0, 0, 0));
-				table.addCell(createCell(String.format("%,d", e.letters), TextAlignment.RIGHT, 0, 0, 0, 0));
-			});
+				statisticsTotal.chats += statistics.chats;
+				statisticsTotal.words += statistics.words;
+				statisticsTotal.letters += statistics.letters;
+			}
+			for (int i = 0; i < totalSumUp.size(); i++) {
+				final Statistics statistics = totalSumUp.get(i);
+				final Cell cell = createCell(statistics.user, TextAlignment.RIGHT, 0, 0, 0, 0);
+				final java.awt.Color color = chartService.nextColor(i);
+				cell.setFontColor(
+						PatternColor.createColorWithColorSpace(new float[] { ((float) color.getRed()) / 255,
+								((float) color.getGreen()) / 255, ((float) color.getBlue()) / 255 }));
+				table.addCell(cell);
+				table.addCell(createCell(String.format("%,d", statistics.chats), TextAlignment.RIGHT, 0, 0, 0, 0));
+				table.addCell(createCell(String.format("%,d", statistics.words), TextAlignment.RIGHT, 0, 0, 0, 0));
+				table.addCell(createCell(String.format("%,d", statistics.letters), TextAlignment.RIGHT, 0, 0, 0, 0));
+			}
 			table.setMarginBottom(20f);
 			document.add(table);
 

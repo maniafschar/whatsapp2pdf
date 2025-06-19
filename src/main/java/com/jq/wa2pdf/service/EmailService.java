@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailService {
+class EmailService {
 	@Autowired
 	private MailCreateor mailCreateor;
 
@@ -27,7 +27,7 @@ public class EmailService {
 	@Value("${app.mail.password}")
 	private String emailPassword;
 
-	public void send(final String address, final String text) throws EmailException {
+	void send(final String address, final String text) throws EmailException {
 		final ImageHtmlEmail email = mailCreateor.create();
 		email.setHostName(emailHost);
 		email.setSmtpPort(emailPort);
