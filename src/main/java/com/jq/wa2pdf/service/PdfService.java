@@ -384,8 +384,9 @@ public class PdfService {
 			header.setWidth(UnitValue.createPercentValue(100f));
 			header.setHeight(UnitValue.createPointValue(80));
 			header.addCell(createCell("https://wa2pdf.com"));
+			header.getCell(0, 0).setPadding(0);
 			header.getCell(0, 0).setFontColor(colorDate);
-			header.getCell(0, 0).setPaddingTop(32);
+			header.getCell(0, 0).setPaddingTop(36);
 			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
 			document.add(header);
 
@@ -444,8 +445,8 @@ public class PdfService {
 						preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
 								? wordCloud.text.lastIndexOf(" ", (int) (0.1 * wordCloud.text.length()))
 								: wordCloud.text.length()));
-				while (token.size() > 40)
-					token.remove(40);
+				while (token.size() > 80)
+					token.remove(80);
 				if (max < token.get(0).getCount())
 					max = token.get(0).getCount();
 				if (min > token.get(token.size() - 1).getCount())

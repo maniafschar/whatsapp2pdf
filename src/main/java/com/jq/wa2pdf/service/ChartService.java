@@ -1,6 +1,7 @@
 package com.jq.wa2pdf.service;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -26,17 +27,11 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 @Service
 public class ChartService {
 	public void createImage(final List<Statistics> data, final Path file) throws IOException, ParseException {
-		final Set<String> users = new HashSet<>();
-		data.stream().forEach(e -> users.add(e.getUser()));
 		final List<String> periods = expandPeriods(data.stream().map(e -> e.getPeriod()).collect(Collectors.toList()));
-
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		drawLegend(g, data, image.getWidth(), image.getHeight(), periods);
-		users.stream().forEach(user -> {
-			drawChart(g, data.stream().filter(e -> user.equals(e.getUser())).collect(Collectors.toList()),
-					image.getWidth(), image.getHeight(), periods, user);
-		});
+		drawChart(g, data, image.getWidth(), image.getHeight(), periods);
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
@@ -61,18 +56,34 @@ public class ChartService {
 	}
 
 	private void drawChart(final Graphics2D g, final List<Statistics> data, final int width, final int height,
-			final List<String> periods, final String user) {
+			final List<String> periods) {
+		final Set<String> users = new HashSet<>();
+		data.stream().forEach(e -> users.add(e.getUser()));
 	}
 
 	private void drawLegend(final Graphics2D g, final List<Statistics> data, final int width, final int height,
 			final List<String> periods) {
-		final int margin = 40;
-		int x = margin;
-		g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5)));
+		final int marginLegend = 40, marginPlot = 10, heightPlot = (height - marginLegend - 2 * marginPlot) / 3;
+		int x = marginLegend;
+		final Font fontHorizontal = g.getFont();
+		final Font fontVertical = g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5));
+		g.setFont(fontVertical);
 		g.setColor(new Color(0, 0, 0, 200));
+
 		for (String period : periods)
-			g.drawString(period, x += (width - 2 * margin) / periods.size(), height);
-		g.drawLine(margin, margin, margin, height - margin * 2 / 3);
-		g.drawLine(margin * 2 / 3, height - margin, width - margin, height - margin);
+			g.drawString(period, x += (width - marginLegend) / periods.size(), height);
+
+		g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(0)));
+		final String[] types = { "chats", "words", "letters" };
+		for (int i = 0; i < types.length; i++) {
+			final int y = (i + 1) * heightPlot + i * marginPlot;
+			g.drawLine(marginLegend - marginPlot / 2, y, width, y);
+			g.drawLine(marginLegend, y + marginPlot / 2, marginLegend, y - heightPlot);
+			g.setFont(fontHorizontal);
+			final int stringWidth = g.getFontMetrics().stringWidth(types[i]);
+			g.setFont(fontVertical);
+			g.drawString(types[i], width - g.getFontMetrics().getHeight(),
+					y - heightPlot + stringWidth + marginPlot / 2);
+		}
 	}
 }
