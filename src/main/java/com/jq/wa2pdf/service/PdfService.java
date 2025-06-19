@@ -297,21 +297,8 @@ public class PdfService {
 			if (lastDate != null && !lastDate.equals(date)) {
 				String s = total.get(total.size() - 1).period;
 				for (final Statistics statistics : total.stream().filter(e -> lastDate.equals(e.getPeriod()))
-						.collect(Collectors.toList())) {
+						.collect(Collectors.toList()))
 					s += " · " + statistics.user + " " + statistics.chats;
-					Statistics statisticsTotal = total.stream()
-							.filter(e -> e.user.equals(statistics.user) && e.period.equals(date))
-							.findFirst().orElse(null);
-					if (statisticsTotal == null) {
-						statisticsTotal = new Statistics();
-						statisticsTotal.user = statistics.user;
-						statisticsTotal.period = date;
-						total.add(statisticsTotal);
-					}
-					statisticsTotal.chats += statistics.chats;
-					statisticsTotal.words += statistics.words;
-					statisticsTotal.letters += statistics.letters;
-				}
 				outline.add(s);
 			}
 			if (date != null && !date.equals(lastDate)) {
@@ -430,7 +417,7 @@ public class PdfService {
 			tableChart.setWidth(UnitValue.createPercentValue(100f));
 			tableChart.setKeepTogether(true);
 			final String idChart = filename + UUID.randomUUID().toString() + ".png";
-			chartService.createImage(total, dir.resolve(idChart));
+			chartService.createImage(total, dir.resolve(idChart), preview);
 			final Cell cellChart = createCell(idChart, true);
 			cellChart.setPadding(0);
 			cellChart.setWidth(UnitValue.createPercentValue(100f));

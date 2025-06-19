@@ -83,7 +83,6 @@ public class WordCloudService {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		final List<Position> positions = createPositions(tokens, min, max, image, 20.0f);
-		System.out.println(positions);
 		for (Position position : positions) {
 			g.setFont(position.font);
 			g.setColor(createColor(position.percent));
