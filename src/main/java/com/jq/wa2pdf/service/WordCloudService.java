@@ -35,7 +35,7 @@ public class WordCloudService {
 							StandardCharsets.UTF_8).split("\n"));
 			FONT = Font.createFont(Font.TRUETYPE_FONT,
 					WordCloudService.class.getResourceAsStream("/font/Comfortaa-Regular.ttf"));
-		} catch (Exception ex) {
+		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
 	}
@@ -44,28 +44,28 @@ public class WordCloudService {
 		int count = 1;
 		private final String text;
 
-		Token(String s) {
-			text = s;
+		Token(final String s) {
+			this.text = s;
 		}
 
 		public String getText() {
-			return text;
+			return this.text;
 		}
 
 		public int getCount() {
-			return count;
+			return this.count;
 		}
 	}
 
-	List<Token> extract(String text) {
-		final StringBuilder s = new StringBuilder(sanatize.matcher(text).replaceAll(" "));
+	List<Token> extract(final String text) {
+		final StringBuilder s = new StringBuilder(this.sanatize.matcher(text).replaceAll(" "));
 		s.trimToSize();
 		final List<String> emojis = EmojiParser.extractEmojis(s.toString());
 		int i;
-		for (String emoji : emojis)
+		for (final String emoji : emojis)
 			s.delete(i = s.indexOf(emoji), i + emoji.length());
 		final List<Token> list = new ArrayList<>();
-		for (String candidate : s.toString().toLowerCase().split(" ")) {
+		for (final String candidate : s.toString().toLowerCase().split(" ")) {
 			if (candidate.trim().length() > 1) {
 				final Token token = list.stream().filter(e -> e.text.equals(candidate)).findFirst().orElse(null);
 				if (token != null)
@@ -82,10 +82,10 @@ public class WordCloudService {
 			throws IOException {
 		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		final List<Position> positions = createPositions(tokens, min, max, image, 20.0f);
-		for (Position position : positions) {
+		final List<Position> positions = this.createPositions(tokens, min, max, image, 20.0f);
+		for (final Position position : positions) {
 			g.setFont(position.font);
-			g.setColor(createColor(position.percent));
+			g.setColor(this.createColor(position.percent));
 			if (position.vertical) {
 				final AffineTransform t = AffineTransform.getRotateInstance(Math.PI * 1.5, position.x, position.y);
 				t.concatenate(AffineTransform.getTranslateInstance(-position.width, 0));
@@ -103,11 +103,11 @@ public class WordCloudService {
 	}
 
 	private Color createColor(final double percent) {
-		if (percent > 0.666)
-			return new Color(0, 0, 255 - (int) (percent * 200));
-		if (percent > 0.333)
-			return new Color(0, 255 - (int) (percent * 200), 0);
-		return new Color(255 - (int) (percent * 200), 0, 0);
+		if (percent > 0.5)
+			return new Color(0, 0, 255 - (int) (percent * 150));
+		if (percent > 0.20)
+			return new Color(0, 255 - (int) (percent * 150), 0);
+		return new Color(255 - (int) (percent * 150), 0, 0);
 	}
 
 	private List<Position> createPositions(final List<Token> tokens, final int min, final int max,
@@ -118,7 +118,7 @@ public class WordCloudService {
 		final Graphics2D g = image.createGraphics();
 		final int width = image.getWidth();
 		final int height = image.getHeight();
-		boolean mainLoop = true;
+		boolean nextLoop = true;
 		Position next;
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
@@ -129,9 +129,11 @@ public class WordCloudService {
 			if (i == 0) {
 				next.x = (image.getWidth() - next.width) / 2;
 				next.y = (image.getHeight() - next.height) / 2;
-			} else if (i < positions.size() / 3 && mainLoop)
-				mainLoop = positionNext(next, positions, width, height);
-			if (!mainLoop && !positionFringe(next, positions, width, height))
+			} else if (nextLoop)
+				nextLoop = this.positionNext(next, positions, width, height);
+			else if (i > tokens.size() / 3)
+				nextLoop = false;
+			if (!nextLoop && !this.positionFringe(next, positions, width, height))
 				next = null;
 			if (next != null)
 				positions.add(next);
@@ -168,14 +170,14 @@ public class WordCloudService {
 				y3 = candidate.y + candidate.height - position.width;
 				y4 = candidate.y + candidate.height;
 			}
-			for (Integer[] xy : Arrays.asList(
+			for (final Integer[] xy : Arrays.asList(
 					new Integer[] { x1, y2 }, new Integer[] { x2, y1 },
 					new Integer[] { x3, y1 }, new Integer[] { x4, y2 },
 					new Integer[] { x1, y3 }, new Integer[] { x2, y4 },
 					new Integer[] { x3, y4 }, new Integer[] { x4, y3 })) {
 				position.x = xy[0];
 				position.y = xy[1];
-				if (inside(position, width, height) && intersects(position, positions) == null)
+				if (this.inside(position, width, height) && this.intersects(position, positions) == null)
 					return true;
 			}
 		}
@@ -198,9 +200,9 @@ public class WordCloudService {
 						position.y = candidate.y;
 					}
 					while (position.y < candidate.y + candidate.width) {
-						final Position intersection = intersects(position, positions);
+						final Position intersection = this.intersects(position, positions);
 						if (intersection == null) {
-							if (inside(position, width, height)) {
+							if (this.inside(position, width, height)) {
 								position.fringe = true;
 								return true;
 							}
@@ -220,9 +222,9 @@ public class WordCloudService {
 						position.y = candidate.y + candidate.height;
 					}
 					while (position.x < candidate.x + candidate.width) {
-						final Position intersection = intersects(position, positions);
+						final Position intersection = this.intersects(position, positions);
 						if (intersection == null) {
-							if (inside(position, width, height)) {
+							if (this.inside(position, width, height)) {
 								position.fringe = true;
 								return true;
 							}
@@ -272,14 +274,14 @@ public class WordCloudService {
 			this.font = font;
 		}
 
-		private boolean intersects(Position position) {
+		private boolean intersects(final Position position) {
 			final int w1, h1, w2, h2;
-			if (vertical) {
-				w1 = height;
-				h1 = width;
+			if (this.vertical) {
+				w1 = this.height;
+				h1 = this.width;
 			} else {
-				w1 = width;
-				h1 = height;
+				w1 = this.width;
+				h1 = this.height;
 			}
 			if (position.vertical) {
 				w2 = position.height;
@@ -288,7 +290,8 @@ public class WordCloudService {
 				w2 = position.width;
 				h2 = position.height;
 			}
-			return x + w1 > position.x && x < position.x + w2 && y + h1 > position.y && y < position.y + h2;
+			return this.x + w1 > position.x && this.x < position.x + w2 && this.y + h1 > position.y
+					&& this.y < position.y + h2;
 		}
 	}
 }
