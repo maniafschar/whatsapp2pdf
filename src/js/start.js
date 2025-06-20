@@ -13,6 +13,14 @@ export { ui };
 class ui {
 	static init() {
 		window.onresize();
+		if (window.location.search) {
+			var params = new URL(location.href).searchParams;
+			if (params.get('id') && params.get('pin'))
+				api.saveFeedback({
+					id: params.get('id'),
+					pin: params.get('pin')
+				});
+		}
 	}
 
 	static showDescription(i) {
