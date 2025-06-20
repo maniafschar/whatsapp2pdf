@@ -27,8 +27,7 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 
 @Service
 class ChartService {
-	private static Color[] COLORS = { Color.RED, Color.BLUE, Color.GRAY, Color.CYAN, Color.BLACK, Color.ORANGE,
-			Color.WHITE, Color.MAGENTA, Color.GREEN, Color.PINK };
+	private static Color[] COLORS = { Color.RED, Color.DARK_GRAY, Color.BLUE, Color.BLACK, Color.MAGENTA };
 
 	Color nextColor(final int i) {
 		return COLORS[i % COLORS.length];
@@ -193,5 +192,13 @@ class ChartService {
 		private int wordsMax = 0;
 		private int lettersMax = 0;
 		private final List<Plot> plots = new ArrayList<>();
+	}
+
+	public static Color[] getCOLORS() {
+		return COLORS;
+	}
+
+	public static void setCOLORS(Color[] cOLORS) {
+		COLORS = cOLORS;
 	}
 }
