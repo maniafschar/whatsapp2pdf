@@ -42,7 +42,7 @@ public class FeedbackService {
 
 	@SuppressWarnings("unchecked")
 	public List<Feedback> list() {
-		return (List<Feedback>) repository.list("from Feedback f ORDER BY f.createdAt DESC");
+		return (List<Feedback>) repository.list("from Feedback f where f.verified=true ORDER BY f.createdAt DESC");
 	}
 
 	private String generatePin(final int length) {
