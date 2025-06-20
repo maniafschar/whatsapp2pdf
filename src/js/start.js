@@ -15,11 +15,22 @@ class ui {
 		window.onresize();
 		if (window.location.search) {
 			var params = new URL(location.href).searchParams;
-			if (params.get('id') && params.get('pin'))
-				api.saveFeedback({
-					id: params.get('id'),
-					pin: params.get('pin')
+			if (params.get('id') && params.get('pin')) {
+				api.ajax({
+					url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
+					method: 'PUT',
+					body: {
+						id: params.get('id'),
+						pin: params.get('pin')
+					},
+					success: xhr => {
+						document.querySelector('popup content').innerHTML = xhr;
+					},
+					error: xhr => {
+						document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+					}
 				});
+			}
 		}
 	}
 
