@@ -81,7 +81,8 @@ class api {
 
 	static saveFeedback() {
 		var body = {
-			id: null,
+			id: document.querySelector('popup input[name="id"]').value,
+			pin: document.querySelector('popup input[name="pin"]').value,
 			note: document.querySelector('popup textarea[name="note"]').value,
 			name: document.querySelector('popup input[name="name"]').value,
 			email: document.querySelector('popup input[name="email"]').value

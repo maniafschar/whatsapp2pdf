@@ -25,6 +25,9 @@ public class FeedbackService {
 				|| Strings.isEmpty(feedback.getNote()))
 			return "No input.";
 		if (Files.exists(ExtractService.getTempDir(id))) {
+			if (feedback.getPin() != null
+					&& !feedback.getPin().equals(repository.one(Feedback.class, feedback.getId()).getPin()))
+				return "Pin expired.";
 			feedback.setPin(generatePin(6));
 			repository.save(feedback);
 			emailService.send(feedback.getEmail(), "ydfgdf");
