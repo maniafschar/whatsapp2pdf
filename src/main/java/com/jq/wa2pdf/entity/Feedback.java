@@ -14,6 +14,7 @@ public class Feedback extends BaseEntity {
 	private String image;
 	private String pin;
 	private short rating;
+	private boolean verified = false;
 
 	public String getNote() {
 		return note;
@@ -69,5 +70,13 @@ public class Feedback extends BaseEntity {
 
 	public void setRating(final short rating) {
 		this.rating = rating;
+	}
+
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(final boolean verified) {
+		this.verified = verified;
 	}
 }
