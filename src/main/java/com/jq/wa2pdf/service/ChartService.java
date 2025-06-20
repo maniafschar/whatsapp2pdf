@@ -193,12 +193,4 @@ class ChartService {
 		private int lettersMax = 0;
 		private final List<Plot> plots = new ArrayList<>();
 	}
-
-	public static Color[] getCOLORS() {
-		return COLORS;
-	}
-
-	public static void setCOLORS(Color[] cOLORS) {
-		COLORS = cOLORS;
-	}
 }
