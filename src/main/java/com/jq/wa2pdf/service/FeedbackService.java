@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.util.List;
 
 import org.apache.commons.mail.EmailException;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,11 @@ public class FeedbackService {
 	private EmailService emailService;
 
 	public String save(final String id, final Feedback feedback) throws EmailException {
+		if (Strings.isEmpty(feedback.getName()) || Strings.isEmpty(feedback.getEmail())
+				|| Strings.isEmpty(feedback.getNote()))
+			return "No input.";
 		if (Files.exists(ExtractService.getTempDir(id))) {
+			feedback.setPin(generatePin(6));
 			repository.save(feedback);
 			emailService.send(feedback.getEmail(), "ydfgdf");
 			return "An email has been sent to you. Please confirm to publish your feedback.";
@@ -29,13 +34,22 @@ public class FeedbackService {
 	}
 
 	public Feedback one(final BigInteger id, final String pin) {
-		@SuppressWarnings("unchecked")
-		final List<Feedback> list = (List<Feedback>) repository.list("");
-		return list.size() == 1 ? list.get(0) : null;
+		return repository.one(Feedback.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Feedback> list() {
-		return (List<Feedback>) repository.list("");
+		return (List<Feedback>) repository.list("from Feedback f ORDER BY f.createdAt DESC");
+	}
+
+	private String generatePin(final int length) {
+		final StringBuilder s = new StringBuilder();
+		char c;
+		while (s.length() < length) {
+			c = (char) (Math.random() * 150);
+			if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+				s.append(c);
+		}
+		return s.toString();
 	}
 }
