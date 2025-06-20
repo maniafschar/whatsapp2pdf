@@ -129,11 +129,26 @@ public class WordCloudService {
 				positionVerticalTopLeft(next, positions.get(positions.size() - 1));
 			else if (i == 2)
 				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
+			else if (i == 3)
+				positionVerticalBottomRight(next, positions.get(positions.size() - 2));
+			else if (i == 4)
+				positionHorizontalRightBottom(next, positions.get(positions.size() - 1));
 			else if (!positionFringe(next, positions))
 				break;
 			positions.add(next);
 		}
 		return positions;
+	}
+
+	private void positionHorizontalRightBottom(final Position position, final Position relative) {
+		position.x = relative.x + relative.height;
+		position.y = relative.y + relative.width;
+	}
+
+	private void positionVerticalBottomRight(final Position position, final Position relative) {
+		position.x = relative.x + relative.width;
+		position.y = relative.y;
+		position.vertical = true;
 	}
 
 	private void positionVerticalTopLeft(final Position position, final Position relative) {
