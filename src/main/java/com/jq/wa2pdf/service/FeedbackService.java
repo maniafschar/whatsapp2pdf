@@ -20,22 +20,25 @@ public class FeedbackService {
 	@Autowired
 	private EmailService emailService;
 
-	public String save(final String id, final Feedback feedback) throws EmailException {
+	public String save(final String id, Feedback feedback) throws EmailException {
 		if (Strings.isEmpty(feedback.getName()) || Strings.isEmpty(feedback.getEmail())
 				|| Strings.isEmpty(feedback.getNote()))
 			return "No input.";
 		if (Files.exists(ExtractService.getTempDir(id))) {
-			if (!Strings.isEmpty(feedback.getPin())) {
-				final String pin = repository.one(Feedback.class, feedback.getId()).getPin();
-				if (!feedback.getPin().equals(pin))
+			boolean isNew = feedback.getId() == null;
+			if (!isNew) {
+				final Feedback original = repository.one(Feedback.class, feedback.getId());
+				if (!original.getPin().equals(feedback.getPin()))
 					return "Pin expired.";
+				if (!Strings.isEmpty(feedback.getNote()))
+					original.setNote(feedback.getNote());
+				feedback = original;
 				feedback.setVerified(true);
 			}
-			boolean newFeedback = feedback.getId() == null;
 			feedback.setPin(generatePin(6));
 			repository.save(feedback);
 			emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
-			return newFeedback ? "An email has been sent to you. Please confirm to publish your feedback." :
+			return isNew ? "An email has been sent to you. Please confirm to publish your feedback." :
 					"Your feedback is now online.";
 		}
 		return "You data has already been deleted. Please leave feedback before deleting you data.";
