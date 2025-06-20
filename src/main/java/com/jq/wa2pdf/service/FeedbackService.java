@@ -38,8 +38,8 @@ public class FeedbackService {
 			feedback.setPin(generatePin(6));
 			repository.save(feedback);
 			emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
-			return isNew ? "An email has been sent to you. Please confirm to publish your feedback." :
-					"Your feedback is now online.";
+			return isNew ? "An email has been sent to you. Please confirm to publish your feedback."
+					: "Your feedback is now online.";
 		}
 		return "You data has already been deleted. Please leave feedback before deleting you data.";
 	}
@@ -50,7 +50,8 @@ public class FeedbackService {
 
 	@SuppressWarnings("unchecked")
 	public List<Feedback> list() {
-		return (List<Feedback>) repository.list("select f.note, f.rating, f.answer, f.image, f.name from Feedback f where f.verified=true ORDER BY f.createdAt DESC");
+		return (List<Feedback>) repository.list(
+				"select f.note, f.rating, f.answer, f.image, f.name from Feedback f where f.verified=true ORDER BY f.createdAt DESC");
 	}
 
 	private String generatePin(final int length) {

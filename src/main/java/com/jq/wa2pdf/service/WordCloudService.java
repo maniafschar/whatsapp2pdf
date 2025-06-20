@@ -141,10 +141,11 @@ public class WordCloudService {
 		return positions;
 	}
 
-	private boolean positionNext(final Position position, final List<Position> positions) {
+	private boolean positionNext(final Position position, final List<Position> positions,
+			final int width, final int height) {
 		final int offset = (int) (Math.random() * positions.size());
-		for (int i = 0; i < p.size(); i++) {
-			final Position candidate = positions.get((i + offset) % p.size());
+		for (int i = 0; i < positions.size(); i++) {
+			final Position candidate = positions.get((i + offset) % positions.size());
 			final int x1, x2, x3, x4, y1, y2, y3, y4;
 			if (candidate.vertical) {
 				position.vertical = false;
@@ -167,7 +168,11 @@ public class WordCloudService {
 				y3 = candidate.y + candidate.height - position.width;
 				y4 = candidate.y + candidate.height;
 			}
-			for (Integer[] xy : Arrays.asList({x1, y2}, {x2, y1}, {x3, y1}, {x4, y2}, {x1, y3}, {x2, y4}, {x3, y4}, {x4, y3})) {
+			for (Integer[] xy : Arrays.asList(
+					new Integer[] { x1, y2 }, new Integer[] { x2, y1 },
+					new Integer[] { x3, y1 }, new Integer[] { x4, y2 },
+					new Integer[] { x1, y3 }, new Integer[] { x2, y4 },
+					new Integer[] { x3, y4 }, new Integer[] { x4, y3 })) {
 				position.x = xy[0];
 				position.y = xy[1];
 				if (inside(position, width, height) && intersects(position, positions) == null)
@@ -177,7 +182,8 @@ public class WordCloudService {
 		return false;
 	}
 
-	private boolean positionFringe(final Position position, final List<Position> positions, final int width, final int height) {
+	private boolean positionFringe(final Position position, final List<Position> positions,
+			final int width, final int height) {
 		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
 		final int offset = (int) (Math.random() * p.size());
 		for (int i = 0; i < p.size(); i++) {
@@ -193,12 +199,15 @@ public class WordCloudService {
 					}
 					while (position.y < candidate.y + candidate.width) {
 						final Position intersection = intersects(position, positions);
-						if (intersection == null && inside(position, width, height)) {
-							position.fringe = true;
-							return true;
-						}
-						position.y = intersection.y
-								+ (intersection.vertical ? intersection.width : intersection.height);
+						if (intersection == null) {
+							if (inside(position, width, height)) {
+								position.fringe = true;
+								return true;
+							}
+							position.y += position.width;
+						} else
+							position.y = intersection.y
+									+ (intersection.vertical ? intersection.width : intersection.height);
 					}
 				}
 			} else {
@@ -212,12 +221,15 @@ public class WordCloudService {
 					}
 					while (position.x < candidate.x + candidate.width) {
 						final Position intersection = intersects(position, positions);
-						if (intersection == null && inside(position, width, height)) {
-							position.fringe = true;
-							return true;
-						}
-						position.x = intersection.x
-								+ (intersection.vertical ? intersection.height : intersection.width);
+						if (intersection == null) {
+							if (inside(position, width, height)) {
+								position.fringe = true;
+								return true;
+							}
+							position.x += position.height;
+						} else
+							position.x = intersection.x
+									+ (intersection.vertical ? intersection.height : intersection.width);
 					}
 				}
 			}
@@ -278,4 +290,5 @@ public class WordCloudService {
 			}
 			return x + w1 > position.x && x < position.x + w2 && y + h1 > position.y && y < position.y + h2;
 		}
+	}
 }
