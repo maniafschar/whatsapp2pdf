@@ -11,6 +11,10 @@ window.onresize = function () {
 export { ui };
 
 class ui {
+	static init() {
+		window.onresize();
+	}
+
 	static showDescription(i) {
 		document.querySelector('description container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
@@ -263,4 +267,3 @@ ratingSelection span {
 customElements.define('input-rating', InputRating);
 window.api = api;
 window.ui = ui;
-window.onresize();
