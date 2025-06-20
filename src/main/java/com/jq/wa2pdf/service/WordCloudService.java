@@ -116,54 +116,68 @@ public class WordCloudService {
 		if (tokens.size() == 0)
 			return positions;
 		final Graphics2D g = image.createGraphics();
+		final int width = image.getWidth();
+		final int height = image.getHeight();
+		boolean mainLoop = true;
+		Position next;
 		for (int i = 0; i < tokens.size(); i++) {
 			final Token token = tokens.get(i);
 			final double percent = ((double) token.getCount() - min) / (max - min);
 			g.setFont(FONT.deriveFont((float) ((percent + 1) * fontSize)));
-			final Position next = new Position(token, g.getFontMetrics().stringWidth(token.getText()),
+			next = new Position(token, g.getFontMetrics().stringWidth(token.getText()),
 					g.getFontMetrics().getHeight(), percent, g.getFont());
 			if (i == 0) {
 				next.x = (image.getWidth() - next.width) / 2;
 				next.y = (image.getHeight() - next.height) / 2;
-			} else if (i == 1)
-				positionVerticalTopLeft(next, positions.get(positions.size() - 1));
-			else if (i == 2)
-				positionVerticalLeftAlignEnd(next, positions.get(positions.size() - 1));
-			else if (i == 3)
-				positionVerticalBottomRight(next, positions.get(positions.size() - 2));
-			else if (i == 4)
-				positionHorizontalRightBottom(next, positions.get(positions.size() - 1));
-			else if (!positionFringe(next, positions))
-				break;
-			positions.add(next);
+			} else if (i < positions.size() / 3 && mainLoop)
+				mainLoop = positionNext(next, positions, width, height);
+			if (!mainLoop && !positionFringe(next, positions, width, height))
+				next = null;
+			if (next != null)
+				positions.add(next);
+			else
+				System.out.println("Failed on " + token.text);
 		}
 		return positions;
 	}
 
-	private void positionHorizontalRightBottom(final Position position, final Position relative) {
-		position.x = relative.x + relative.height;
-		position.y = relative.y + relative.width;
+	private boolean positionNext(final Position position, final List<Position> positions) {
+		final int offset = (int) (Math.random() * positions.size());
+		for (int i = 0; i < p.size(); i++) {
+			final Position candidate = positions.get((i + offset) % p.size());
+			final int x1, x2, x3, x4, y1, y2, y3, y4;
+			if (candidate.vertical) {
+				position.vertical = false;
+				x1 = candidate.x - position.width;
+				x2 = candidate.x - position.width + candidate.height;
+				x3 = candidate.x;
+				x4 = candidate.x + candidate.height;
+				y1 = candidate.y - position.height;
+				y2 = candidate.y;
+				y3 = candidate.y + candidate.width - position.height;
+				y4 = candidate.y + candidate.width;
+			} else {
+				position.vertical = true;
+				x1 = candidate.x - position.height;
+				x2 = candidate.x;
+				x3 = candidate.x + candidate.width - position.height;
+				x4 = candidate.x + candidate.width;
+				y1 = candidate.y - position.width;
+				y2 = candidate.y;
+				y3 = candidate.y + candidate.height - position.width;
+				y4 = candidate.y + candidate.height;
+			}
+			for (Integer[] xy : Arrays.asList({x1, y2}, {x2, y1}, {x3, y1}, {x4, y2}, {x1, y3}, {x2, y4}, {x3, y4}, {x4, y3})) {
+				position.x = xy[0];
+				position.y = xy[1];
+				if (ininside(position, width, height) && intersects(position, positions) == null)
+					return true;
+			}
+		}
+		return false;
 	}
 
-	private void positionVerticalBottomRight(final Position position, final Position relative) {
-		position.x = relative.x + relative.width;
-		position.y = relative.y;
-		position.vertical = true;
-	}
-
-	private void positionVerticalTopLeft(final Position position, final Position relative) {
-		position.x = relative.x;
-		position.y = relative.y - position.width;
-		position.vertical = true;
-	}
-
-	private void positionVerticalLeftAlignEnd(final Position position, final Position relative) {
-		position.x = relative.x - position.height;
-		position.y = relative.y + relative.width;
-		position.vertical = true;
-	}
-
-	private boolean positionFringe(final Position position, final List<Position> positions) {
+	private boolean positionFringe(final Position position, final List<Position> positions, final int width, final int height) {
 		final List<Position> p = positions.stream().filter(e -> !e.fringe).collect(Collectors.toList());
 		final int offset = (int) (Math.random() * p.size());
 		for (int i = 0; i < p.size(); i++) {
@@ -179,7 +193,7 @@ public class WordCloudService {
 					}
 					while (position.y < candidate.y + candidate.width) {
 						final Position intersection = intersects(position, positions);
-						if (intersection == null) {
+						if (intersection == null && inside(position, width, height)) {
 							position.fringe = true;
 							return true;
 						}
@@ -198,7 +212,7 @@ public class WordCloudService {
 					}
 					while (position.x < candidate.x + candidate.width) {
 						final Position intersection = intersects(position, positions);
-						if (intersection == null) {
+						if (intersection == null && inside(position, width, height)) {
 							position.fringe = true;
 							return true;
 						}
@@ -217,6 +231,14 @@ public class WordCloudService {
 				return p;
 		}
 		return null;
+	}
+
+	private boolean inside(final Position position, final int width, final int height) {
+		if (position.x < 0 || position.y < 0)
+			return false;
+		if (position.vertical)
+			return position.x + position.height < width && position.y + position.width < height;
+		return position.x + position.width < width && position.y + position.height < height;
 	}
 
 	private static class Position {
@@ -256,10 +278,4 @@ public class WordCloudService {
 			}
 			return x + w1 > position.x && x < position.x + w2 && y + h1 > position.y && y < position.y + h2;
 		}
-
-		@Override
-		public String toString() {
-			return "{" + token.getText() + ": " + x + ", " + y + ", " + width + ", " + height + ", " + vertical + "}";
-		}
-	}
 }
