@@ -170,7 +170,7 @@ public class WordCloudService {
 			for (Integer[] xy : Arrays.asList({x1, y2}, {x2, y1}, {x3, y1}, {x4, y2}, {x1, y3}, {x2, y4}, {x3, y4}, {x4, y3})) {
 				position.x = xy[0];
 				position.y = xy[1];
-				if (ininside(position, width, height) && intersects(position, positions) == null)
+				if (inside(position, width, height) && intersects(position, positions) == null)
 					return true;
 			}
 		}
