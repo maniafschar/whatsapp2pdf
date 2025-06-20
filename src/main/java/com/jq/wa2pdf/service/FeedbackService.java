@@ -25,7 +25,7 @@ public class FeedbackService {
 				|| Strings.isEmpty(feedback.getNote()))
 			return "No input.";
 		if (Files.exists(ExtractService.getTempDir(id))) {
-			boolean isNew = feedback.getId() == null;
+			final boolean isNew = feedback.getId() == null;
 			if (!isNew) {
 				final Feedback original = repository.one(Feedback.class, feedback.getId());
 				if (!original.getPin().equals(feedback.getPin()))
