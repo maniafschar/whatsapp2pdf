@@ -79,14 +79,7 @@ class api {
 		});
 	}
 
-	static saveFeedback() {
-		var body = {
-			id: document.querySelector('popup input[name="id"]').value,
-			pin: document.querySelector('popup input[name="pin"]').value,
-			note: document.querySelector('popup textarea[name="note"]').value,
-			name: document.querySelector('popup input[name="name"]').value,
-			email: document.querySelector('popup input[name="email"]').value
-		};
+	static saveFeedback(body) {
 		if (!body.email || !body.name || !body.note) {
 			document.querySelector('popup content error').innerHTML = 'Please enter all fields.';
 			return;
