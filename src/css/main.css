@@ -83,6 +83,7 @@ button {
 	margin: 0 0.5em 0.5em 0.5em;
 	font-size: 1em;
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
+	z-index: 2;
 }
 
 h1 {
@@ -330,6 +331,25 @@ label {
 	text-indent: 1em;
 	font-style: italic;
 	color: rgba(0, 0, 100, 0.5);
+}
+
+feedbacks {
+	text-align: left;
+}
+
+rating,
+rating top,
+rating note {
+	display: block;
+	position: relative;
+}
+
+rating top {
+	font-size: 0.8em;
+}
+
+rating note {
+	margin: 0.5em 0 2em 0;
 }
 
 progressbar {

@@ -56,7 +56,7 @@ class ui {
 }
 
 class InputRating extends HTMLElement {
-	rating = `<ratingSelection style="font-size:2em;margin-top:0.5em;">
+	rating = `<ratingSelection style="font-size:2em;margin:0.5em 0;">
 	<empty><span>☆</span><span onclick="this.getRootNode().host.rate(event,2)">☆</span><span
 			onclick="this.getRootNode().host.rate(event,3)">☆</span><span onclick="this.getRootNode().host.rate(event,4)">☆</span><span
 			onclick="this.getRootNode().host.rate(event,5)">☆</span></empty>
@@ -72,38 +72,13 @@ class InputRating extends HTMLElement {
 		const style = document.createElement('style');
 		style.textContent = `
 detailRating {
-	font-size: 1.5em;
-	margin: 1em 0 0.75em 0;
-	display: block;
 	position: relative;
-	cursor: pointer;
+	color: darkgoldenrod;
 }
 
 ratingHint {
 	margin: 0 1em 1em 1em;
 	display: block;
-}
-
-ratingHistory {
-	display: block;
-}
-
-ratingHistory rating {
-	display: block;
-	background: transparent;
-	padding: 0.5em;
-	text-align: left;
-	width: 100%;
-	position: relative;
-}
-
-ratingHistory rating img {
-	max-width: 100%;
-	border-radius: 1em;
-}
-
-ratingHistory span {
-	position: relative;
 }
 
 rating,
@@ -139,11 +114,6 @@ ratingSelection span {
 		var element, id = this.getAttribute('id');
 		var stars = '<empty>☆☆☆☆☆</empty><full style="width:{0}%;">★★★★★</full>';
 		if (this.getAttribute('ui') == 'dialog') {
-			this.removeAttribute('ui');
-			element = document.createElement('div');
-			element.innerHTML = this.getForm(id);
-			this._root.appendChild(element);
-		} else if (this.getAttribute('ui') == 'rating') {
 			element = document.createElement('div');
 			element.innerHTML = this.rating;
 			this._root.appendChild(element.children[0]);
@@ -151,31 +121,20 @@ ratingSelection span {
 			element.setAttribute('type', 'hidden');
 			element.setAttribute('name', 'rating');
 			element.setAttribute('value', '80');
-			this._root.appendChild(element);
+		} else {
+			var stars = '<empty>☆☆☆☆☆</empty><full style="width:{0}%;">★★★★★</full>';
+			element = document.createElement('detailRating');
+			element.innerHTML = '<ratingSelection>' + stars.replace('{0}', this.getAttribute('rating')) + '</ratingSelection>';
 		}
+		this.removeAttribute('ui');
+		this._root.appendChild(element);
 	}
 	rate(event, x) {
 		var e = event.target.getRootNode().querySelectorAll('ratingSelection > full span');
-		ui.css(e, 'display', 'none');
-		for (var i = 0; i < x; i++)
-			ui.css(e[i], 'display', '');
+		for (var i = 0; i < 5; i++)
+			e[i].style.display = i < x ? '' : 'none';
 		event.target.getRootNode().querySelector('[name="rating"]').value = x * 20;
 		event.target.getRootNode().host.setAttribute('value', x * 20);
-	}
-	getForm(id) {
-		return `${this.rating}<input type="hidden" name="rating" value="80" />`;
-	}
-	static open(id) {
-		var lastRating = {};
-		var render = function () {
-			if (lastRating)
-				ui.navigation.openPopup(ui.l('rating.title'), '<input-rating ui="dialog"' + (id ? ' id="' + id + '"' : '')
-					+ (lastRating ? ' lastRating="' + encodeURIComponent(JSON.stringify(lastRating)) + '"' : '') + '></input-rating>');
-		};
-		render();
-	}
-	save(event) {
-		api.saveFeedback();
 	}
 }
 

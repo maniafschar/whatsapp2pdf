@@ -113,7 +113,10 @@ class api {
 		api.ajax({
 			url: api.url + '/rest/api/feedback/list',
 			success: xhr => {
-				console.log(xhr.response);
+				var s = '';
+				for (var i = 0; i < xhr.length; i++)
+					s += '<rating><input-rating rating="' + (20 * xhr[i].rating) + '"></input-rating><top>' + new Date(xhr[i].modifiedAt).toLocaleString() + ' &middot; ' + xhr[i].name + '</top><note>' + xhr[i].note + '</note></rating>';
+				document.querySelector('feedbacks').innerHTML = s;
 			}
 		});
 	}

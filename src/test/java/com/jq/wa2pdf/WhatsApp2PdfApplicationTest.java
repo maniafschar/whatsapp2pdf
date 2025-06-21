@@ -1,5 +1,6 @@
 package com.jq.wa2pdf;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class WhatsApp2PdfApplicationTest {
 		feedback.setName("mani");
 		feedback.setEmail("mani.afschar@jq-consulting.de");
 		feedback.setPin("123456");
+		feedback.setModifiedAt(new Timestamp(System.currentTimeMillis()));
 		feedback.setVerified(true);
 		this.repository.save(feedback);
 	}

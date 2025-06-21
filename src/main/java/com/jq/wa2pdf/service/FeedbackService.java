@@ -62,7 +62,7 @@ public class FeedbackService {
 
 	public List<Feedback> list() {
 		final List<Feedback> list = this.repository.list(
-				"select feedback from Feedback feedback where verified=true ORDER BY createdAt DESC", Feedback.class);
+				"from Feedback feedback where verified=true ORDER BY createdAt DESC", Feedback.class);
 		list.stream().forEach(e -> {
 			e.setCreatedAt(null);
 			e.setEmail(null);
