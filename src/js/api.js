@@ -101,6 +101,7 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content message').innerHTML = xhr;
 				document.querySelector('popup content data').style.display = '';
+				document.querySelector('description button[onclick*="feedback"]').style.display = 'none';
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
