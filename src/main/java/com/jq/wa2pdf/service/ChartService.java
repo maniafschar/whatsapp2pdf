@@ -33,9 +33,10 @@ class ChartService {
 		return COLORS[i % COLORS.length];
 	}
 
-	void createImage(final List<Statistics> data, final Path file, final boolean preview)
+	void createImage(final List<Statistics> data, final Path file, final boolean preview, final String user)
 			throws IOException, ParseException {
-		final List<String> periods = expandPeriods(data.stream().map(e -> e.getPeriod()).collect(Collectors.toList()));
+		final List<String> periods = this
+				.expandPeriods(data.stream().map(e -> e.getPeriod()).collect(Collectors.toList()));
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -48,17 +49,17 @@ class ChartService {
 		final int marginPlot = 10;
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
 		final int marginX = (image.getWidth() - marginLegend) / periods.size();
-		drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
+		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
 				periods);
-		drawChart(g, marginLegend, marginPlot, heightPlot,
-				preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, periods, preview));
+		this.drawChart(g, marginLegend, marginPlot, heightPlot,
+				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, periods, preview, user));
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private List<String> expandPeriods(List<String> periods) throws ParseException {
+	private List<String> expandPeriods(final List<String> periods) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat(
 				periods.get(0).contains("/") ? "MM/dd/yy" : periods.get(0).contains(".") ? "dd.MM.yy" : "yy-MM-dd");
 		final GregorianCalendar gc = new GregorianCalendar();
@@ -76,9 +77,10 @@ class ChartService {
 	}
 
 	private PlotData preparePlotData(final List<Statistics> data, final int marginLegend, final int marginPlot,
-			final int marginX, final int heightPlot, final List<String> periods, final boolean preview) {
+			final int marginX, final int heightPlot, final List<String> periods, final boolean preview,
+			final String user) {
 		final PlotData plotData = new PlotData();
-		for (Statistics statistics : data) {
+		for (final Statistics statistics : data) {
 			if (plotData.chatsMax < statistics.chats)
 				plotData.chatsMax = statistics.chats;
 			if (plotData.wordsMax < statistics.words)
@@ -90,7 +92,7 @@ class ChartService {
 			final Statistics statistics = data.get(i);
 			Plot plot = plotData.plots.stream().filter(e -> e.user.equals(statistics.user)).findFirst().orElse(null);
 			if (plot == null) {
-				plot = new Plot(statistics.user, nextColor(plotData.plots.size()));
+				plot = new Plot(statistics.user, this.nextColor(plotData.plots.size()));
 				plotData.plots.add(plot);
 			}
 			final int index = periods
@@ -116,6 +118,11 @@ class ChartService {
 				e.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
 			}
 		});
+		final Plot userPlot = plotData.plots.stream().filter(e -> e.user.equals(user)).findFirst().orElse(null);
+		if (userPlot != null) {
+			plotData.plots.remove(userPlot);
+			plotData.plots.add(userPlot);
+		}
 		return plotData;
 	}
 
@@ -155,7 +162,7 @@ class ChartService {
 		g.setFont(fontVertical);
 		g.setColor(new Color(0, 0, 0, 120));
 
-		for (String period : periods)
+		for (final String period : periods)
 			g.drawString(period, x += marginX, height);
 
 		g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(0)));

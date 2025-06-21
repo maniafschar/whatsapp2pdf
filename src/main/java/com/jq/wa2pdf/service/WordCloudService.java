@@ -92,7 +92,6 @@ public class WordCloudService {
 				g.setTransform(t);
 			}
 			g.drawString(position.token.getText(), position.x, position.y + (int) (0.784 * position.height));
-			// g.drawRect(position.x, position.y, position.width, position.height);
 			if (position.vertical)
 				g.setTransform(AffineTransform.getRotateInstance(0));
 		}
@@ -103,9 +102,9 @@ public class WordCloudService {
 	}
 
 	private Color createColor(final double percent) {
-		if (percent > 0.5)
+		if (percent > 0.45)
 			return new Color(0, 0, 255 - (int) (percent * 150));
-		if (percent > 0.20)
+		if (percent > 0.15)
 			return new Color(0, 255 - (int) (percent * 150), 0);
 		return new Color(255 - (int) (percent * 150), 0, 0);
 	}

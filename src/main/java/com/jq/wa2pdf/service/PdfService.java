@@ -356,6 +356,7 @@ public class PdfService {
 					wordCloud = new Statistics();
 					wordCloud.user = user;
 					wordCloud.text = new StringBuilder();
+					System.out.println(wordCloud.user);
 					this.wordClouds.add(wordCloud);
 				}
 				wordCloud.text.append(message).append(" ");
@@ -409,6 +410,12 @@ public class PdfService {
 				statisticsTotal.words += statistics.words;
 				statisticsTotal.letters += statistics.letters;
 			}
+			final Statistics userStatistics = totalSumUp.stream().filter(e -> e.user.equals(this.user)).findFirst()
+					.orElse(null);
+			if (userStatistics != null) {
+				totalSumUp.remove(userStatistics);
+				totalSumUp.add(userStatistics);
+			}
 			for (int i = 0; i < totalSumUp.size(); i++) {
 				final Statistics statistics = totalSumUp.get(i);
 				final Cell cell = this.createCell(statistics.user, TextAlignment.RIGHT, 0, 0, 0, 0);
@@ -429,13 +436,19 @@ public class PdfService {
 			tableChart.setWidth(UnitValue.createPercentValue(100f));
 			tableChart.setKeepTogether(true);
 			final String idChart = filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview);
+			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.user);
 			final Cell cellChart = this.createCell(idChart, true);
 			cellChart.setPadding(0);
 			cellChart.setWidth(UnitValue.createPercentValue(100f));
 			tableChart.addCell(cellChart);
 			this.document.add(tableChart);
 
+			final Statistics wordCloudStatistics = this.wordClouds.stream().filter(e -> e.user.equals(this.user))
+					.findFirst().orElse(null);
+			if (wordCloudStatistics != null) {
+				this.wordClouds.remove(wordCloudStatistics);
+				this.wordClouds.add(wordCloudStatistics);
+			}
 			final Table tableWordCloud = new Table(this.wordClouds.size());
 			tableWordCloud.setMarginTop(20f);
 			final List<List<Token>> tokens = new ArrayList<>();
