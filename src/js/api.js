@@ -73,7 +73,7 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
 				document.getElementsByTagName('upload')[0].style.display = null;
-				document.querySelector('description button[onclick*="feedback"]').style.display = 'none';
+				document.querySelector('tabBody button[onclick*="feedback"]').style.display = 'none';
 				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '');
 			}
 		});
@@ -81,6 +81,7 @@ class api {
 
 	static saveFeedback() {
 		var body = {
+			rating: document.querySelector('popup input-rating').getAttribute('value'),
 			id: document.querySelector('popup input[name="id"]').value,
 			pin: document.querySelector('popup input[name="pin"]').value,
 			note: document.querySelector('popup textarea[name="note"]').value,
@@ -101,7 +102,7 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content message').innerHTML = xhr;
 				document.querySelector('popup content data').style.display = '';
-				document.querySelector('description button[onclick*="feedback"]').style.display = 'none';
+				document.querySelector('tabBody button[onclick*="feedback"]').style.display = 'none';
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
@@ -145,7 +146,7 @@ class api {
 						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
-					document.querySelector('description button[onclick*="feedback"]').style.display = '';
+					document.querySelector('tabBody button[onclick*="feedback"]').style.display = '';
 				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						tr.classList.remove('selected');

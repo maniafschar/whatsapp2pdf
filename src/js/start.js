@@ -39,7 +39,7 @@ class ui {
 	}
 
 	static showDescription(i) {
-		document.querySelector('description container').style.marginLeft = -(i * 100) + '%';
+		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
 		document.querySelectorAll('tab')[i].classList.add('selected');
 	}
@@ -128,6 +128,7 @@ ratingSelection span {
 		}
 		this.removeAttribute('ui');
 		this._root.appendChild(element);
+		this._root.host.setAttribute('value', 80);
 	}
 	rate(event, x) {
 		var e = event.target.getRootNode().querySelectorAll('ratingSelection > full span');

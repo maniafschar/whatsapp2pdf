@@ -64,7 +64,7 @@ body header {
 }
 
 body header span,
-description upload span {
+tabBody upload span {
 	position: relative;
 	display: inline-block;
 	background: var(--headerLabelBG);
@@ -197,7 +197,7 @@ table td button {
 	margin: 0;
 }
 
-description {
+tabBody {
 	display: inline-block;
 	width: 100%;
 	max-width: 50em;
@@ -209,7 +209,7 @@ description {
 	border: solid 2em transparent;
 }
 
-description>container {
+tabBody>container {
 	width: 400%;
 	display: inline-block;
 	position: absolute;
@@ -219,7 +219,7 @@ description>container {
 	overflow-y: hidden;
 }
 
-description element {
+tabBody element {
 	display: inline-block;
 	position: absolute;
 	width: 25%;
