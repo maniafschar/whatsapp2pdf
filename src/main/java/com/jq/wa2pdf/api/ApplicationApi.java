@@ -46,26 +46,28 @@ public class ApplicationApi {
 
 	@PostMapping("analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws Exception {
-		return extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
+		return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
 	}
 
 	@PostMapping("preview/{id}")
-	public void preview(@PathVariable String id, @RequestParam final String period, @RequestParam final String user)
+	public void preview(@PathVariable final String id, @RequestParam final String period,
+			@RequestParam final String user)
 			throws Exception {
-		pdfService.create(id, period, user, true);
+		this.pdfService.create(id, period, user, true);
 	}
 
 	@PostMapping("buy/{id}")
-	public void buy(@PathVariable String id, @RequestParam final String[] periods, @RequestParam final String user)
+	public void buy(@PathVariable final String id, @RequestParam final String[] periods,
+			@RequestParam final String user)
 			throws Exception {
-		for (String period : periods)
-			pdfService.create(id, period, user, false);
+		for (final String period : periods)
+			this.pdfService.create(id, period, user, false);
 	}
 
 	@GetMapping("pdf/{id}")
 	public void pdf(@PathVariable final String id, @RequestParam(required = false) final String period,
 			final HttpServletResponse response) throws IOException {
-		final Path file = pdfService.get(id, period);
+		final Path file = this.pdfService.get(id, period);
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
@@ -78,8 +80,8 @@ public class ApplicationApi {
 			response.sendError(566);
 		} else {
 			response.setHeader("Content-Disposition",
-					"attachment; filename=\"" + sanatizeFilename(extractService.getFilename(id)) +
-							sanatizePeriod(period) + ".pdf\"");
+					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +
+							this.sanatizePeriod(period) + ".pdf\"");
 			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 			response.flushBuffer();
 		}
@@ -87,23 +89,29 @@ public class ApplicationApi {
 
 	@DeleteMapping("cleanUp/{id}")
 	public void cleanUp(@PathVariable final String id) throws IOException {
-		extractService.cleanUp(id);
+		this.extractService.cleanUp(id);
 	}
 
 	@GetMapping("feedback/{id}/{pin}")
 	public Feedback feedback(@PathVariable final BigInteger id, @PathVariable final String pin) throws IOException {
-		return feedbackService.one(id, pin);
+		return this.feedbackService.one(id, pin);
+	}
+
+	@PutMapping("feedback/confirm")
+	public String feedbackConfim(@RequestBody final Feedback feedback)
+			throws IOException, EmailException {
+		return this.feedbackService.confirm(feedback);
 	}
 
 	@PutMapping("feedback/{id}")
 	public String feedbackSave(@PathVariable final String id, @RequestBody final Feedback feedback)
 			throws IOException, EmailException {
-		return feedbackService.save(id, feedback);
+		return this.feedbackService.save(id, feedback);
 	}
 
 	@GetMapping("feedback/list")
 	public List<Feedback> feedbackList() throws IOException {
-		return feedbackService.list();
+		return this.feedbackService.list();
 	}
 
 	private String sanatizeFilename(String filename) {

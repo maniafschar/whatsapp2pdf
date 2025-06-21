@@ -356,7 +356,6 @@ public class PdfService {
 					wordCloud = new Statistics();
 					wordCloud.user = user;
 					wordCloud.text = new StringBuilder();
-					System.out.println(wordCloud.user);
 					this.wordClouds.add(wordCloud);
 				}
 				wordCloud.text.append(message).append(" ");

@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-document.querySelectorAll('input[type="file"]').forEach(e => e.onchange = api.analyse );
+document.querySelectorAll('input[type="file"]').forEach(e => e.onchange = api.analyse);
 
 window.onresize = function () {
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
@@ -17,17 +17,20 @@ class ui {
 			var params = new URL(location.href).searchParams;
 			if (params.get('id') && params.get('pin')) {
 				api.ajax({
-					url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
+					url: api.url + '/rest/api/feedback/confirm',
 					method: 'PUT',
 					body: {
 						id: params.get('id'),
 						pin: params.get('pin')
 					},
 					success: xhr => {
-						document.querySelector('popup content').innerHTML = xhr;
+						document.querySelector('popup content message').innerHTML = xhr;
+						ui.feedback();
+						api.feedback();
 					},
 					error: xhr => {
-						document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+						document.querySelector('popup content message').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+						ui.feedback();
 					}
 				});
 			}
@@ -42,6 +45,8 @@ class ui {
 
 	static feedback() {
 		document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
+		if (!document.querySelector('popup content message').innerText)
+			document.querySelector('popup content data').style.display = 'block';
 	}
 
 	static feedbackClose() {

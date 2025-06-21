@@ -99,11 +99,21 @@ class api {
 			body: body,
 			success: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
-				document.querySelector('popup content').innerHTML = xhr;
+				document.querySelector('popup content message').innerHTML = xhr;
+				document.querySelector('popup content data').style.display = '';
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+			}
+		});
+	}
+
+	static feedback() {
+		api.ajax({
+			url: api.url + '/rest/api/feedback/list',
+			success: xhr => {
+				console.log(xhr.response);
 			}
 		});
 	}

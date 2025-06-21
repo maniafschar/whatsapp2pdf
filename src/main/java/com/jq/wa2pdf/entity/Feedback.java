@@ -17,7 +17,7 @@ public class Feedback extends BaseEntity {
 	private boolean verified = false;
 
 	public String getNote() {
-		return note;
+		return this.note;
 	}
 
 	public void setNote(final String note) {
@@ -25,7 +25,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public String getAnswer() {
-		return answer;
+		return this.answer;
 	}
 
 	public void setAnswer(final String answer) {
@@ -33,7 +33,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public String getImage() {
-		return image;
+		return this.image;
 	}
 
 	public void setImage(final String image) {
@@ -41,7 +41,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -49,7 +49,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public String getEmail() {
-		return email;
+		return this.email;
 	}
 
 	public void setEmail(final String email) {
@@ -57,7 +57,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public String getPin() {
-		return pin;
+		return this.pin;
 	}
 
 	public void setPin(final String pin) {
@@ -65,7 +65,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public short getRating() {
-		return rating;
+		return this.rating;
 	}
 
 	public void setRating(final short rating) {
@@ -73,7 +73,7 @@ public class Feedback extends BaseEntity {
 	}
 
 	public boolean isVerified() {
-		return verified;
+		return this.verified;
 	}
 
 	public void setVerified(final boolean verified) {

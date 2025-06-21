@@ -20,6 +20,17 @@ public class FeedbackService {
 	@Autowired
 	private EmailService emailService;
 
+	public String confirm(final Feedback feedback) throws EmailException {
+		final Feedback original = this.repository.one(Feedback.class, feedback.getId());
+		if (!original.getPin().equals(feedback.getPin()))
+			return "Pin expired.";
+		original.setVerified(true);
+		original.setPin(this.generatePin(6));
+		this.repository.save(original);
+		this.emailService.send(original.getEmail(), "?id=" + original.getId() + "&pin=" + original.getPin());
+		return "Your feedback is now online.";
+	}
+
 	public String save(final String id, Feedback feedback) throws EmailException {
 		if (Strings.isEmpty(feedback.getName()) || Strings.isEmpty(feedback.getEmail())
 				|| Strings.isEmpty(feedback.getNote()))
@@ -27,7 +38,7 @@ public class FeedbackService {
 		if (Files.exists(ExtractService.getTempDir(id))) {
 			final boolean isNew = feedback.getId() == null;
 			if (!isNew) {
-				final Feedback original = repository.one(Feedback.class, feedback.getId());
+				final Feedback original = this.repository.one(Feedback.class, feedback.getId());
 				if (!original.getPin().equals(feedback.getPin()))
 					return "Pin expired.";
 				if (!Strings.isEmpty(feedback.getNote()))
@@ -35,9 +46,9 @@ public class FeedbackService {
 				feedback = original;
 				feedback.setVerified(true);
 			}
-			feedback.setPin(generatePin(6));
-			repository.save(feedback);
-			emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
+			feedback.setPin(this.generatePin(6));
+			this.repository.save(feedback);
+			this.emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
 			return isNew ? "An email has been sent to you. Please confirm to publish your feedback."
 					: "Your feedback is now online.";
 		}
@@ -45,13 +56,13 @@ public class FeedbackService {
 	}
 
 	public Feedback one(final BigInteger id, final String pin) {
-		return repository.one(Feedback.class, id);
+		return this.repository.one(Feedback.class, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Feedback> list() {
-		return (List<Feedback>) repository.list(
-				"select f.note, f.rating, f.answer, f.image, f.name from Feedback f where f.verified=true ORDER BY f.createdAt DESC");
+		return (List<Feedback>) this.repository.list(
+				"select feedback.note, feedback.rating, feedback.answer, feedback.image, feedback.name from Feedback feedback where verified=true ORDER BY createdAt DESC");
 	}
 
 	private String generatePin(final int length) {

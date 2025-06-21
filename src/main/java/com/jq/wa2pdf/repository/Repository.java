@@ -24,16 +24,11 @@ public class Repository {
 
 	@SuppressWarnings("unchecked")
 	public List<? extends BaseEntity> list(final String hql) {
-		try {
-			return (List<BaseEntity>) em.createQuery(hql,
-					Class.forName(BaseEntity.class.getPackage().getName() + "." + hql.split(" ")[1])).getResultList();
-		} catch (ClassNotFoundException ex) {
-			throw new RuntimeException(ex);
-		}
+		return (List<BaseEntity>) this.em.createQuery(hql).getResultList();
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {
-		return em.find(clazz, id);
+		return this.em.find(clazz, id);
 	}
 
 	public void save(final BaseEntity entity) throws IllegalArgumentException {
@@ -41,27 +36,27 @@ public class Repository {
 			if (entity.getId() == null) {
 				if (entity.getCreatedAt() == null)
 					entity.setCreatedAt(new Timestamp(Instant.now().toEpochMilli()));
-				em.persist(entity);
+				this.em.persist(entity);
 			} else {
 				entity.setModifiedAt(new Timestamp(Instant.now().toEpochMilli()));
-				em.merge(entity);
+				this.em.merge(entity);
 			}
-			em.flush();
-		} catch (PersistenceException ex) {
+			this.em.flush();
+		} catch (final PersistenceException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	public void delete(final BaseEntity entity) throws IllegalArgumentException {
 		try {
-			em.remove(em.contains(entity) ? entity : em.merge(entity));
-		} catch (PersistenceException ex) {
+			this.em.remove(this.em.contains(entity) ? entity : this.em.merge(entity));
+		} catch (final PersistenceException ex) {
 			throw new RuntimeException(ex);
 		}
 	}
 
 	public void executeUpdate(final String hql, final Object... params) {
-		final jakarta.persistence.Query query = em.createQuery(hql);
+		final jakarta.persistence.Query query = this.em.createQuery(hql);
 		if (params != null) {
 			for (int i = 0; i < params.length; i++)
 				query.setParameter(i + 1, params[i]);

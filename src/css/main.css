@@ -275,6 +275,11 @@ popup content {
 	padding: 1em;
 }
 
+popup content data {
+	position: relative;
+	display: none;
+}
+
 textarea,
 input {
 	appearance: none;
