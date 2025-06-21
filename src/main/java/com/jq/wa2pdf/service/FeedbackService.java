@@ -48,7 +48,8 @@ public class FeedbackService {
 			}
 			feedback.setPin(this.generatePin(6));
 			this.repository.save(feedback);
-			this.emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
+			if (Strings.isEmpty(feedback.getAnswer()))
+				this.emailService.send(feedback.getEmail(), "?id=" + feedback.getId() + "&pin=" + feedback.getPin());
 			return isNew ? "An email has been sent to you. Please confirm to publish your feedback."
 					: "Your feedback is now online.";
 		}
@@ -59,10 +60,16 @@ public class FeedbackService {
 		return this.repository.one(Feedback.class, id);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Feedback> list() {
-		return (List<Feedback>) this.repository.list(
-				"select feedback.note, feedback.rating, feedback.answer, feedback.image, feedback.name from Feedback feedback where verified=true ORDER BY createdAt DESC");
+		final List<Feedback> list = this.repository.list(
+				"select feedback from Feedback feedback where verified=true ORDER BY createdAt DESC", Feedback.class);
+		list.stream().forEach(e -> {
+			e.setCreatedAt(null);
+			e.setEmail(null);
+			e.setId(null);
+			e.setPin(null);
+		});
+		return list;
 	}
 
 	private String generatePin(final int length) {

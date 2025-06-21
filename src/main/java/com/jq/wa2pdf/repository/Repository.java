@@ -22,9 +22,8 @@ public class Repository {
 	@PersistenceContext
 	private EntityManager em;
 
-	@SuppressWarnings("unchecked")
-	public List<? extends BaseEntity> list(final String hql) {
-		return (List<BaseEntity>) this.em.createQuery(hql).getResultList();
+	public <T> List<T> list(final String hql, final Class<T> clazz) {
+		return this.em.createQuery(hql, clazz).getResultList();
 	}
 
 	public <T extends BaseEntity> T one(final Class<T> clazz, final BigInteger id) {

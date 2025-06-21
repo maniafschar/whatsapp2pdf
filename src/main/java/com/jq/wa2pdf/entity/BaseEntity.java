@@ -2,13 +2,11 @@ package com.jq.wa2pdf.entity;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
-import java.util.Map;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Transient;
 
 @MappedSuperclass
 public abstract class BaseEntity {
@@ -19,11 +17,8 @@ public abstract class BaseEntity {
 	private Timestamp createdAt;
 	private Timestamp modifiedAt;
 
-	@Transient
-	private Map<String, Object> old = null;
-
 	public BigInteger getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final BigInteger id) {
@@ -31,7 +26,7 @@ public abstract class BaseEntity {
 	}
 
 	public Timestamp getCreatedAt() {
-		return createdAt;
+		return this.createdAt;
 	}
 
 	public void setCreatedAt(final Timestamp createdAt) {
@@ -39,7 +34,7 @@ public abstract class BaseEntity {
 	}
 
 	public Timestamp getModifiedAt() {
-		return modifiedAt;
+		return this.modifiedAt;
 	}
 
 	public void setModifiedAt(final Timestamp modifiedAt) {

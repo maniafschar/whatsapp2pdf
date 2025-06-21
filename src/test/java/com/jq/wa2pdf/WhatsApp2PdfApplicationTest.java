@@ -10,8 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.jq.wa2pdf.entity.Feedback;
+import com.jq.wa2pdf.repository.Repository;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -21,6 +25,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class WhatsApp2PdfApplicationTest {
 	private static String url = "http://localhost:9000/";
 	private WebDriver driver;
+	@Autowired
+	private Repository repository;
 
 	@Test
 	public void run() throws Exception {
@@ -30,17 +36,25 @@ public class WhatsApp2PdfApplicationTest {
 	@BeforeEach
 	public void beforeEach() throws Exception {
 		new ProcessBuilder("./web.sh", "start").start();
-		driver = createWebDriver(600, 900);
-		driver.get(url);
+		this.driver = createWebDriver(600, 900);
+		this.driver.get(url);
+		final Feedback feedback = new Feedback();
+		feedback.setNote("abc");
+		feedback.setRating((short) 4);
+		feedback.setName("mani");
+		feedback.setEmail("mani.afschar@jq-consulting.de");
+		feedback.setPin("123456");
+		feedback.setVerified(true);
+		this.repository.save(feedback);
 	}
 
 	@AfterEach
 	public void afterEach() throws Exception {
-		driver.close();
+		this.driver.close();
 		new ProcessBuilder("./web.sh", "stop").start();
 	}
 
-	static WebDriver createWebDriver(int width, int height) {
+	static WebDriver createWebDriver(final int width, final int height) {
 		final ChromeOptions options = new ChromeOptions();
 		final Map<String, Object> deviceMetrics = new HashMap<>();
 		deviceMetrics.put("pixelRatio", 1.0);
