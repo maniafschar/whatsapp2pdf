@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.wa2pdf.TestConfig;
@@ -21,6 +22,7 @@ import com.jq.wa2pdf.service.WordCloudService.Token;
 		WhatsApp2PdfApplication.class,
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
 				"server.port=9001", "server.servlet.context-path=/rest" })
+@ActiveProfiles("test")
 public class WordCloudServiceTest {
 	@Autowired
 	private WordCloudService wordCloudService;

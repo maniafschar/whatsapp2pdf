@@ -6,13 +6,13 @@ import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.wa2pdf.entity.Feedback;
@@ -23,13 +23,13 @@ import com.jq.wa2pdf.repository.Repository;
 		WhatsApp2PdfApplication.class,
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
 				"server.port=9001", "server.servlet.context-path=/rest" })
+@ActiveProfiles("test")
 public class WhatsApp2PdfApplicationTest {
 	private static String url = "http://localhost:9000/";
 	private WebDriver driver;
 	@Autowired
 	private Repository repository;
 
-	@Test
 	public void run() throws Exception {
 		Thread.sleep(600000);
 	}

@@ -22,7 +22,8 @@ import com.jq.wa2pdf.util.Utilities;
 @Configuration
 public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 	private static final String[] allowedOrigins = {
-			"http://localhost:9000"
+			"http://localhost:9000",
+			"https://wa2pdf.com"
 	};
 
 	@Autowired
@@ -41,13 +42,13 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 		return new AsyncUncaughtExceptionHandler() {
 			@SuppressWarnings("null")
 			@Override
-			public void handleUncaughtException(Throwable ex, Method method, Object... obj) {
+			public void handleUncaughtException(final Throwable ex, final Method method, final Object... obj) {
 				final Ticket ticket = new Ticket();
 				ticket.setNote(method.toGenericString() + "\n" + (obj == null ? ""
 						: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
 								.collect(Collectors.joining(", ")) + "\n")
 						+ Utilities.stackTraceToString(ex));
-				repository.save(ticket);
+				WhatsApp2PdfConfiguration.this.repository.save(ticket);
 				System.out.println(ticket.getNote());
 			}
 		};
