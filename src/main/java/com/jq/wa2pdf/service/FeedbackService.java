@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.mail.EmailException;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jq.wa2pdf.entity.Feedback;
@@ -20,6 +21,9 @@ public class FeedbackService {
 	@Autowired
 	private EmailService emailService;
 
+	@Value("${app.url}")
+	private String url;
+
 	public String confirm(final Feedback feedback) throws EmailException {
 		final Feedback original = this.repository.one(Feedback.class, feedback.getId());
 		if (!original.getPin().equals(feedback.getPin()))
@@ -27,7 +31,7 @@ public class FeedbackService {
 		original.setVerified(true);
 		original.setPin(this.generatePin(6));
 		this.repository.save(original);
-		this.emailService.send(original.getEmail(), "?id=" + original.getId() + "&pin=" + original.getPin());
+		this.emailService.send(original.getEmail(), this.url + "?id=" + original.getId() + "&pin=" + original.getPin());
 		return "Your feedback is now online.";
 	}
 

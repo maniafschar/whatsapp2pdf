@@ -230,6 +230,12 @@ tabBody element {
 	height: 100%;
 }
 
+tabBody img {
+	padding: 1em;
+	background: rgba(255, 255, 255, 0.3);
+	border-radius: 1em;
+}
+
 tab {
 	position: relative;
 	display: inline-block;

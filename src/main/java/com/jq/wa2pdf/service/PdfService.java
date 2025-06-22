@@ -157,7 +157,8 @@ public class PdfService {
 				throws IOException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
 			this.period = period;
-			this.user = user;
+			// this.user = user;
+			this.user = "Julia";
 			this.id = id;
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -215,9 +216,11 @@ public class PdfService {
 										+ ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				final Pattern patternMonth = Pattern
 						.compile("^.?\\[" + this.period + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				String lastChat = null, line, user = null, date = null, time = null;
+				String line, lastChat = null, user = null, date = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
+					line = line.replaceAll("Anja Kieseler", "Julia");
+					line = line.replaceAll("man", "Romeo");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
 						final boolean inMonth = patternMonth.matcher(line).matches();
 						if (foundMonth && !inMonth)
@@ -226,7 +229,8 @@ public class PdfService {
 						if (foundMonth) {
 							if (lastChat != null) {
 								final String s = user, d = date;
-								Statistics u = this.total.stream().filter(e -> e.user.equals(s) && e.period.equals(d))
+								Statistics u = this.total.stream()
+										.filter(e -> e.user.equals(s) && e.period.equals(d))
 										.findFirst().orElse(null);
 								if (u == null) {
 									u = new Statistics();
@@ -497,9 +501,10 @@ public class PdfService {
 			cell.setBorder(Border.NO_BORDER);
 			cell.setFontSize(11f);
 			cell.setMargin(0);
-			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : defaultPadding / 2);
+			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : defaultPadding / (media ? 1 : 2));
 			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
-			cell.setPaddingBottom(padding != null && padding.length > 2 ? padding[2] : defaultPadding / 2);
+			cell.setPaddingBottom(
+					padding != null && padding.length > 2 ? padding[2] : defaultPadding / (media ? 1 : 2));
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
 			if (media)
 				this.fillMedia(cell, text);
@@ -510,7 +515,6 @@ public class PdfService {
 
 		private void fillMedia(final Cell cell, String mediaId) {
 			try {
-				System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				if (mediaId.endsWith(".mp4")) {
 					final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(this.document.getPdfDocument(),
 							IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
@@ -523,27 +527,31 @@ public class PdfService {
 							new PdfLinkAnnotation(new Rectangle(200, 200))));
 					cell.setMinHeight(200f);
 					cell.add(paragraph);
+					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				} else {
 					final BufferedImage originalImage = ImageIO
 							.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 					final double max = 800;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
-					if (mediaId.endsWith(".webp") || w > max || h > max) {
+					if (!mediaId.endsWith(".png") && (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
 						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
 						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
-								BufferedImage.TYPE_INT_RGB);
+								BufferedImage.TYPE_4BYTE_ABGR);
 						final Graphics2D g = image.createGraphics();
 						g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0, w, h, null);
 						image.flush();
 						g.dispose();
-						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.jpg";
-						ImageIO.write(image, "jpg", this.dir.resolve(mediaId).toAbsolutePath().toFile());
+						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.png";
+						ImageIO.write(image, "png", this.dir.resolve(mediaId).toAbsolutePath().toFile());
 					}
-					final Image image = new Image(
-							ImageDataFactory
-									.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					image.setAutoScaleWidth(true);
+					final Image image = new Image(ImageDataFactory
+							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
+					if (w > h)
+						image.setAutoScaleWidth(true);
+					else
+						image.setAutoScaleHeight(true);
 					cell.add(image);
+					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				}
 			} catch (final IOException ex) {
 				throw new RuntimeException(ex);

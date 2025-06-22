@@ -28,13 +28,13 @@ class EmailService {
 	private String emailPassword;
 
 	void send(final String address, final String text) throws EmailException {
-		final ImageHtmlEmail email = mailCreateor.create();
-		email.setHostName(emailHost);
-		email.setSmtpPort(emailPort);
+		final ImageHtmlEmail email = this.mailCreateor.create();
+		email.setHostName(this.emailHost);
+		email.setSmtpPort(this.emailPort);
 		email.setCharset(StandardCharsets.UTF_8.name());
-		email.setAuthenticator(new DefaultAuthenticator(emailAddress, emailPassword));
+		email.setAuthenticator(new DefaultAuthenticator(this.emailAddress, this.emailPassword));
 		email.setSSLOnConnect(true);
-		email.setFrom(emailAddress, "WhatsApp PDF Converter");
+		email.setFrom(this.emailAddress, "WhatsApp PDF Converter");
 		email.addTo(address);
 		email.setSubject("Feedback on WhatsApp PDF Converter");
 		email.setMsg(text);
