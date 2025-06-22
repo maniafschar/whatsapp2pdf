@@ -2,6 +2,7 @@ export { api };
 
 class api {
 	static url = '{placeholderServer}';
+	static feedbackStatus = 'You need to print at least one document, to give feedback.';
 
 	static analyse(event) {
 		document.getElementsByTagName('attributes')[0].style.display = 'none';
@@ -73,7 +74,7 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
 				document.getElementsByTagName('upload')[0].style.display = null;
-				document.querySelector('tabBody button[onclick*="feedback"]').style.display = 'none';
+				api.feedbackStatus = 'You already deleted the uploaded data. Please give feedback before deleting the data.';
 				document.querySelectorAll('input[type="file"]').forEach(e => e.value = '');
 			}
 		});
@@ -102,7 +103,7 @@ class api {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content message').innerHTML = xhr;
 				document.querySelector('popup content data').style.display = '';
-				document.querySelector('tabBody button[onclick*="feedback"]').style.display = 'none';
+				api.feedbackStatus = 'You already successfully added a feedback. You may edit it with the link in the email we sent you.';
 			},
 			error: xhr => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
@@ -146,7 +147,7 @@ class api {
 						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
-					document.querySelector('tabBody button[onclick*="feedback"]').style.display = '';
+					api.feedbackStatus = '';
 				} else if (tr.classList.contains('selected')) {
 					if (document.querySelectorAll('period .selected').length > 1)
 						tr.classList.remove('selected');
@@ -167,6 +168,7 @@ class api {
 	}
 
 	static postBuy() {
+		api.feedbackStatus = 'Download one of your printed documents, then you can give feedback.';
 		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = 'none';
 		var periods = document.querySelectorAll('period .selected');
 		for (var i = 0; i < periods.length; i++) {

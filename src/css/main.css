@@ -276,6 +276,10 @@ popup content {
 	padding: 1em;
 }
 
+popup content message {
+	line-height: 1.8;
+}
+
 popup content data {
 	position: relative;
 	display: none;

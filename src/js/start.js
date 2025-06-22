@@ -25,7 +25,7 @@ class ui {
 						pin: params.get('pin')
 					},
 					success: xhr => {
-						document.querySelector('popup content message').innerHTML = xhr;
+						api.feedbackStatus = xhr;
 						ui.feedback();
 						api.feedback();
 					},
@@ -45,9 +45,9 @@ class ui {
 	}
 
 	static feedback() {
+		document.querySelector('popup content message').innerHTML = api.feedbackStatus;
+		document.querySelector('popup content data').style.display = api.feedbackStatus ? '' : 'block';
 		document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
-		if (!document.querySelector('popup content message').innerText)
-			document.querySelector('popup content data').style.display = 'block';
 	}
 
 	static feedbackClose() {
