@@ -157,8 +157,7 @@ public class PdfService {
 				throws IOException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
 			this.period = period;
-			// this.user = user;
-			this.user = "Julia";
+			this.user = user;
 			this.id = id;
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
@@ -219,8 +218,6 @@ public class PdfService {
 				String line, lastChat = null, user = null, date = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
-					line = line.replaceAll("Anja Kieseler", "Julia");
-					line = line.replaceAll("man", "Romeo");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
 						final boolean inMonth = patternMonth.matcher(line).matches();
 						if (foundMonth && !inMonth)
