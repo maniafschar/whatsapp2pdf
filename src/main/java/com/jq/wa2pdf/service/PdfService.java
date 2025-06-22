@@ -562,10 +562,18 @@ public class PdfService {
 				if (text.substring(0, text.indexOf(emoji)).trim().length() > 0)
 					paragraph.add(this.createText(text.substring(0, text.indexOf(emoji)), fontMessage));
 				String id = "";
-				for (int i = 0; i < emoji.length(); i++)
-					id += "_" + Integer.toHexString(emoji.codePointAt(i));
+				for (int i = 0; i < emoji.length(); i++) {
+					if (emoji.codePointAt(i) != 56614)
+						id += "_" + Integer.toHexString(emoji.codePointAt(i));
+				}
+				if (text.indexOf("\ufe0f") < 9) {
+					for (int i = emoji.length(); i < text.indexOf("\ufe0f"); i++)
+						id += "_" + Integer.toHexString(text.codePointAt(i));
+				}
 				id = id.substring(1);
 				InputStream s = PdfService.class.getResourceAsStream("/emoji/" + id + ".png");
+				if (s == null)
+					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
 				if (s == null && id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
 				if (s == null && !id.contains("_"))

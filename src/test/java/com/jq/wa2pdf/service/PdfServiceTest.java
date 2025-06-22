@@ -1,11 +1,16 @@
 package com.jq.wa2pdf.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
+
+import com.vdurmont.emoji.Emoji;
+import com.vdurmont.emoji.EmojiManager;
 
 public class PdfServiceTest {
 	@Test
@@ -45,5 +50,18 @@ public class PdfServiceTest {
 
 		// then
 		assertFalse(match);
+	}
+
+	@Test
+	public void emoji() {
+		// given
+		final String emojiString = "🤦";
+
+		// when
+		final Emoji emoji = EmojiManager.getByUnicode(emojiString);
+
+		// then
+		assertNotNull(emoji);
+		assertEquals(1, emoji.getAliases().size());
 	}
 }
