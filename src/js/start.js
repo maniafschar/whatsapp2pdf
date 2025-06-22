@@ -25,9 +25,14 @@ class ui {
 						pin: params.get('pin')
 					},
 					success: xhr => {
-						api.feedbackStatus = xhr;
-						ui.feedback();
-						api.feedback();
+						if (xhr) {
+							var s = api.feedbackStatus;
+							api.feedbackStatus = xhr;
+							ui.feedback();
+							api.feedback();
+							ui.showTab(2);
+							api.feedbackStatus = s;
+						}
 					},
 					error: xhr => {
 						document.querySelector('popup content message').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
@@ -38,7 +43,7 @@ class ui {
 		}
 	}
 
-	static showDescription(i) {
+	static showTab(i) {
 		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
 		document.querySelectorAll('tab')[i].classList.add('selected');

@@ -26,8 +26,10 @@ public class FeedbackService {
 
 	public String confirm(final Feedback feedback) throws EmailException {
 		final Feedback original = this.repository.one(Feedback.class, feedback.getId());
+		if (original == null)
+			return null;
 		if (!original.getPin().equals(feedback.getPin()))
-			return "Pin expired.";
+			return "You are using an old link, your pin to your feedback has expired.";
 		original.setVerified(true);
 		original.setPin(this.generatePin(6));
 		this.repository.save(original);
