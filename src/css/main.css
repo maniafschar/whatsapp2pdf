@@ -250,6 +250,11 @@ tab.selected {
 	background: var(--borderColor);
 }
 
+a {
+	text-decoration: none;
+	color: darkblue;
+}
+
 popup {
 	transform: scale(0);
 	position: fixed;
