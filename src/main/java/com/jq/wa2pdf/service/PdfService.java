@@ -586,7 +586,7 @@ public class PdfService {
 				}
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
-			if (text.length() > 0 && (text.length() != 1 || text.codePointAt(0) != 65039))
+			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039)
 				paragraph.add(this.createText(text, fontMessage));
 			else if (paragraph.getChildren().size() == 1 && paragraph.getChildren().get(0) instanceof Image) {
 				final Image image = (Image) paragraph.getChildren().get(0);

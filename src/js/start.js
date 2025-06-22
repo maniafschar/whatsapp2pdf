@@ -47,7 +47,8 @@ class ui {
 	static feedback() {
 		document.querySelector('popup content message').innerHTML = api.feedbackStatus;
 		document.querySelector('popup content data').style.display = api.feedbackStatus ? '' : 'block';
-		document.getElementsByTagName('popup')[0].style.transform = 'scale(1)';
+		var s = document.getElementsByTagName('popup')[0].style;
+		s.transform = s.transform && s.transform.indexOf('1') > 0 ? 'scale(0)' : 'scale(1)';
 	}
 
 	static feedbackClose() {
