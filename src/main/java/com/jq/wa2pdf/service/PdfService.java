@@ -173,7 +173,7 @@ public class PdfService {
 			this.writer = new PdfWriter(
 					this.dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile());
 			this.document = new Document(new PdfDocument(this.writer));
-			this.document.getPdfDocument().addEventHandler(PdfDocumentEvent.START_PAGE,
+			this.document.getPdfDocument().addEventHandler(PdfDocumentEvent.START_,
 					new AbstractPdfDocumentEventHandler() {
 						@Override
 						protected void onAcceptedEvent(final AbstractPdfDocumentEvent event) {
@@ -496,7 +496,8 @@ public class PdfService {
 				}
 			}
 			this.document.add(table);
-			this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)
+				this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 		}
 
 		private Cell createCell(final String text, final boolean... media) {
