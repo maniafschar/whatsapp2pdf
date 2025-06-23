@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
@@ -30,6 +31,9 @@ public class LogFilter implements Filter {
 
 	@Autowired
 	private Repository repository;
+
+	@Value("${app.supportCenter.secret}")
+	private String supportCenterSecret;
 
 	@Override
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
@@ -62,7 +66,11 @@ public class LogFilter implements Filter {
 		}
 		final long time = System.currentTimeMillis();
 		try {
-			chain.doFilter(req, res);
+			if ("OPTIONS".equals(req.getMethod()) || !req.getRequestURI().startsWith("/sc/")
+					|| supportCenterSecret.equals(req.getHeader("user")))
+				chain.doFilter(req, res);
+			else
+				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			log.setStatus(LogStatus.get(res.getStatus()));
