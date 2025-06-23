@@ -461,7 +461,8 @@ public class PdfService {
 				this.wordClouds.remove(wordCloudStatistics);
 				this.wordClouds.add(wordCloudStatistics);
 			}
-			final Table table = new Table(this.wordClouds.size());
+			final int maxColumns = 4;
+			final Table table = new Table(Math.min(this.wordClouds.size(), maxColumns));
 			table.setMarginTop(20f);
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
@@ -478,18 +479,21 @@ public class PdfService {
 					min = token.get(token.size() - 1).getCount();
 				tokens.add(token);
 			}
-			for (final List<Token> token : tokens) {
+			for (final int i = 0; i < tokens.size(); i++) {
+				final List<Token> token = tokens.get(i);
 				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
 				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
 				final Cell cell = this.createCell(idWordCloud, true);
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				table.addCell(cell);
-			}
-			for (final Statistics wordCloud : this.wordClouds) {
-				final Cell cell = this.createCell(wordCloud.getUser(), TextAlignment.CENTER);
-				cell.setPaddingTop(0);
-				table.addCell(cell);
+				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1) {
+					for (int i2 = 0; i2 < maxColumns && i + i2 < this.wordClouds.size(); i2++) {
+						final Cell cell = this.createCell(this.wordClouds.get(i + i2).getUser(), TextAlignment.CENTER);
+						cell.setPaddingTop(0);
+						table.addCell(cell);
+					}
+				}
 			}
 			this.document.add(table);
 			this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
