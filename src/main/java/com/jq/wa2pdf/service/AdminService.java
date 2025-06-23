@@ -35,7 +35,7 @@ public class AdminService {
 		}
 	}
   
-	public String init() throws EmailException {
+	public String init() {
 		return new AdminData(
 				this.repository.list("from Log where createdAt>'" + Instant.now().minus(Duration.ofDays(5)).toString() + "'", Log.class),
 				this.repository.list("from Ticket", Ticket.class));
