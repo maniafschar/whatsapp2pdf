@@ -525,6 +525,7 @@ public class PdfService {
 		private void fillMedia(final Cell cell, String mediaId) {
 			try {
 				if (mediaId.endsWith(".mp4")) {
+					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 					final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(this.document.getPdfDocument(),
 							IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
 									.toUri().toURL()),
@@ -536,7 +537,6 @@ public class PdfService {
 							new PdfLinkAnnotation(new Rectangle(200, 200))));
 					cell.setMinHeight(200f);
 					cell.add(paragraph);
-					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				} else {
 					final BufferedImage originalImage = ImageIO
 							.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
@@ -560,7 +560,6 @@ public class PdfService {
 					else
 						image.setAutoScaleHeight(true);
 					cell.add(image);
-					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				}
 			} catch (final IOException ex) {
 				throw new RuntimeException(ex);
