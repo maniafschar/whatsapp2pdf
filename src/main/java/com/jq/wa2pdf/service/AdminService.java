@@ -19,11 +19,13 @@ public class AdminService {
 	public static class AdminData {
 		private final List<Log> logs;
 		private final List<Ticket> tickets;
+		private final String tempDir;
 
-		private AdminData(final List<Log> logs, final List<Ticket> tickets) {
+		private AdminData(final List<Log> logs, final List<Ticket> tickets, final String tempDir) {
 			super();
 			this.logs = logs;
 			this.tickets = tickets;
+			this.tempDir = tempDir;
 		}
 
 		public List<Log> getLogs() {
@@ -33,6 +35,10 @@ public class AdminService {
 		public List<Ticket> getTickets() {
 			return this.tickets;
 		}
+
+		public String getTempDir() {
+			return this.tempDir;
+		}
 	}
 
 	public AdminData init() {
@@ -41,7 +47,8 @@ public class AdminService {
 						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
 								+ "' as timestamp)",
 						Log.class),
-				this.repository.list("from Ticket", Ticket.class));
+				this.repository.list("from Ticket", Ticket.class),
+				ExtractService.getTempDir("").toAbsolutePath().toFile().getAbsolutePath());
 	}
 
 	public void createTicket(final Ticket ticket) {

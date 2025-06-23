@@ -31,8 +31,8 @@ class api {
 						xhr.param = param;
 						param.error(xhr);
 					} else {
-						document.getElementsByTagName('progressbar')[0].style.display = null;
-						document.getElementsByTagName('error')[0].innerHTML = 'An error occurred while processing your request. Please try again later.';
+						document.querySelector('progressbar').style.display = null;
+						document.querySelector('error').innerHTML = JSON.stringify(xhr);
 					}
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {

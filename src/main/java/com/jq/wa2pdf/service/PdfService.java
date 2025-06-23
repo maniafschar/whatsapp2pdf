@@ -491,8 +491,10 @@ public class PdfService {
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				table.addCell(cell);
 				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1)) {
-					for (int i2 = 0; i2 < maxColumns && i + i2 < this.wordClouds.size(); i2++) {
-						cell = this.createCell(this.wordClouds.get(i + i2).getUser(), TextAlignment.CENTER);
+					final int offset = (i / maxColumns * maxColumns);
+					for (int i2 = 0; i2 < maxColumns && offset + i2 < this.wordClouds.size(); i2++) {
+						cell = this.createCell(this.wordClouds.get(offset + i2).getUser(),
+								TextAlignment.CENTER);
 						cell.setPaddingTop(0);
 						table.addCell(cell);
 					}
