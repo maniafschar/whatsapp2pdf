@@ -577,9 +577,13 @@ public class PdfService {
 				if (s == null && !id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
 				if (s == null) {
-					final Ticket ticket = new Ticket();
-					ticket.setNote("Emoji " + emoji + " (" + id + ") not found!");
-					PdfService.this.repository.save(ticket);
+					if (PdfService.this.repository
+							.list("from Ticket where note like 'Emoji % (" + id + ") not found!'", Ticket.class)
+							.size() == 0) {
+						final Ticket ticket = new Ticket();
+						ticket.setNote("Emoji " + emoji + " (" + id + ") not found!");
+						PdfService.this.repository.save(ticket);
+					}
 				} else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
