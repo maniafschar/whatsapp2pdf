@@ -69,11 +69,14 @@ public class LogFilter implements Filter {
 			if ("OPTIONS".equals(req.getMethod()) || !req.getRequestURI().startsWith("/sc/")
 					|| supportCenterSecret.equals(req.getHeader("user")))
 				chain.doFilter(req, res);
-			else
+			else {
 				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
+				log.setStatus(LogStatus.ErrorAuthentication);
+			}
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
-			log.setStatus(LogStatus.get(res.getStatus()));
+			if (log.getStatus() == null)
+				log.setStatus(LogStatus.get(res.getStatus()));
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			final byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
