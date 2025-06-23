@@ -18,7 +18,7 @@ public class Log extends BaseEntity {
 	private int time;
 
 	public enum LogStatus {
-		ErrorClient, ErrorRedirection, ErrorServer, Ok;
+		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
 		public static LogStatus get(int httpCode) {
 			return httpCode < 300 ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
