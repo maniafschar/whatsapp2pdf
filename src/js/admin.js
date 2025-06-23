@@ -2,9 +2,17 @@ export { api };
 
 class api {
 	static url = 'https://wa2pdf.com/rest/sc/';
-	static user;
 
 	static init() {
+		if (document.querySelector('login input').value) {
+			window.localStorage.setItem('credentials', document.querySelector('login input').value);
+			document.querySelector('login').style.display = 'none';
+			document.querySelector('login input').value = '';
+		}
+		if (!window.localStorage.getItem('credentials')) {
+			document.querySelector('login').style.display = 'block';
+			return;
+		}
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
@@ -43,7 +51,7 @@ class api {
 			}
 		};
 		xhr.open(param.method ? param.method : 'GET', param.url, true);
-		xhr.setRequestHeader('user', api.user);
+		xhr.setRequestHeader('user', window.localStorage.getItem('credentials'));
 		if (typeof param.body == 'string')
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		else if (param.body && !(param.body instanceof FormData)) {
