@@ -2,7 +2,35 @@ const path = require('path');
 const express = require('express');
 
 module.exports = (env) => {
-	return {
+	return [{
+		entry: './src/js/admin.js',
+		mode: 'production',
+		output: {
+			globalObject: 'this',
+			filename: 'js/admin.js',
+			path: path.resolve(__dirname, 'dist'),
+		},
+		optimization: {
+			minimize: true
+		},
+		target: ['web', 'es5'],
+		module: {
+			rules: [
+				{
+					test: /\.m?js$/,
+					exclude: /(node_modules|bower_components)/,
+					use: {
+						loader: 'babel-loader',
+						options: {
+							presets: ['@babel/preset-env'],
+							plugins: ['@babel/plugin-transform-runtime']
+						}
+					}
+				}
+			]
+		}
+	},
+	{
 		entry: './src/js/start.js',
 		mode: 'production',
 		output: {
@@ -85,7 +113,7 @@ module.exports = (env) => {
 				}
 			]
 		}
-	}
+	}]
 }
 var emojis = [
 	{ code: '231A..231B', type: 'Basic_Emoji', description: 'watch..hourglass done', cat: 'E0.6 [2]', char: '⌚..⌛' },

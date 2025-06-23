@@ -24,20 +24,30 @@ public class AdminService {
 			super();
 			this.logs = logs;
 			this.tickets = tickets;
+		}
 
-			public List<Log> getLogs() {
-				return logs;
-			}
+		public List<Log> getLogs() {
+			return this.logs;
+		}
 
-			public List<Ticket> getTickets() {
-				return tickets;
-			}
+		public List<Ticket> getTickets() {
+			return this.tickets;
 		}
 	}
-  
-	public String init() {
+
+	public AdminData init() {
 		return new AdminData(
-				this.repository.list("from Log where createdAt>'" + Instant.now().minus(Duration.ofDays(5)).toString() + "'", Log.class),
+				this.repository.list(
+						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
+								+ "' as timestamp)",
+						Log.class),
 				this.repository.list("from Ticket", Ticket.class));
+	}
+
+	public void createTicket(final Ticket ticket) {
+		if (this.repository
+				.list("from Ticket where note like '" + ticket.getNote().replaceAll("\n", "_") + "'", Ticket.class)
+				.size() == 0)
+			this.repository.save(ticket);
 	}
 }

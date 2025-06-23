@@ -78,6 +78,9 @@ public class PdfService {
 	private WordCloudService wordCloudService;
 
 	@Autowired
+	private AdminService adminService;
+
+	@Autowired
 	private Repository repository;
 
 	@Async
@@ -154,7 +157,7 @@ public class PdfService {
 		private final String user;
 		private final String id;
 		private final boolean preview;
-		private final boolean groupChat = false;
+		private boolean groupChat = false;
 
 		private PDF(final String id, final String period, final String user, final boolean preview)
 				throws IOException {
@@ -173,7 +176,7 @@ public class PdfService {
 			this.writer = new PdfWriter(
 					this.dir.resolve(filename + ".tmp").toAbsolutePath().toFile().getAbsoluteFile());
 			this.document = new Document(new PdfDocument(this.writer));
-			this.document.getPdfDocument().addEventHandler(PdfDocumentEvent.START_,
+			this.document.getPdfDocument().addEventHandler(PdfDocumentEvent.START_PAGE,
 					new AbstractPdfDocumentEventHandler() {
 						@Override
 						protected void onAcceptedEvent(final AbstractPdfDocumentEvent event) {
@@ -379,7 +382,7 @@ public class PdfService {
 			this.content.add(empty);
 		}
 
-		private void addMetaData() {
+		private void addMetaData() throws IOException {
 			final Table header = new Table(1);
 			header.setWidth(UnitValue.createPercentValue(100f));
 			header.setHeight(UnitValue.createPointValue(80));
@@ -441,7 +444,7 @@ public class PdfService {
 			this.document.add(table);
 		}
 
-		private void addChart() {
+		private void addChart() throws IOException, ParseException {
 			final Table table = new Table(1);
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
@@ -454,7 +457,7 @@ public class PdfService {
 			this.document.add(table);
 		}
 
-		private void addWordCloud() {
+		private void addWordCloud() throws IOException {
 			final Statistics wordCloudStatistics = this.wordClouds.stream().filter(e -> e.user.equals(this.user))
 					.findFirst().orElse(null);
 			if (wordCloudStatistics != null) {
@@ -479,17 +482,17 @@ public class PdfService {
 					min = token.get(token.size() - 1).getCount();
 				tokens.add(token);
 			}
-			for (final int i = 0; i < tokens.size(); i++) {
+			for (int i = 0; i < tokens.size(); i++) {
 				final List<Token> token = tokens.get(i);
 				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
 				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
-				final Cell cell = this.createCell(idWordCloud, true);
+				Cell cell = this.createCell(idWordCloud, true);
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				table.addCell(cell);
-				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1) {
+				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1)) {
 					for (int i2 = 0; i2 < maxColumns && i + i2 < this.wordClouds.size(); i2++) {
-						final Cell cell = this.createCell(this.wordClouds.get(i + i2).getUser(), TextAlignment.CENTER);
+						cell = this.createCell(this.wordClouds.get(i + i2).getUser(), TextAlignment.CENTER);
 						cell.setPaddingTop(0);
 						table.addCell(cell);
 					}
@@ -593,13 +596,9 @@ public class PdfService {
 				if (s == null && !id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
 				if (s == null) {
-					if (PdfService.this.repository
-							.list("from Ticket where note like 'Emoji % (" + id + ") not found!'", Ticket.class)
-							.size() == 0) {
-						final Ticket ticket = new Ticket();
-						ticket.setNote("Emoji " + emoji + " (" + id + ") not found!");
-						PdfService.this.repository.save(ticket);
-					}
+					final Ticket ticket = new Ticket();
+					ticket.setNote("Emoji " + emoji + " (" + id + ") not found!");
+					PdfService.this.adminService.createTicket(ticket);
 				} else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -30,6 +31,7 @@ public class WhatsApp2PdfApplicationTest {
 	@Autowired
 	private Repository repository;
 
+	@Test
 	public void run() throws Exception {
 		Thread.sleep(600000);
 	}

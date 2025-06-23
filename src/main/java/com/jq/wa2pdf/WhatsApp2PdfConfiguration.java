@@ -16,7 +16,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.jq.wa2pdf.entity.Ticket;
-import com.jq.wa2pdf.repository.Repository;
+import com.jq.wa2pdf.service.AdminService;
 import com.jq.wa2pdf.util.Utilities;
 
 @Configuration
@@ -27,7 +27,7 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 	};
 
 	@Autowired
-	private Repository repository;
+	private AdminService adminService;
 
 	@Override
 	public Executor getAsyncExecutor() {
@@ -48,7 +48,7 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 						: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
 								.collect(Collectors.joining(", ")) + "\n")
 						+ Utilities.stackTraceToString(ex));
-				WhatsApp2PdfConfiguration.this.repository.save(ticket);
+				WhatsApp2PdfConfiguration.this.adminService.createTicket(ticket);
 				System.out.println(ticket.getNote());
 			}
 		};

@@ -61,3 +61,5 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
+window.api = api;

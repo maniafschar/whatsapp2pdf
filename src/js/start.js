@@ -3,7 +3,7 @@ import { api } from "./api";
 document.querySelectorAll('input[type="file"]').forEach(e => e.onchange = api.analyse);
 
 window.onresize = function () {
-	var mobile = document.body.computedStyleMap().get('font-size') * 50 < window.innerWidth ? 0 : 5;
+	var mobile = document.body.computedStyleMap().get('font-size').value * 50 < window.innerWidth ? 0 : 5;
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
 	document.body.style.fontSize = (Math.min(10 + diagonal / 160, 26) + mobile) + 'px';
 	document.querySelector('body container header').style.borderRadius = mobile ? '0' : '';

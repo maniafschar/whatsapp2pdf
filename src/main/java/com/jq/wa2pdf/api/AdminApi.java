@@ -10,7 +10,7 @@ import com.jq.wa2pdf.service.AdminService.AdminData;
 
 @RestController
 @RequestMapping("sc")
-public class ApplicationApi {
+public class AdminApi {
 	@Autowired
 	private AdminService adminService;
 
