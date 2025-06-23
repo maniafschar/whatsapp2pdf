@@ -118,7 +118,7 @@ class api {
 			success: xhr => {
 				var s = '';
 				for (var i = 0; i < xhr.length; i++)
-					s += '<rating><input-rating rating="' + (20 * xhr[i].rating) + '"></input-rating><top>' + new Date(xhr[i].modifiedAt.replace('+00:00', '')).toLocaleString() + ' &middot; ' + xhr[i].name + '</top><note>' + xhr[i].note.replace(/\n/g, '<br/>') + '</note></rating>';
+					s += '<rating><input-rating rating="' + (20 * xhr[i].rating) + '"></input-rating><top>' + new Date(xhr[i].modifiedAt.replace('+00:00', '')).toLocaleString() + '<br/>' + xhr[i].name + '</top><note>' + xhr[i].note.replace(/\n/g, '<br/>') + '</note></rating>';
 				document.querySelector('feedbacks').innerHTML = s;
 			}
 		});

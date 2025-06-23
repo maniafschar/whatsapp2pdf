@@ -3,8 +3,11 @@ import { api } from "./api";
 document.querySelectorAll('input[type="file"]').forEach(e => e.onchange = api.analyse);
 
 window.onresize = function () {
+	var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 5 : 0;
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
-	document.body.style.fontSize = Math.min(10 + diagonal / 160, 26) + 'px';
+	document.body.style.fontSize = (Math.min(10 + diagonal / 160, 26) + mobile) + 'px';
+	document.querySelector('body container header').style.borderRadius = mobile ? '0' : '';
+	document.querySelector('body container tabBody').style.borderRadius = mobile ? '0' : '';
 }
 
 

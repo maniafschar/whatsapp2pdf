@@ -30,6 +30,7 @@
 	<link rel="apple-touch-icon" href="https://wa2pdf.com/image/icon.png" />
 	<link rel="icon" type="image/x-icon" href="favicon.ico" />
 
+	<meta name="viewport" content="width=device-width; initial-scale=1.0;" />
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv='content-language' content='en-en' />
 	<meta http-equiv="Pragma" content="no-cache" />
@@ -52,10 +53,12 @@
 			</header>
 		</element>
 		<element style="height: 100%; margin-top: 1em;">
-			<tab onclick="ui.showTab(0)" class="selected">Description</tab>
-			<tab onclick="ui.showTab(1)">Create</tab>
-			<tab onclick="ui.showTab(2)">Feedback</tab>
-			<tab onclick="ui.showTab(3)">Legal</tab><br />
+			<tabHeader>
+				<tab onclick="ui.showTab(0)" class="selected">Description</tab>
+				<tab onclick="ui.showTab(1)">Create</tab>
+				<tab onclick="ui.showTab(2)">Feedback</tab>
+				<tab onclick="ui.showTab(3)">Legal</tab><br />
+			</tabHeader>
 			<tabBody>
 				<container>
 					<element style="line-height: 1.4; padding-bottom: 5em;">
