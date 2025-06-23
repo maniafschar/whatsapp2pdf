@@ -58,7 +58,7 @@ body header {
 	max-width: 50em;
 	position: relative;
 	overflow-x: hidden;
-	border-radius: 0 0 2em 2em;
+	border-radius: 0 0 1em 1em;
 	background: url("/image/heartBG.jpg");
 	background-size: auto 100%;
 }
@@ -212,7 +212,7 @@ tabBody {
 	position: relative;
 	overflow-x: hidden;
 	height: 100%;
-	border-radius: 2em 2em 0 0;
+	border-radius: 1em 1em 0 0;
 	background: var(--borderColor);
 	border: solid 1em transparent;
 }
