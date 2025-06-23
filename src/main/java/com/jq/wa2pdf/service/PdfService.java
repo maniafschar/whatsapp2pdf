@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -152,6 +154,7 @@ public class PdfService {
 		private final String user;
 		private final String id;
 		private final boolean preview;
+		private final boolean groupChat = false;
 
 		private PDF(final String id, final String period, final String user, final boolean preview)
 				throws IOException {
@@ -199,6 +202,8 @@ public class PdfService {
 					});
 			this.parseChats();
 			this.addMetaData();
+			this.addChart();
+			this.addWordCloud();
 			this.writeContent();
 			this.document.flush();
 			this.document.close();
@@ -208,13 +213,14 @@ public class PdfService {
 		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(
 					new FileReader(this.dir.resolve("_chat.txt").toFile()))) {
-				boolean foundMonth = false;
 				final Pattern patternStart = Pattern
 						.compile(
 								"^.?\\[" + this.period.replaceAll("[0-9]", "\\\\d")
 										+ ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 				final Pattern patternMonth = Pattern
 						.compile("^.?\\[" + this.period + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
+				final Set<String> users = new HashSet<>();
+				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, time = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
@@ -250,6 +256,7 @@ public class PdfService {
 							this.addDate(date = line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
 							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
+							users.add(user);
 							if (line.indexOf("<Anhang: ") < 0 || !line.endsWith(">"))
 								lastChat = line.substring(line.indexOf(": ") + 2);
 							else {
@@ -263,6 +270,7 @@ public class PdfService {
 				}
 				this.addMessage(user, time, lastChat);
 				this.addDate(null);
+				this.groupChat = users.size() > 2;
 			}
 		}
 
@@ -322,7 +330,7 @@ public class PdfService {
 		private void addMessage(final String user, final String time, final String message, final boolean... media) {
 			final Cell cellMessage = this.createCell(message, media);
 
-			final Cell cellTime = this.createCell(time);
+			final Cell cellTime = this.createCell(time + (this.groupChat ? " · " + user : ""));
 			cellTime.setFontSize(8.5f);
 			cellTime.setFontColor(this.colorDate);
 			cellTime.setPaddingBottom(0);
@@ -371,7 +379,7 @@ public class PdfService {
 			this.content.add(empty);
 		}
 
-		private void addMetaData() throws IOException, FontFormatException, ParseException {
+		private void addMetaData() {
 			final Table header = new Table(1);
 			header.setWidth(UnitValue.createPercentValue(100f));
 			header.setHeight(UnitValue.createPointValue(80));
@@ -431,26 +439,30 @@ public class PdfService {
 			}
 			table.setMarginBottom(20f);
 			this.document.add(table);
+		}
 
-			final Table tableChart = new Table(1);
-			tableChart.setWidth(UnitValue.createPercentValue(100f));
-			tableChart.setKeepTogether(true);
+		private void addChart() {
+			final Table table = new Table(1);
+			table.setWidth(UnitValue.createPercentValue(100f));
+			table.setKeepTogether(true);
 			final String idChart = filename + UUID.randomUUID().toString() + ".png";
 			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.user);
 			final Cell cellChart = this.createCell(idChart, true);
 			cellChart.setPadding(0);
 			cellChart.setWidth(UnitValue.createPercentValue(100f));
-			tableChart.addCell(cellChart);
-			this.document.add(tableChart);
+			table.addCell(cellChart);
+			this.document.add(table);
+		}
 
+		private void addWordCloud() {
 			final Statistics wordCloudStatistics = this.wordClouds.stream().filter(e -> e.user.equals(this.user))
 					.findFirst().orElse(null);
 			if (wordCloudStatistics != null) {
 				this.wordClouds.remove(wordCloudStatistics);
 				this.wordClouds.add(wordCloudStatistics);
 			}
-			final Table tableWordCloud = new Table(this.wordClouds.size());
-			tableWordCloud.setMarginTop(20f);
+			final Table table = new Table(this.wordClouds.size());
+			table.setMarginTop(20f);
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
 			for (final Statistics wordCloud : this.wordClouds) {
@@ -472,14 +484,14 @@ public class PdfService {
 				final Cell cell = this.createCell(idWordCloud, true);
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
-				tableWordCloud.addCell(cell);
+				table.addCell(cell);
 			}
 			for (final Statistics wordCloud : this.wordClouds) {
 				final Cell cell = this.createCell(wordCloud.getUser(), TextAlignment.CENTER);
 				cell.setPaddingTop(0);
-				tableWordCloud.addCell(cell);
+				table.addCell(cell);
 			}
-			this.document.add(tableWordCloud);
+			this.document.add(table);
 			this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 		}
 
