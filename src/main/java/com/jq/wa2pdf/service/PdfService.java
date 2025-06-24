@@ -464,12 +464,12 @@ public class PdfService {
 				this.wordClouds.remove(wordCloudStatistics);
 				this.wordClouds.add(wordCloudStatistics);
 			}
+			table.setMarginTop(20f);
 			final int maxColumns = 3;
 			final Table table = new Table(Math.min(this.wordClouds.size(), maxColumns));
-			table.setMarginTop(20f);
 			final List<List<Token>> tokens = new ArrayList<>();
-			int max = 0, min = Integer.MAX_VALUE;
 			final List<String> names = new ArrayList<>();
+			int max = 0, min = Integer.MAX_VALUE;
 			for (final Statistics wordCloud : this.wordClouds) {
 				final List<Token> token = PdfService.this.wordCloudService.extract(wordCloud.text.substring(0,
 						this.preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
