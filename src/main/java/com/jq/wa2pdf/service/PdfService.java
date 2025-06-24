@@ -498,10 +498,9 @@ public class PdfService {
 			if (tokens.size() > maxColumns) {
 				for (int i = 0; i < maxColumns - tokens.size() % maxColumns; i++)
 					table.addCell(this.createCell(""));
+				table.setMarginBottom(40);
 			}
 			this.addWordCloudNames(names, maxColumns, table);
-			if (tokens.size() > maxColumns)
-				table.setMarginBottom(40);
 			this.document.add(table);
 			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)
 				this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
