@@ -203,6 +203,7 @@ tabHeader {
 	width: 100%;
 	position: relative;
 	display: block;
+	padding: 0 0.75em;
 }
 
 tabBody {
