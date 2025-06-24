@@ -6,12 +6,12 @@ import jakarta.persistence.Enumerated;
 
 @Entity
 public class Log extends BaseEntity {
-	private String method;
+	private String method = "";
 	private String body = "";
-	private String referer;
-	private String query;
-	private String ip;
-	private String uri;
+	private String referer = "";
+	private String query = "";
+	private String ip = "";
+	private String uri = "";
 	@Enumerated(EnumType.STRING)
 	private LogStatus status;
 	private int port;
@@ -20,13 +20,13 @@ public class Log extends BaseEntity {
 	public enum LogStatus {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
-		public static LogStatus get(int httpCode) {
+		public static LogStatus get(final int httpCode) {
 			return httpCode < 300 ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
 		}
 	}
 
 	public String getMethod() {
-		return method;
+		return this.method;
 	}
 
 	public void setMethod(final String method) {
@@ -34,7 +34,7 @@ public class Log extends BaseEntity {
 	}
 
 	public String getQuery() {
-		return query;
+		return this.query;
 	}
 
 	public void setQuery(final String query) {
@@ -42,7 +42,7 @@ public class Log extends BaseEntity {
 	}
 
 	public String getUri() {
-		return uri;
+		return this.uri;
 	}
 
 	public void setUri(final String uri) {
@@ -50,7 +50,7 @@ public class Log extends BaseEntity {
 	}
 
 	public int getTime() {
-		return time;
+		return this.time;
 	}
 
 	public void setTime(final int time) {
@@ -58,7 +58,7 @@ public class Log extends BaseEntity {
 	}
 
 	public LogStatus getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(final LogStatus status) {
@@ -66,7 +66,7 @@ public class Log extends BaseEntity {
 	}
 
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 
 	public void setPort(final int port) {
@@ -74,7 +74,7 @@ public class Log extends BaseEntity {
 	}
 
 	public String getBody() {
-		return body;
+		return this.body;
 	}
 
 	public void setBody(final String body) {
@@ -82,7 +82,7 @@ public class Log extends BaseEntity {
 	}
 
 	public String getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	public void setIp(final String ip) {
@@ -90,7 +90,7 @@ public class Log extends BaseEntity {
 	}
 
 	public String getReferer() {
-		return referer;
+		return this.referer;
 	}
 
 	public void setReferer(final String referer) {
