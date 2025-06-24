@@ -36,9 +36,9 @@ button {
     cursor: pointer;
 }
 
-h1 {
-    font-weight: normal;
-    margin-top: 0.3em;
+output {
+    position: relative;
+    display: block;
 }
 
 a {
