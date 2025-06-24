@@ -86,5 +86,5 @@ tickets {
     position: relative;
     display: block;
     overflow-x: auto;
-    margin: 1em;
+    padding: 1em;
 }
