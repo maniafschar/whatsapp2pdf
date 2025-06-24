@@ -36,9 +36,19 @@ button {
     cursor: pointer;
 }
 
+td button {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
 a {
     text-decoration: none;
     color: darkblue;
+}
+
+msg {
+    margin-left: 1em;
 }
 
 login {
@@ -88,6 +98,7 @@ tickets {
     overflow-x: auto;
     padding: 1em;
     box-sizing: border-box;
+    white-space: nowrap;
 }
 
 output {

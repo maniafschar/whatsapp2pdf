@@ -1,8 +1,10 @@
 package com.jq.wa2pdf.api;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,5 +28,10 @@ public class AdminApi {
 	@PostMapping("build/{type}")
 	public String build(@PathVariable final String type) throws IOException {
 		return this.adminService.build(type);
+	}
+
+	@DeleteMapping("ticket/{id}")
+	public void deleteTicket(@PathVariable final BigInteger id) {
+		this.adminService.deleteTicket(id);
 	}
 }

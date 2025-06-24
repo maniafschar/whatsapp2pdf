@@ -1,6 +1,7 @@
 package com.jq.wa2pdf.service;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -52,11 +53,15 @@ public class AdminService {
 	}
 
 	public String build(final String type) throws IOException {
-		final ProcessBuilder pb = new ProcessBuilder("status".equals(type) ? 
-				new String[] { "/usr/bin/bash", "-c", "ps aux|grep java" }
-				: this.buildScript.replace("{type}", type).split(" "));
+		final ProcessBuilder pb = new ProcessBuilder(
+				"status".equals(type) ? new String[] { "/usr/bin/bash", "-c", "ps aux|grep java" }
+						: this.buildScript.replace("{type}", type).split(" "));
 		pb.redirectErrorStream(true);
 		return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
+	}
+
+	public void deleteTicket(final BigInteger id) {
+		this.repository.delete(this.repository.one(Ticket.class, id));
 	}
 
 	public void createTicket(final Ticket ticket) {

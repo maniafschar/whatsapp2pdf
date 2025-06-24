@@ -18,7 +18,7 @@ class api {
 			success: xhr => {
 				var s = '<table><tr><th>id</th><th>createdAt</th><th>note</th></tr>';
 				for (var i = 0; i < xhr.tickets.length; i++)
-					s += '<tr><td>' + xhr.tickets[i].id + '</td><td>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + api.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
+					s += '<tr><td>' + xhr.tickets[i].id + '</td><td>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				document.querySelector('tickets').innerHTML = s + '</table>';
 				s = '<table><tr><th>id</th><th>createdAt</th><th>status</th><th>method</th><th>uri</th><th>query</th><th>time</th><th>ip</th><th>body</th><th>referer</th></tr>';
 				for (var i = 0; i < xhr.logs.length; i++)
@@ -34,6 +34,15 @@ class api {
 		api.ajax({
 			url: api.url + 'build/' + type,
 			method: 'POST',
+			success: xhr => {
+				document.querySelector('output').innerHTML = api.sanitizeText(xhr);
+			}
+		});
+	}
+	static deleteTicket(event, id) {
+		api.ajax({
+			url: api.url + 'ticket/' + id,
+			method: 'DELETE',
 			success: xhr => {
 				document.querySelector('output').innerHTML = api.sanitizeText(xhr);
 			}
