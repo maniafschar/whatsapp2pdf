@@ -28,6 +28,16 @@ class api {
 		});
 	}
 
+	static build(type) {
+		document.querySelector('output').innerHTML = '';
+		api.ajax({
+			url: api.url + 'build/' + type,
+			success: xhr => {
+				document.querySelector('output').innerHTML = xhr;
+			}
+		});
+	}
+
 	static ajax(param) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
@@ -38,7 +48,7 @@ class api {
 						param.error(xhr);
 					} else {
 						document.querySelector('progressbar').style.display = null;
-						document.querySelector('error').innerHTML = JSON.stringify(xhr);
+						document.querySelector('output').innerHTML = JSON.stringify(xhr);
 					}
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
