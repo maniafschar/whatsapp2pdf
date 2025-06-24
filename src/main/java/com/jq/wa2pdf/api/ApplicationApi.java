@@ -51,15 +51,13 @@ public class ApplicationApi {
 
 	@PostMapping("preview/{id}")
 	public void preview(@PathVariable final String id, @RequestParam final String period,
-			@RequestParam final String user)
-			throws Exception {
+			@RequestParam final String user) throws Exception {
 		this.pdfService.create(id, period, user, true);
 	}
 
 	@PostMapping("buy/{id}")
 	public void buy(@PathVariable final String id, @RequestParam final String[] periods,
-			@RequestParam final String user)
-			throws Exception {
+			@RequestParam final String user) throws Exception {
 		for (final String period : periods)
 			this.pdfService.create(id, period, user, false);
 	}
