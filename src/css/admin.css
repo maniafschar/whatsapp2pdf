@@ -21,6 +21,9 @@ body>buttons {
     z-index: 8;
     opacity: 0.8;
     left: 0.75em;
+    white-space: nowrap;
+    right: 0.75em;
+    overflow-x: auto;
 }
 
 buttons button {
