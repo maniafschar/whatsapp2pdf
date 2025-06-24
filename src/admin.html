@@ -13,17 +13,17 @@
 </head>
 
 <body onload="api.init()">
+	<div>
+		<button onclick="api.build('client')">Build Client</button>
+		<button onclick="api.build('server')">Build Server</button>
+	</div>
+	<output></output>
 	<tickets></tickets>
-
 	<logs></logs>
-
-	<error></error>
-
 	<login style="display:none;">
 		<input />
 		<button onclick="api.init()">Einloggen</button>
 	</login>
-
 	<progressbar>
 		<loader>
 			<div class="one"></div>
