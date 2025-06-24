@@ -46,7 +46,7 @@ public class LogFilter implements Filter {
 			if (log.getReferer().length() > 255)
 				log.setReferer(log.getReferer().substring(0, 255));
 		}
-		log.setIp(sanatizeIp(req.getHeader("X-Forwarded-For")));
+		log.setIp(this.sanatizeIp(req.getHeader("X-Forwarded-For")));
 		log.setPort(req.getLocalPort());
 		final String query = req.getQueryString();
 		if (query != null) {
@@ -61,7 +61,7 @@ public class LogFilter implements Filter {
 		final long time = System.currentTimeMillis();
 		try {
 			if ("OPTIONS".equals(req.getMethod()) || !req.getRequestURI().startsWith("/sc/")
-					|| supportCenterSecret.equals(req.getHeader("user")))
+					|| this.supportCenterSecret.equals(req.getHeader("user")))
 				chain.doFilter(req, res);
 			else {
 				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
@@ -76,7 +76,7 @@ public class LogFilter implements Filter {
 			if (b != null && b.length > 0)
 				log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
 			try {
-				repository.save(log);
+				this.repository.save(log);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
@@ -84,7 +84,9 @@ public class LogFilter implements Filter {
 	}
 
 	private String sanatizeIp(final String ip) {
-		if (ip != null && ip.contains(","))
+		if (ip == null)
+			return "";
+		if (ip.contains(","))
 			return ip.substring(ip.lastIndexOf(",") + 1).trim();
 		return ip;
 	}
