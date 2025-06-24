@@ -32,6 +32,7 @@ class api {
 		api.clear();
 		api.ajax({
 			url: api.url + 'build/' + type,
+			method: 'POST',
 			success: xhr => {
 				document.querySelector('output').innerHTML = xhr;
 			}
