@@ -464,11 +464,12 @@ public class PdfService {
 				this.wordClouds.remove(wordCloudStatistics);
 				this.wordClouds.add(wordCloudStatistics);
 			}
-			final int maxColumns = 4;
+			final int maxColumns = 3;
 			final Table table = new Table(Math.min(this.wordClouds.size(), maxColumns));
 			table.setMarginTop(20f);
 			final List<List<Token>> tokens = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
+			final List<String> names = new ArrayList<>();
 			for (final Statistics wordCloud : this.wordClouds) {
 				final List<Token> token = PdfService.this.wordCloudService.extract(wordCloud.text.substring(0,
 						this.preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
@@ -481,17 +482,11 @@ public class PdfService {
 				if (min > token.get(token.size() - 1).getCount())
 					min = token.get(token.size() - 1).getCount();
 				tokens.add(token);
+				names.add(wordCloud.getUser());
 			}
 			for (int i = 0; i < tokens.size(); i++) {
-				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1)) {
-					final int offset = (i / maxColumns * maxColumns);
-					for (int i2 = 0; i2 < maxColumns && offset + i2 < this.wordClouds.size(); i2++) {
-						final Cell cell = this.createCell(this.wordClouds.get(offset + i2).getUser(),
-								TextAlignment.CENTER);
-						cell.setPaddingTop(0);
-						table.addCell(cell);
-					}
-				}
+				if (i > 0 && i % maxColumns == 0)
+					this.addWordCloudNames(names, maxColumns, table);
 				final List<Token> token = tokens.get(i);
 				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
 				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
@@ -500,9 +495,24 @@ public class PdfService {
 				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
 				table.addCell(cell);
 			}
+			if (tokens.size() > maxColumns) {
+				for (int i = 0; i < maxColumns - tokens.size() % maxColumns; i++)
+					table.addCell(this.createCell(""));
+			}
+			this.addWordCloudNames(names, maxColumns, table);
+			if (tokens.size() > maxColumns)
+				table.setMarginBottom(40);
 			this.document.add(table);
 			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)
 				this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
+		}
+
+		private void addWordCloudNames(final List<String> names, final int maxColumns, final Table table) {
+			for (int i = 0; i < maxColumns && names.size() > 0; i++) {
+				final Cell cell = this.createCell(names.remove(0), TextAlignment.CENTER);
+				cell.setPaddingTop(0);
+				table.addCell(cell);
+			}
 		}
 
 		private Cell createCell(final String text, final boolean... media) {
