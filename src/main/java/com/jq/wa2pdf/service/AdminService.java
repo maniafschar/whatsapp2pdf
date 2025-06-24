@@ -52,12 +52,9 @@ public class AdminService {
 	}
 
 	public String build(final String type) throws IOException {
-		if ("status".equals(type)) {
-			final ProcessBuilder pb = new ProcessBuilder("/usr/bin/bash", "-c", "ps aux|grep java");
-			pb.redirectErrorStream(true);
-			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
-		}
-		final ProcessBuilder pb = new ProcessBuilder(this.buildScript.replace("{type}", type).split(" "));
+		final ProcessBuilder pb = new ProcessBuilder("status".equals(type) ? 
+				new String[] { "/usr/bin/bash", "-c", "ps aux|grep java" }
+				: this.buildScript.replace("{type}", type).split(" "));
 		pb.redirectErrorStream(true);
 		return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 	}
