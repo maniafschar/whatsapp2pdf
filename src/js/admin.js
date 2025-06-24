@@ -18,11 +18,11 @@ class api {
 			success: xhr => {
 				var s = '<table><tr><th>id</th><th>createdAt</th><th>note</th></tr>';
 				for (var i = 0; i < xhr.tickets.length; i++)
-					s += '<tr><td>' + xhr.tickets[i].id + '</td><td>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.tickets[i].note.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') + '</td></tr>';
+					s += '<tr><td>' + xhr.tickets[i].id + '</td><td>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + api.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
 				document.querySelector('tickets').innerHTML = s + '</table>';
 				s = '<table><tr><th>id</th><th>createdAt</th><th>status</th><th>method</th><th>uri</th><th>port</th><th>query</th><th>time</th><th>ip</th><th>body</th><th>referer</th></tr>';
 				for (var i = 0; i < xhr.logs.length; i++)
-					s += '<tr><td>' + xhr.logs[i].id + '</td><td>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.logs[i].status + '</td><td>' + xhr.logs[i].method + '</td><td>' + xhr.logs[i].uri + '</td><td>' + xhr.logs[i].port + '</td><td>' + xhr.logs[i].query + '</td><td>' + xhr.logs[i].time + '</td><td>' + xhr.logs[i].ip + '</td><td>' + xhr.logs[i].body + '</td><td>' + xhr.logs[i].referer + '</td></tr>';
+					s += '<tr><td>' + xhr.logs[i].id + '</td><td>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.logs[i].status + '</td><td>' + xhr.logs[i].method + '</td><td>' + xhr.logs[i].uri + '</td><td>' + xhr.logs[i].port + '</td><td>' + xhr.logs[i].query + '</td><td>' + xhr.logs[i].time + '</td><td>' + xhr.logs[i].ip + '</td><td>' + api.sanitizeText(xhr.logs[i].body) + '</td><td>' + xhr.logs[i].referer + '</td></tr>';
 				document.querySelector('logs').innerHTML = s + '</table>';
 			}
 		});
@@ -34,7 +34,7 @@ class api {
 			url: api.url + 'build/' + type,
 			method: 'POST',
 			success: xhr => {
-				document.querySelector('output').innerHTML = xhr;
+				document.querySelector('output').innerHTML = api.sanitizeText(xhr);
 			}
 		});
 	}
@@ -80,6 +80,10 @@ class api {
 			param.body = JSON.stringify(param.body);
 		}
 		xhr.send(param.body);
+	}
+
+	static sanitizeText(s) {
+		return s ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : '';
 	}
 }
 
