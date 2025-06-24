@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -60,7 +61,7 @@ import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
-import com.jq.wa2pdf.repository.Repository;
+import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.vdurmont.emoji.EmojiParser;
 
@@ -79,9 +80,6 @@ public class PdfService {
 
 	@Autowired
 	private AdminService adminService;
-
-	@Autowired
-	private Repository repository;
 
 	@Async
 	public void create(final String id, final String period, final String user, final boolean preview)
@@ -157,7 +155,7 @@ public class PdfService {
 		private final String user;
 		private final String id;
 		private final boolean preview;
-		private boolean groupChat = false;
+		private final boolean groupChat;
 
 		private PDF(final String id, final String period, final String user, final boolean preview)
 				throws IOException {
@@ -167,6 +165,9 @@ public class PdfService {
 			this.id = id;
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			this.groupChat = new ObjectMapper().readValue(
+					ExtractService.getTempDir(id).resolve(PdfService.filename + "Attributes").toFile(),
+					Attributes.class).getUsers().size() > 2;
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
@@ -273,7 +274,6 @@ public class PdfService {
 				}
 				this.addMessage(user, time, lastChat);
 				this.addDate(null);
-				this.groupChat = users.size() > 2;
 			}
 		}
 
@@ -483,22 +483,22 @@ public class PdfService {
 				tokens.add(token);
 			}
 			for (int i = 0; i < tokens.size(); i++) {
-				final List<Token> token = tokens.get(i);
-				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
-				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
-				Cell cell = this.createCell(idWordCloud, true);
-				cell.setPadding(0);
-				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
-				table.addCell(cell);
 				if (i > 0 && (i % maxColumns == 0 || i == tokens.size() - 1)) {
 					final int offset = (i / maxColumns * maxColumns);
 					for (int i2 = 0; i2 < maxColumns && offset + i2 < this.wordClouds.size(); i2++) {
-						cell = this.createCell(this.wordClouds.get(offset + i2).getUser(),
+						final Cell cell = this.createCell(this.wordClouds.get(offset + i2).getUser(),
 								TextAlignment.CENTER);
 						cell.setPaddingTop(0);
 						table.addCell(cell);
 					}
 				}
+				final List<Token> token = tokens.get(i);
+				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
+				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
+				final Cell cell = this.createCell(idWordCloud, true);
+				cell.setPadding(0);
+				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
+				table.addCell(cell);
 			}
 			this.document.add(table);
 			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)

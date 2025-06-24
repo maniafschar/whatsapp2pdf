@@ -19,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.wa2pdf.service.PdfService.Statistics;
 
 @Service
@@ -28,20 +29,24 @@ public class ExtractService {
 		private final List<Statistics> periods = new ArrayList<>();
 		private final String id;
 
-		public Attributes(String id) {
+		public Attributes() {
+			this.id = null;
+		}
+
+		public Attributes(final String id) {
 			this.id = id;
 		}
 
 		public List<Statistics> getUsers() {
-			return users;
+			return this.users;
 		}
 
 		public List<Statistics> getPeriods() {
-			return periods;
+			return this.periods;
 		}
 
 		public String getId() {
-			return id;
+			return this.id;
 		}
 	}
 
@@ -78,7 +83,7 @@ public class ExtractService {
 			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
 					.getBytes(StandardCharsets.UTF_8));
 		}
-		return analyse(id);
+		return this.analyse(id);
 	}
 
 	public void cleanUp(final String id) throws IOException {
@@ -147,6 +152,8 @@ public class ExtractService {
 				} else
 					lastChat += " " + line;
 			}
+			new ObjectMapper().writeValue(
+					ExtractService.getTempDir(id).resolve(PdfService.filename + "Attributes").toFile(), attributes);
 			return attributes;
 		}
 	}

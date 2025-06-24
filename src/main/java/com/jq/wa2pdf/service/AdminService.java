@@ -39,9 +39,9 @@ public class AdminService {
 		return new AdminData(
 				this.repository.list(
 						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
-								+ "' as timestamp)",
+								+ "' as timestamp) order by id desc",
 						Log.class),
-				this.repository.list("from Ticket", Ticket.class));
+				this.repository.list("from Ticket order by id desc", Ticket.class));
 	}
 
 	public void createTicket(final Ticket ticket) {
