@@ -1,10 +1,14 @@
 package com.jq.wa2pdf.service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.jq.wa2pdf.entity.Log;
@@ -15,6 +19,9 @@ import com.jq.wa2pdf.repository.Repository;
 public class AdminService {
 	@Autowired
 	private Repository repository;
+
+	@Value("${app.admin.buildScript}")
+	private String buildScript;
 
 	public static class AdminData {
 		private final List<Log> logs;
@@ -42,6 +49,17 @@ public class AdminService {
 								+ "' as timestamp) order by id desc",
 						Log.class),
 				this.repository.list("from Ticket order by id desc", Ticket.class));
+	}
+
+	public String build(final String type) throws IOException {
+		if ("status".equals(type)) {
+			final ProcessBuilder pb = new ProcessBuilder("/usr/bin/bash", "-c", "ps aux|grep java");
+			pb.redirectErrorStream(true);
+			return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
+		}
+		final ProcessBuilder pb = new ProcessBuilder(this.buildScript.replace("{type}", type).split(" "));
+		pb.redirectErrorStream(true);
+		return IOUtils.toString(pb.start().getInputStream(), StandardCharsets.UTF_8);
 	}
 
 	public void createTicket(final Ticket ticket) {
