@@ -44,7 +44,11 @@ class api {
 			url: api.url + 'ticket/' + id,
 			method: 'DELETE',
 			success: xhr => {
-				document.querySelector('output').innerHTML = api.sanitizeText(xhr);
+				var e = event.target;
+				while (e && e.nodeName != 'TR')
+					e = e.parentElement;
+				if (e)
+					e.outerHTML = '';
 			}
 		});
 	}
