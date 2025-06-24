@@ -23,7 +23,7 @@ public class AdminApi {
 		return this.adminService.init();
 	}
 
-	@PostMapping("build")
+	@PostMapping("build/{type}")
 	public String build(@PathVariable final String type) throws IOException {
 		return this.adminService.build(type);
 	}
