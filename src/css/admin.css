@@ -89,3 +89,8 @@ tickets {
     padding: 1em;
     box-sizing: border-box;
 }
+
+output {
+    text-align: left;
+    padding: 3em 1em 0 1em;
+}
