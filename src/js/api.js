@@ -2,7 +2,7 @@ export { api };
 
 class api {
 	static url = '{placeholderServer}';
-	static feedbackStatus = 'You need to print at least one document, to give feedback.';
+	static feedbackStatus = 'You need to create at least one document, to give feedback.';
 
 	static analyse(event) {
 		document.getElementsByTagName('attributes')[0].style.display = 'none';
