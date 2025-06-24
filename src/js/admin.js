@@ -62,15 +62,15 @@ class api {
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				var errorHandler = function () {
+					document.querySelector('progressbar').style.display = null;
 					if (param.error) {
 						xhr.param = param;
 						param.error(xhr);
-					} else {
-						document.querySelector('progressbar').style.display = null;
+					} else
 						document.querySelector('output').innerHTML = JSON.stringify(xhr);
-					}
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
+					document.getElementsByTagName('progressbar')[0].style.display = null;
 					if (param.success) {
 						var response = xhr.responseText;
 						if (response && (response.indexOf('{') === 0 || response.indexOf('[') === 0)) {
@@ -93,6 +93,7 @@ class api {
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			param.body = JSON.stringify(param.body);
 		}
+		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		xhr.send(param.body);
 	}
 
