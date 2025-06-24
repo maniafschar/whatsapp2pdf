@@ -29,13 +29,17 @@ class api {
 	}
 
 	static build(type) {
-		document.querySelector('output').innerHTML = '';
+		api.clear();
 		api.ajax({
 			url: api.url + 'build/' + type,
 			success: xhr => {
 				document.querySelector('output').innerHTML = xhr;
 			}
 		});
+	}
+
+	static clear() {
+		document.querySelector('output').innerHTML = '';
 	}
 
 	static ajax(param) {
