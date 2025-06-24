@@ -22,7 +22,7 @@ class api {
 				document.querySelector('tickets').innerHTML = s + '</table>';
 				s = '<table><tr><th>id</th><th>createdAt</th><th>status</th><th>method</th><th>uri</th><th>port</th><th>query</th><th>time</th><th>ip</th><th>body</th><th>referer</th></tr>';
 				for (var i = 0; i < xhr.logs.length; i++)
-					s += '<tr><td>' + xhr.logs[i].id + '</td><td>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.logs[i].status + '</td><td>' + xhr.logs[i].method + '</td><td>' + xhr.logs[i].uri + '</td><td>' + xhr.logs[i].port + '</td><td>' + xhr.logs[i].query + '</td><td>' + xhr.logs[i].time + '</td><td>' + xhr.logs[i].ip + '</td><td>' + api.sanitizeText(xhr.logs[i].body) + '</td><td>' + xhr.logs[i].referer + '</td></tr>';
+					s += '<tr><td>' + xhr.logs[i].id + '</td><td>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.logs[i].status + '</td><td>' + xhr.logs[i].method + '</td><td>' + xhr.logs[i].uri + '</td><td>' + xhr.logs[i].port + '</td><td>' + xhr.logs[i].query + '</td><td>' + xhr.logs[i].time + '</td><td>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td>' + api.sanitizeText(xhr.logs[i].body) + '</td><td>' + xhr.logs[i].referer + '</td></tr>';
 				document.querySelector('logs').innerHTML = s + '</table>';
 			}
 		});
