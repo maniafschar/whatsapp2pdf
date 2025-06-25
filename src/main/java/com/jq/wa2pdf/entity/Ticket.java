@@ -8,6 +8,15 @@ public class Ticket extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String note;
 
+	public Ticket() {
+		super();
+	}
+
+	public Ticket(final String note) {
+		this();
+		setNote(note);
+	}
+
 	public String getNote() {
 		return note;
 	}
