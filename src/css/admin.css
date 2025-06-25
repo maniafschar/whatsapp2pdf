@@ -102,6 +102,7 @@ th {
     position: relative;
 	white-space: nowrap;
 	font-size: 1em;
+	overflow-x: auto;
 }
 
 th {
