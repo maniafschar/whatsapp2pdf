@@ -43,13 +43,11 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 			@SuppressWarnings("null")
 			@Override
 			public void handleUncaughtException(final Throwable ex, final Method method, final Object... obj) {
-				final Ticket ticket = new Ticket();
-				ticket.setNote(method.toGenericString() + "\n" + (obj == null ? ""
-						: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
+				WhatsApp2PdfConfiguration.this.adminService.createTicket(
+						new Ticket(method.toGenericString() + "\n" + (obj == null ? ""
+							: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
 								.collect(Collectors.joining(", ")) + "\n")
-						+ Utilities.stackTraceToString(ex));
-				WhatsApp2PdfConfiguration.this.adminService.createTicket(ticket);
-				System.out.println(ticket.getNote());
+							+ Utilities.stackTraceToString(ex)));
 			}
 		};
 	}
