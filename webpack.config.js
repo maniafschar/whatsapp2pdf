@@ -3,7 +3,7 @@ const express = require('express');
 
 module.exports = (env) => {
 	return [{
-		entry: './src/js/admin.js',
+		entry: './src/web/js/admin.js',
 		mode: 'production',
 		output: {
 			globalObject: 'this',
@@ -31,7 +31,7 @@ module.exports = (env) => {
 		}
 	},
 	{
-		entry: './src/js/start.js',
+		entry: './src/web/js/start.js',
 		mode: 'production',
 		output: {
 			globalObject: 'this',
