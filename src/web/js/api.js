@@ -2,7 +2,7 @@ export { api };
 
 class api {
 	static url = '{placeholderServer}';
-	static feedbackStatus = 'You need to <span onclick="ui.showTab(1)">create</span> at least one document, to give feedback.';
+	static feedbackStatus = 'You need to <a onclick="ui.showTab(1)">create</a> at least one document, to give feedback.';
 
 	static analyse(event) {
 		document.getElementsByTagName('attributes')[0].style.display = 'none';
