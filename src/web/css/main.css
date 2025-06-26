@@ -283,7 +283,7 @@ popup {
 
 popup close {
 	position: absolute;
-	padding: 1em;
+	padding: 1em 1em 2em 3em;
 	top: 0;
 	right: 0;
 	cursor: pointer;
