@@ -262,6 +262,7 @@ tab.selected {
 a {
 	text-decoration: none;
 	color: darkblue;
+	cursor: pointer;
 }
 
 popup {
