@@ -214,8 +214,6 @@ tabBody {
 	overflow-x: hidden;
 	height: 100%;
 	border-radius: 1em 1em 0 0;
-	background: var(--borderColor);
-	border: solid 1em transparent;
 }
 
 tabBody>container {
@@ -225,6 +223,7 @@ tabBody>container {
 	height: 100%;
 	transition: all ease-out .4s;
 	left: 0;
+	background: var(--borderColor);
 	overflow-y: hidden;
 }
 
@@ -236,6 +235,7 @@ tabBody element {
 	left: 0;
 	box-sizing: border-box;
 	overflow-y: auto;
+	border: solid 1em transparent;
 	height: 100%;
 }
 
