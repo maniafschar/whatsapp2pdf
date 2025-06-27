@@ -35,6 +35,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("api")
 public class ApplicationApi {
+	public static final int STATUS_PROCESSING_PDF = 566;
+
 	@Autowired
 	private PdfService pdfService;
 
@@ -75,7 +77,7 @@ public class ApplicationApi {
 								ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toUri()
 										.toURL(),
 								StandardCharsets.UTF_8));
-			response.sendError(566);
+			response.sendError(STATUS_PROCESSING_PDF);
 		} else {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +
