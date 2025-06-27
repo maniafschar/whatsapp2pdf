@@ -16,7 +16,7 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				var formatTime(d) {
+				var formatTime = function(d) {
 					return new Date(d.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;').replace(new Date().getFullYear() - 1, '').replace(new Date().getFullYear(), '').replace(',', '');
 				}
 				var replaceWidths = function(widths, s) {
