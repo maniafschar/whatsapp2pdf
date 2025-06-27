@@ -6,6 +6,8 @@ import jakarta.persistence.Enumerated;
 
 @Entity
 public class Log extends BaseEntity {
+	public static final int STATUS_PROCESSING_PDF = 566;
+
 	private String method = "";
 	private String body = "";
 	private String referer = "";
@@ -21,7 +23,7 @@ public class Log extends BaseEntity {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
 		public static LogStatus get(final int httpCode) {
-			return httpCode < 300 ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
+			return httpCode < 300 || httpCode == STATUS_PROCESSING_PDF ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
 		}
 	}
 
