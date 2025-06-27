@@ -29,7 +29,7 @@ class api {
 				var s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
 				for (var i = 0; i < xhr.tickets.length; i++)
 					s += '<tr><td [[w1]]>' + xhr.tickets[i].id + '</td><td [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
-				document.querySelector('tickets').innerHTML = replaceWidths([5, 10, 85], s) + '</table>';
+				document.querySelector('tickets').innerHTML = replaceWidths(narrowView ? [10, 20, 70] : [5, 10, 85], s) + '</table>';
 				s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>uri</th><th [[w6]]>time</th>';
 				if (!narrowView)
 					s += '<th [[w7]]>body</th><th [[w8]]>referer</th>';
