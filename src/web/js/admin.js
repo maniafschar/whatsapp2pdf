@@ -42,7 +42,7 @@ class api {
 					s += '<th [[w1]]>id</th>';
 				s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>uri</th><th [[w6]]>time</th>';
 				if (!narrowView)
-					s += '<th [[w8]]>referer</th>';
+					s += '<th [[w7]]>referer</th>';
 				s += '</tr></thead>';
 				for (var i = 0; i < xhr.logs.length; i++) {
 					s += '<tr>';
