@@ -36,7 +36,7 @@ class api {
 						s += '<td [[w7]]>' + api.sanitizeText(xhr.logs[i].body) + '</td><td [[w8]]>' + xhr.logs[i].referer + '</td>';
 					s += '</tr>';
 				}
-				document.querySelector('logs').innerHTML = replaceWidths([5, 10, 5, 10, 5, 10, 5, 5, 15, 30], s) + '</table>';
+				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [10, 20, 10, 10, 40, 10] :  [5, 10, 5, 10, 15, 5, 15, 35], s) + '</table>';
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
