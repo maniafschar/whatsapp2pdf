@@ -19,7 +19,7 @@ class api {
 				var formatTime = function(d) {
 					d = new Date(d.replace('+00:00', ''));
 					return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' d.getSeconds();
-				}
+				};
 				var replaceWidths = function(widths, s) {
 					for (var i = 0; i < widths.length; i++)
 						s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
