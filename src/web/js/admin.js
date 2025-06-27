@@ -19,6 +19,7 @@ class api {
 				var replaceWidths = function(widths, s) {
 					for (var i = 0; i < widths.length; i++)
 						s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;"');
+					return s;
 				};
 				var s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
 				for (var i = 0; i < xhr.tickets.length; i++)
