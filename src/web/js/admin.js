@@ -11,13 +11,14 @@ class api {
 		}
 		if (!window.localStorage.getItem('credentials')) {
 			document.querySelector('login').style.display = 'block';
-			return;
+			return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' d.getSeconds();
 		}
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
 				var formatTime = function(d) {
-					return new Date(d.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;').replace(new Date().getFullYear() - 1, '').replace(new Date().getFullYear(), '').replace(',', '');
+					d  =new Date(d.replace('+00:00', ''));
+					return ;
 				}
 				var replaceWidths = function(widths, s) {
 					for (var i = 0; i < widths.length; i++)
