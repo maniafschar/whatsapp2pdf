@@ -91,7 +91,24 @@ login input {
 
 table {
 	border-collapse: collapse;
-	min-width: 100%;
+	width: 100%;
+	overflow: hidden;
+	position: relative;
+	display: block;
+}
+
+thead,
+tbody{
+	display: block;
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+}
+
+tr {
+	width: 100%;
+	position: relative;
+	display: block;
 }
 
 td,
@@ -104,6 +121,8 @@ th {
 	font-size: 1em;
 	overflow-x: auto;
 	-webkit-text-size-adjust: 100%;
+	box-sizing: border-box;
+	display: inline-block;
 }
 
 th {
