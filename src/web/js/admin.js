@@ -40,7 +40,7 @@ class api {
 				s = '<table><thead><tr>';
 				if (!narrowView)
 					s += '<th [[w1]]>id</th>';
-				s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>uri</th><th [[w6]]>time</th>';
+				s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>time</th><th [[w6]]>uri</th>';
 				if (!narrowView)
 					s += '<th [[w7]]>referer</th>';
 				s += '</tr></thead>';
@@ -48,12 +48,12 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.logs[i].id + '</td>';
-					s += '<td [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td><td [[w6]]>' + xhr.logs[i].time + '</td>';
+					s += '<td [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w6]]>' + xhr.logs[i].time + '</td><td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
 					if (!narrowView)
 						s += '<td [[w7]]>' + xhr.logs[i].referer + '</td>';
 					s += '</tr>';
 				}
-				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [0, 20, 10, 15, 45, 10] :  [5, 10, 5, 10, 25, 10, 35], s) + '</table>';
+				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] :  [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
