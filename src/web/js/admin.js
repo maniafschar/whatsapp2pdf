@@ -16,14 +16,18 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				var s = '<table><tr><th>id</th><th>createdAt</th><th>note</th></tr>';
+				var replaceWidths = function(widths, s) {
+					for (var i = 0; i < widths.length; i++)
+						s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;"');
+				};
+				var s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
 				for (var i = 0; i < xhr.tickets.length; i++)
-					s += '<tr><td>' + xhr.tickets[i].id + '</td><td>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
-				document.querySelector('tickets').innerHTML = s + '</table>';
-				s = '<table><tr><th>id</th><th>createdAt</th><th>status</th><th>ip</th><th>method</th><th>uri</th><th>query</th><th>time</th><th>body</th><th>referer</th></tr>';
+					s += '<tr><td [[w1]]>' + xhr.tickets[i].id + '</td><td [[w2]]>' + new Date(xhr.tickets[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+				document.querySelector('tickets').innerHTML = replaceWidths([5, 10, 85], s) + '</table>';
+				s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>method</th><th [[w6]]>uri</th><th [[w7]]>query</th><th [[w8]]>time</th><th [[w9]>body</th><th [[w10]]>referer</th></tr></thead>';
 				for (var i = 0; i < xhr.logs.length; i++)
 					s += '<tr><td>' + xhr.logs[i].id + '</td><td>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td>' + xhr.logs[i].status + '</td><td>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td>' + xhr.logs[i].method + '</td><td>' + xhr.logs[i].uri + '</td><td>' + xhr.logs[i].query + '</td><td>' + xhr.logs[i].time + '</td><td>' + api.sanitizeText(xhr.logs[i].body) + '</td><td>' + xhr.logs[i].referer + '</td></tr>';
-				document.querySelector('logs').innerHTML = s + '</table>';
+				document.querySelector('logs').innerHTML = replaceWidths([5, 10, 5, 5, 5, 10, 5, 5, 25, 25], s) + '</table>';
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
