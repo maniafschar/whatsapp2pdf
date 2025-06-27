@@ -28,7 +28,7 @@ class api {
 				s = '<table><thead><tr><th [[w1]]>id</th><th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>method</th><th [[w6]]>uri</th><th [[w7]]>query</th><th [[w8]]>time</th><th [[w9]]>body</th><th [[w10]]>referer</th></tr></thead>';
 				for (var i = 0; i < xhr.logs.length; i++)
 					s += '<tr><td [[w1]]>' + xhr.logs[i].id + '</td><td [[w2]]>' + new Date(xhr.logs[i].createdAt.replace('+00:00', '')).toLocaleString().replace(' ', '&nbsp;') + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].method + '</td><td [[w6]]>' + xhr.logs[i].uri + '</td><td [[w7]]>' + xhr.logs[i].query + '</td><td [[w8]]>' + xhr.logs[i].time + '</td><td [[w9]]>' + api.sanitizeText(xhr.logs[i].body) + '</td><td [[w10]]>' + xhr.logs[i].referer + '</td></tr>';
-				document.querySelector('logs').innerHTML = replaceWidths([5, 10, 5, 5, 5, 10, 5, 5, 25, 25], s) + '</table>';
+				document.querySelector('logs').innerHTML = replaceWidths([5, 10, 5, 10, 5, 10, 5, 5, 15, 30], s) + '</table>';
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
