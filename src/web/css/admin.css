@@ -100,7 +100,8 @@ table {
 thead,
 tbody{
 	display: block;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	width: 100%;
 	position: relative;
 }
