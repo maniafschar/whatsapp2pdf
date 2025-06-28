@@ -33,6 +33,7 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 	public Executor getAsyncExecutor() {
 		final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.initialize();
+		executor.setWaitForTasksToCompleteOnShutdown(true);
 		return executor;
 	}
 
@@ -45,9 +46,9 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 			public void handleUncaughtException(final Throwable ex, final Method method, final Object... obj) {
 				WhatsApp2PdfConfiguration.this.adminService.createTicket(
 						new Ticket(method.toGenericString() + "\n" + (obj == null ? ""
-							: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
-								.collect(Collectors.joining(", ")) + "\n")
-							+ Utilities.stackTraceToString(ex)));
+								: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
+										.collect(Collectors.joining(", ")) + "\n")
+								+ Utilities.stackTraceToString(ex)));
 			}
 		};
 	}
