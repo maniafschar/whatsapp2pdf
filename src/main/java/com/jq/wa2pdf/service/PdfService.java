@@ -465,7 +465,11 @@ public class PdfService {
 				this.wordClouds.add(wordCloudStatistics);
 			}
 			final int maxColumns = 3;
-			final Table table = new Table(Math.min(this.wordClouds.size(), maxColumns));
+			final int columns = Math.min(this.wordClouds.size(), maxColumns);
+			final UnitValue[] columnWidths = new UnitValue[columns];
+			for (int i = 0; i < columnWidths.length; i++)
+				columnWidths[i] = UnitValue.createPercentValue(1.0f / columns);
+			final Table table = new Table(columnWidths);
 			final List<List<Token>> tokens = new ArrayList<>();
 			final List<String> names = new ArrayList<>();
 			int max = 0, min = Integer.MAX_VALUE;
@@ -485,32 +489,36 @@ public class PdfService {
 				names.add(wordCloud.getUser());
 			}
 			for (int i = 0; i < tokens.size(); i++) {
-				if (i > 0 && i % maxColumns == 0)
-					this.addWordCloudNames(names, maxColumns, table);
 				final List<Token> token = tokens.get(i);
 				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
 				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
-				final Cell cell = this.createCell(idWordCloud, true);
+				final Table cellTable = new Table(1);
+				cellTable.setWidth(UnitValue.createPercentValue(100f));
+				cellTable.setKeepTogether(true);
+				cellTable.setBorder(Border.NO_BORDER);
+				Cell cell = this.createCell(idWordCloud, true);
 				cell.setPadding(0);
-				cell.setWidth(UnitValue.createPercentValue(100f / tokens.size()));
+				cell.setWidth(UnitValue.createPercentValue(100f));
+				cellTable.addCell(cell);
+				cell = this.createCell(names.remove(0), TextAlignment.CENTER);
+				cell.setPaddingTop(0);
+				cellTable.addCell(cell);
+				cell = new Cell();
+				cell.setBorder(Border.NO_BORDER);
+				cell.setPadding(0);
+				cell.setMargin(0);
+				cell.add(cellTable);
 				table.addCell(cell);
 			}
-			if (tokens.size() > maxColumns) {
-				for (int i = 0; i < maxColumns - tokens.size() % maxColumns; i++)
-					table.addCell(this.createCell(""));
-				table.setMarginBottom(40);
-			}
-			this.addWordCloudNames(names, maxColumns, table);
 			this.document.add(table);
 			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)
 				this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-		}
-
-		private void addWordCloudNames(final List<String> names, final int maxColumns, final Table table) {
-			for (int i = 0; i < maxColumns && names.size() > 0; i++) {
-				final Cell cell = this.createCell(names.remove(0), TextAlignment.CENTER);
-				cell.setPaddingTop(0);
-				table.addCell(cell);
+			else {
+				final Table empty = new Table(1);
+				empty.setWidth(UnitValue.createPercentValue(100f));
+				empty.setHeight(UnitValue.createPointValue(20));
+				empty.addCell(this.createCell(""));
+				this.document.add(empty);
 			}
 		}
 
