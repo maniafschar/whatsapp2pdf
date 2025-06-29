@@ -194,6 +194,7 @@ popup content {
 	position: relative;
 	display: block;
 	padding: 1em;
+	text-align: left;
 }
 
 popup label {

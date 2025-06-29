@@ -100,7 +100,7 @@ class api {
 		var keys = Object.keys(data);
 		var s = '';
 		for (var i = 0; i < keys.length; i++)
-			s += '<label>' + keys[i] + '</label><value>' + data[keys[i]] + '</value>';
+			s += '<label>' + keys[i] + '</label><value>' + api.sanitizeText(data[keys[i]]) + '</value>';
 		document.querySelector('popup content').innerHTML = s;
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
 		document.querySelector('popup').style.transform = 'scale(1)';
