@@ -98,7 +98,7 @@ class api {
 		for (var i = 0; i < keys.length; i++)
 			s += '<label>' + keys[i] + '</label><value>' + data[keys[i]] + '</value>';
 		document.querySelector('popup content').innerHTML = s;
-		document.querySelector('popup').style = 'scale(1)';
+		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 
 	static ajax(param) {
