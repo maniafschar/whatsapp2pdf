@@ -1,11 +1,13 @@
 package com.jq.wa2pdf.api;
 
+import java.awt.FontFormatException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -26,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.jq.wa2pdf.entity.Feedback;
 import com.jq.wa2pdf.entity.Log;
+import com.jq.wa2pdf.entity.Ticket;
+import com.jq.wa2pdf.service.AdminService;
 import com.jq.wa2pdf.service.ExtractService;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.FeedbackService;
@@ -45,20 +49,23 @@ public class ApplicationApi {
 	@Autowired
 	private FeedbackService feedbackService;
 
+	@Autowired
+	private AdminService adminService;
+
 	@PostMapping("analyse")
-	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws Exception {
+	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws IOException {
 		return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
 	}
 
 	@PostMapping("preview/{id}")
 	public void preview(@PathVariable final String id, @RequestParam final String period,
-			@RequestParam final String user) throws Exception {
+			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
 		this.pdfService.create(id, period, user, true);
 	}
 
 	@PostMapping("buy/{id}")
 	public void buy(@PathVariable final String id, @RequestParam final String[] periods,
-			@RequestParam final String user) throws Exception {
+			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
 		for (final String period : periods)
 			this.pdfService.create(id, period, user, false);
 	}
@@ -92,25 +99,29 @@ public class ApplicationApi {
 	}
 
 	@GetMapping("feedback/{id}/{pin}")
-	public Feedback feedback(@PathVariable final BigInteger id, @PathVariable final String pin) throws IOException {
+	public Feedback feedback(@PathVariable final BigInteger id, @PathVariable final String pin) {
 		return this.feedbackService.one(id, pin);
 	}
 
 	@PutMapping("feedback/confirm")
-	public String feedbackConfim(@RequestBody final Feedback feedback)
-			throws IOException, EmailException {
+	public String feedbackConfim(@RequestBody final Feedback feedback) throws EmailException {
 		return this.feedbackService.confirm(feedback);
 	}
 
 	@PutMapping("feedback/{id}")
 	public String feedbackSave(@PathVariable final String id, @RequestBody final Feedback feedback)
-			throws IOException, EmailException {
+			throws EmailException {
 		return this.feedbackService.save(id, feedback);
 	}
 
 	@GetMapping("feedback/list")
-	public List<Feedback> feedbackList() throws IOException {
+	public List<Feedback> feedbackList() {
 		return this.feedbackService.list();
+	}
+
+	@PostMapping("ticket")
+	public void ticket(@RequestBody final Ticket ticket) {
+		this.adminService.createTicket(ticket);
 	}
 
 	private String sanatizeFilename(String filename) {

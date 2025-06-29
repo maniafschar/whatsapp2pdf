@@ -20,6 +20,11 @@ class api {
 				error: xhr => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
 					document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
+					api.ajax({
+						url: api.url + '/rest/api/ticket',
+						method: 'POST',
+						body: { note: JSON.stringify(xhr) }
+					});
 				}
 			});
 		} else

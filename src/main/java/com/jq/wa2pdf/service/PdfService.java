@@ -83,13 +83,12 @@ public class PdfService {
 
 	@Async
 	public void create(final String id, final String period, final String user, final boolean preview)
-			throws Exception {
+			throws IOException, FontFormatException, ParseException {
 		final Path error = ExtractService.getTempDir(id).resolve(PdfService.filename + "Error");
 		try {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
-		} catch (final Exception ex) {
-			ex.printStackTrace();
+		} catch (final IOException | FontFormatException | ParseException ex) {
 			try (final FileOutputStream filename = new FileOutputStream(error.toFile())) {
 				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
 			}
