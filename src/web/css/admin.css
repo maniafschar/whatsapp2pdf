@@ -211,6 +211,7 @@ popup value {
 	display: block;
 	padding-bottom: 1em;
 	white-space: nowrap;
+	overflow-x: auto;
 }
 
 progressbar {
