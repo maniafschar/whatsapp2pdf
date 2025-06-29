@@ -99,8 +99,10 @@ class api {
 		var data = api.data[id[0]][id[1]];
 		var keys = Object.keys(data);
 		var s = '';
-		for (var i = 0; i < keys.length; i++)
-			s += '<label>' + keys[i] + '</label><value>' + api.sanitizeText(data[keys[i]]) + '</value>';
+		for (var i = 0; i < keys.length; i++) {
+			if (data[keys[i]])
+				s += '<label>' + keys[i] + '</label><value>' + api.sanitizeText(data[keys[i]]) + '</value>';
+		}
 		document.querySelector('popup content').innerHTML = s;
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
 		document.querySelector('popup').style.transform = 'scale(1)';
