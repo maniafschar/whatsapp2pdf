@@ -164,8 +164,9 @@ popup {
 	transform: scale(0);
 	position: fixed;
 	max-width: 90%;
+	max-height: 90%;
 	background-color: blanchedalmond;
-	top: 2em;
+	top: 5%;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
