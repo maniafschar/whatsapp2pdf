@@ -156,6 +156,43 @@ output {
 	font-size: 0.7em;
 }
 
+popup {
+	transform: scale(0);
+	position: fixed;
+	width: 30em;
+	max-width: 90%;
+	background-color: blanchedalmond;
+	top: 2em;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	z-index: 2;
+	border-radius: 1em;
+	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
+	transition: all ease-out .4s;
+	max-width: 90%;
+}
+
+popup close {
+	position: absolute;
+	padding: 1em 1em 2em 3em;
+	top: 0;
+	right: 0;
+	cursor: pointer;
+	color: rgba(0, 0, 0, 0.3);
+	z-index: 2;
+}
+
+popup close::before {
+	content: 'x';
+}
+
+popup content {
+	position: relative;
+	display: block;
+	padding: 1em;
+}
+
 progressbar {
 	position: fixed;
 	left: 0;
