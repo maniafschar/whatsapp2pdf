@@ -63,6 +63,7 @@ public class ExtractService {
 	public Attributes unzip(final MultipartFile file, final String id) throws IOException {
 		final Path targetDir = getTempDir(id).toAbsolutePath();
 		Files.createDirectories(targetDir);
+		String name = null;
 		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
 				final FileOutputStream filename = new FileOutputStream(
 						targetDir.resolve(PdfService.filename + "Filename").toFile())) {
@@ -73,6 +74,7 @@ public class ExtractService {
 					throw new RuntimeException("Entry with an illegal path: "
 							+ ze.getName());
 				}
+				name = ze.getName();
 				if (ze.isDirectory())
 					Files.createDirectories(resolvedPath);
 				else {
@@ -80,6 +82,8 @@ public class ExtractService {
 					Files.copy(zipIn, resolvedPath);
 				}
 			}
+			if (!"_chat.txt".equals(name) && targetDir.toAbsolutePath().toFile().list().length == 1)
+				Files.move(targetDir.resolve(name), targetDir.resolve("_chat.txt"));
 			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
 					.getBytes(StandardCharsets.UTF_8));
 		}
