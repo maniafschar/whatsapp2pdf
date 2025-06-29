@@ -215,7 +215,7 @@ public class PdfService {
 
 		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(
-					new FileReader(this.dir.resolve("_chat.txt").toFile()))) {
+					new FileReader(extractService.getFilenameChat(id).toFile()))) {
 				final Pattern patternStart = Pattern
 						.compile(
 								"^.?\\[" + this.period.replaceAll("[0-9]", "\\\\d")
