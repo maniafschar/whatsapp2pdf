@@ -37,7 +37,7 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="api.open(event)" i="ticket-' + i + '" [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+					s += '<td onclick="api.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				s = '<table><thead><tr>';
@@ -51,7 +51,7 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.logs[i].id + '</td>';
-					s += '<td onclick="api.open(event)" i="log-' + i + '" [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].time + '</td><td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
+					s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].time + '</td><td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
 					if (!narrowView)
 						s += '<td [[w7]]>' + xhr.logs[i].referer + '</td>';
 					s += '</tr>';
@@ -108,6 +108,7 @@ class api {
 
 	static popupClose() {
 		document.getElementsByTagName('popup')[0].style.transform = '';
+		document.querySelector('popup content').removeAttribute('i');
 	}
 
 	static ajax(param) {
