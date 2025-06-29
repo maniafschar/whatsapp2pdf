@@ -193,7 +193,7 @@ popup close::before {
 popup content {
 	position: relative;
 	display: block;
-	padding: 1em;
+	padding: 1em 1em 0 1em;
 	text-align: left;
 }
 
@@ -202,11 +202,13 @@ popup label {
 	position: relative;
 	display: block;
 	padding-left: 1em;
+	color: darkmagenta;
 }
 
 popup value {
 	position: relative;
 	display: block;
+	padding-bottom: 1em;
 	white-space: nowrap;
 }
 
