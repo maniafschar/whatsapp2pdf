@@ -93,7 +93,11 @@ class api {
 	static open(event) {
 		var id = event.target.getAttribute('i').split('-');
 		var data = api.data[id[0]][id[1]];
-		document.querySelector('popup content').innerHTML = JSON.stringify(data);
+		var keys = Object.keys(data);
+		var s = '';
+		for (var i = 0; i < keys.length; i++)
+			s += '<label>' + keys[i] + '</label><value>' + data[keys[i]] + '</value>';
+		document.querySelector('popup content').innerHTML = s;
 		document.querySelector('popup').style = 'scale(1)';
 	}
 

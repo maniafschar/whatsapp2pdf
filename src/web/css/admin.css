@@ -159,7 +159,6 @@ output {
 popup {
 	transform: scale(0);
 	position: fixed;
-	width: 30em;
 	max-width: 90%;
 	background-color: blanchedalmond;
 	top: 2em;
@@ -170,7 +169,7 @@ popup {
 	border-radius: 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
-	max-width: 90%;
+	overflow: hidden;
 }
 
 popup close {
