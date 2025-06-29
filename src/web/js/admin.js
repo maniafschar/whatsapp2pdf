@@ -91,6 +91,10 @@ class api {
 	}
 
 	static open(event) {
+		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
+			api.popupClose();
+			return;
+		}
 		var id = event.target.getAttribute('i').split('-');
 		var data = api.data[id[0]][id[1]];
 		var keys = Object.keys(data);
@@ -98,6 +102,7 @@ class api {
 		for (var i = 0; i < keys.length; i++)
 			s += '<label>' + keys[i] + '</label><value>' + data[keys[i]] + '</value>';
 		document.querySelector('popup content').innerHTML = s;
+		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
 		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 

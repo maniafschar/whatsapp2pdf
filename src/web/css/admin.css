@@ -165,7 +165,7 @@ popup {
 	left: 0;
 	right: 0;
 	margin: 0 auto;
-	z-index: 2;
+	z-index: 8;
 	border-radius: 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
