@@ -174,7 +174,7 @@ popup {
 	border-radius: 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
-	overflow: hidden;
+	overflow: auto;
 	width: fit-content;
 }
 
