@@ -228,10 +228,12 @@ class api {
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				var errorHandler = function () {
-					var xhrError = new XMLHttpRequest();
-					xhrError.open('POST', api.url + '/rest/api/ticket', true);
-					xhrError.setRequestHeader('Content-Type', 'application/json');
-					xhrError.send(JSON.stringify({ note: xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
+					if (api.status < 500) {
+						var xhrError = new XMLHttpRequest();
+						xhrError.open('POST', api.url + '/rest/api/ticket', true);
+						xhrError.setRequestHeader('Content-Type', 'application/json');
+						xhrError.send(JSON.stringify({ note: xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
+					}
 					if (param.error) {
 						xhr.param = param;
 						param.error(xhr);

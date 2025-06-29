@@ -74,7 +74,7 @@ public class LogFilter implements Filter {
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			final byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
-				log.setBody(log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8));
+				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
 			try {
 				this.repository.save(log);
 			} catch (final Exception e) {
