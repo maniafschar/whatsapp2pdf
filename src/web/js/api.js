@@ -20,11 +20,6 @@ class api {
 				error: xhr => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
 					document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
-					api.ajax({
-						url: api.url + '/rest/api/ticket',
-						method: 'POST',
-						body: { note: JSON.stringify(xhr) }
-					});
 				}
 			});
 		} else
@@ -233,6 +228,10 @@ class api {
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				var errorHandler = function () {
+					var xhrError = new XMLHttpRequest();
+					xhrError.open('POST', api.url + '/rest/api/ticket', true);
+					xhrError.setRequestHeader('Content-Type', 'application/json');
+					xhrError.send(JSON.stringify({ note: xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
 					if (param.error) {
 						xhr.param = param;
 						param.error(xhr);
