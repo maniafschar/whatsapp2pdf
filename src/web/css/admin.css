@@ -196,6 +196,19 @@ popup content {
 	padding: 1em;
 }
 
+popup label {
+	font-style: italic;
+	position: relative;
+	display: block;
+	padding-left: 1em;
+}
+
+popup value {
+	position: relative;
+	display: block;
+	white-space: nowrap;
+}
+
 progressbar {
 	position: fixed;
 	left: 0;
