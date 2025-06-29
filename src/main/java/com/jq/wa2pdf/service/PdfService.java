@@ -51,18 +51,15 @@ import com.itextpdf.kernel.pdf.filespec.PdfFileSpec;
 import com.itextpdf.kernel.pdf.navigation.PdfNamedDestination;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.element.Text;
-import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
-import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.vdurmont.emoji.EmojiParser;
 
 @Component
@@ -480,10 +477,13 @@ public class PdfService {
 								: wordCloud.text.length()));
 				while (token.size() > 50)
 					token.remove(50);
-				if (max < token.get(0).getCount())
-					max = token.get(0).getCount();
-				if (min > token.get(token.size() - 1).getCount())
-					min = token.get(token.size() - 1).getCount();
+				if (token.size() > 0) {
+				if (token.size() > 0) {
+					if (max < token.get(0).getCount())
+						max = token.get(0).getCount();
+					if (min > token.get(token.size() - 1).getCount())
+						min = token.get(token.size() - 1).getCount();
+				}
 				tokens.add(token);
 				names.add(wordCloud.getUser());
 			}
