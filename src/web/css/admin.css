@@ -123,7 +123,7 @@ th {
 	white-space: nowrap;
 	font-size: 1em;
 	overflow: auto;
-	max-height: 5em;
+	max-height: 3.8em;
 	-webkit-text-size-adjust: 100%;
 	box-sizing: border-box;
 	display: inline-block;
