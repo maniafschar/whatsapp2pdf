@@ -101,6 +101,10 @@ class api {
 		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 
+	static popupClose() {
+		document.getElementsByTagName('popup')[0].style.transform = '';
+	}
+
 	static ajax(param) {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
