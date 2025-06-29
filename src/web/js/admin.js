@@ -2,6 +2,7 @@ export { api };
 
 class api {
 	static url = 'https://wa2pdf.com/rest/sc/';
+	static data = { log: [], ticket: [] };
 
 	static init() {
 		if (document.querySelector('login input').value) {
@@ -16,11 +17,13 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				var formatTime = function(s) {
+				api.data.ticket = xhr.tickets;
+				api.data.log = xhr.logs;
+				var formatTime = function (s) {
 					var d = new Date(s.replace('+00:00', ''));
 					return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 				};
-				var replaceWidths = function(widths, s) {
+				var replaceWidths = function (widths, s) {
 					for (var i = 0; i < widths.length; i++)
 						s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
 					return s;
@@ -34,7 +37,7 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+					s += '<td onclick="api.open(event)" i="ticket-' + i + '" [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				s = '<table><thead><tr>';
@@ -48,12 +51,12 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.logs[i].id + '</td>';
-					s += '<td [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].time + '</td><td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
+					s += '<td onclick="api.open(event)" i="log-' + i + '" [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td><td [[w3]]>' + xhr.logs[i].status + '</td><td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td><td [[w5]]>' + xhr.logs[i].time + '</td><td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
 					if (!narrowView)
 						s += '<td [[w7]]>' + xhr.logs[i].referer + '</td>';
 					s += '</tr>';
 				}
-				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] :  [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
@@ -85,6 +88,13 @@ class api {
 
 	static clear() {
 		document.querySelector('output').innerHTML = '';
+	}
+
+	static open(event) {
+		var id = event.target.getAttribute('i').split('-');
+		var data = api.data[id[0]][id[1]];
+		document.querySelector('popup content').innerHTML = JSON.stringify(data);
+		document.querySelector('popup').style = 'scale(1)';
 	}
 
 	static ajax(param) {
