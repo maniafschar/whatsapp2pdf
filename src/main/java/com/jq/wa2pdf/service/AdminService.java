@@ -46,10 +46,11 @@ public class AdminService {
 	public AdminData init() {
 		return new AdminData(
 				this.repository.list(
-						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
+						"select id, createdAt, ip, status, method, uri, port, query, body, referer, time from Log where createdAt>cast('"
+								+ Instant.now().minus(Duration.ofDays(5)).toString()
 								+ "' as timestamp) order by id desc",
 						Log.class),
-				this.repository.list("from Ticket order by id desc", Ticket.class));
+				this.repository.list("id, createdAt, note from Ticket order by id desc", Ticket.class));
 	}
 
 	public String build(final String type) throws IOException {

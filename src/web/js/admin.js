@@ -97,7 +97,7 @@ class api {
 		}
 		var id = event.target.getAttribute('i').split('-');
 		var data = api.data[id[0]][id[1]];
-		var keys = Object.keys(data).sort();
+		var keys = Object.keys(data);
 		var s = '';
 		for (var i = 0; i < keys.length; i++)
 			s += '<label>' + keys[i] + '</label><value>' + api.sanitizeText(data[keys[i]]) + '</value>';
