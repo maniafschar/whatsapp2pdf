@@ -157,7 +157,7 @@ tickets {
 output {
 	text-align: left;
 	padding: 4em 1em 0 1em;
-	font-size: 0.7em;
+	font-family: monospace;
 }
 
 popup {
