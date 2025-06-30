@@ -73,7 +73,7 @@ class api {
 			url: api.url + 'build/' + type,
 			method: 'POST',
 			success: xhr => {
-				document.querySelector('output').innerHTML = api.sanitizeText(xhr);
+				document.querySelector('output pre').innerHTML = api.sanitizeText(xhr);
 			}
 		});
 	}
@@ -92,7 +92,7 @@ class api {
 	}
 
 	static clear() {
-		document.querySelector('output').innerHTML = '';
+		document.querySelector('output pre').innerHTML = '';
 	}
 
 	static open(event) {
@@ -128,7 +128,7 @@ class api {
 						xhr.param = param;
 						param.error(xhr);
 					} else
-						document.querySelector('output').innerHTML = JSON.stringify(xhr);
+						document.querySelector('output pre').innerHTML = JSON.stringify(xhr);
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
