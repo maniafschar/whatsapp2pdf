@@ -47,6 +47,8 @@ public class LogFilter implements Filter {
 				log.setReferer(log.getReferer().substring(0, 255));
 		}
 		log.setIp(this.sanatizeIp(req.getHeader("X-Forwarded-For")));
+		if ("".equals(log.getIp()))
+			log.setIp(request.getRemoteAddr());
 		log.setPort(req.getLocalPort());
 		final String query = req.getQueryString();
 		if (query != null) {
@@ -87,7 +89,7 @@ public class LogFilter implements Filter {
 		if (ip == null)
 			return "";
 		if (ip.contains(","))
-			return ip.substring(ip.lastIndexOf(",") + 1).trim();
+			return ip.substring(ip.indexOf(',')).trim();
 		return ip;
 	}
 }
