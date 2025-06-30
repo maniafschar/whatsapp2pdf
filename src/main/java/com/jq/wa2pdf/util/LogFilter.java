@@ -89,7 +89,7 @@ public class LogFilter implements Filter {
 		if (ip == null)
 			return "";
 		if (ip.contains(","))
-			return ip.split(",")[1];
+			return ip.substring(ip.lastIndexOf(',') + 1).trim();
 		return ip;
 	}
 }
