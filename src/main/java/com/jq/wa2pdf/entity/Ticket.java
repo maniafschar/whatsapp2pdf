@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 public class Ticket extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
 	private String note;
+	private boolean deleted = false;
 
 	public Ticket() {
 		super();
@@ -23,5 +24,13 @@ public class Ticket extends BaseEntity {
 
 	public void setNote(final String note) {
 		this.note = note.length() > 1000 ? note.substring(0, 1000) : note;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(final boolean deleted) {
+		this.deleted = deleted;
 	}
 }
