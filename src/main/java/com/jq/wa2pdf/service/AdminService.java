@@ -49,7 +49,7 @@ public class AdminService {
 						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
 								+ "' as timestamp) order by id desc",
 						Log.class),
-				this.repository.list("from Ticket order by id desc", Ticket.class));
+				this.repository.list("from Ticket where deleted=false order by id desc", Ticket.class));
 	}
 
 	public String build(final String type) throws IOException {
@@ -61,7 +61,9 @@ public class AdminService {
 	}
 
 	public void deleteTicket(final BigInteger id) {
-		this.repository.delete(this.repository.one(Ticket.class, id));
+		final Ticket ticket = this.repository.one(Ticket.class, id);
+		ticket.setDeleted(true);
+		this.repository.save(ticket);
 	}
 
 	public void createTicket(final Ticket ticket) {
