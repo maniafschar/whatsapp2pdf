@@ -229,6 +229,24 @@ popup value {
 	overflow-x: auto;
 }
 
+popup filter {
+	position: relative;
+	display: block;
+}
+
+popup filter entry {
+	position: relative;
+	display: inline-block;
+	width: 80%;
+}
+
+popup filter count {
+	position: relative;
+	display: inline-block;
+	width: 20%;
+	text-align: right;
+}
+
 progressbar {
 	position: fixed;
 	left: 0;
