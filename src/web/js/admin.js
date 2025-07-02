@@ -83,11 +83,12 @@ class api {
 		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 
-	static log() {
-		api.ajax({
-			url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
-			success: api.renderLog
-		});
+	static log(event) {
+		if (event && event.keyCode == 13)
+			api.ajax({
+				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
+				success: api.renderLog
+			});
 	}
 
 	static popupClose() {
