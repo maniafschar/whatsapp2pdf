@@ -53,7 +53,7 @@ public class AdminService {
 		final String search = "createdAt>cast('" + Instant.now().minus(Duration.ofDays(2)).toString()
 				+ "' as timestamp) and uri not like '/sc/%'";
 		return new AdminData(search,
-				this.repository.list("from Log where " search + " order by id desc", Log.class),
+				this.repository.list("from Log where " + search + " order by id desc", Log.class),
 				this.repository.list("from Ticket where deleted=false order by id desc", Ticket.class));
 	}
 
