@@ -234,15 +234,18 @@ popup filter {
 	display: block;
 }
 
-popup filter entry {
+popup filter entry,
+popup filter count {
 	position: relative;
 	display: inline-block;
+	padding: 0 0.5em 1em 0.5em;
+}
+
+popup filter entry {
 	width: 80%;
 }
 
 popup filter count {
-	position: relative;
-	display: inline-block;
 	width: 20%;
 	text-align: right;
 }
