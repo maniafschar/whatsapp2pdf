@@ -144,6 +144,12 @@ class ui {
 	}
 
 	static filter(event, field) {
+		if (!field) {
+			var trs = document.querySelectorAll('logs tr');
+			for (var i = 1; i < trs.length; i++)
+				trs[i].style.display = 'block';
+			return;
+		}
 		var e = event.target;
 		while (e && e.nodeName != 'FILTER')
 			e = e.parentElement;
@@ -165,7 +171,7 @@ class ui {
 
 	static openFilter(event) {
 		var field = event.target.innerText.trim();
-		var s = '';
+		var s = '<filter onclick="ui.filter(event)"><entry>All</entry><count>' + ui.data.log.length + '</count></filter>';
 		var processed = [];
 		for (var i = 0; i < ui.data.log.length; i++) {
 			if (ui.data.log[i][field])
