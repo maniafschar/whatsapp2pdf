@@ -2,7 +2,6 @@ export { api };
 
 class api {
 	static url = 'https://wa2pdf.com/rest/sc/';
-	static data = { log: [], ticket: [] };
 
 	static init() {
 		if (document.querySelector('login input').value) {
@@ -17,9 +16,9 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				api.data.ticket = xhr.tickets;
-				api.data.log = xhr.logs;
-				var narrowView = api.isNarrowView(();
+				ui.data.ticket = xhr.tickets;
+				ui.data.log = xhr.logs;
+				var narrowView = ui.isNarrowView(();
 				var s = '<table><thead><tr>';
 				if (!narrowView)
 					s += '<th [[w1]]>id</th>';
@@ -28,22 +27,22 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="api.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + api.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				}
-				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
-				api.renderLog(xhr.logs);
+				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
+				ui.renderLog(xhr.logs);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 			}
 		});
 	}
 
 	static build(type) {
-		api.clear();
+		ui.clear();
 		api.ajax({
 			url: api.url + 'build/' + type,
 			method: 'POST',
 			success: xhr => {
-				document.querySelector('output pre').innerHTML = api.sanitizeText(xhr);
+				document.querySelector('output pre').innerHTML = ui.sanitizeText(xhr);
 			}
 		});
 	}
@@ -61,39 +60,12 @@ class api {
 		});
 	}
 
-	static clear() {
-		document.querySelector('output pre').innerHTML = '';
-	}
-
-	static open(event) {
-		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
-			api.popupClose();
-			return;
-		}
-		var id = event.target.getAttribute('i').split('-');
-		var data = api.data[id[0]][id[1]];
-		var keys = Object.keys(data);
-		var s = '';
-		for (var i = 0; i < keys.length; i++) {
-			if (data[keys[i]])
-				s += '<label>' + keys[i] + '</label><value>' + api.sanitizeText(data[keys[i]]) + '</value>';
-		}
-		document.querySelector('popup content').innerHTML = s;
-		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
-		document.querySelector('popup').style.transform = 'scale(1)';
-	}
-
 	static log(event) {
 		if (event && event.keyCode == 13)
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
-				success: api.renderLog
+				success: ui.renderLog
 			});
-	}
-
-	static popupClose() {
-		document.getElementsByTagName('popup')[0].style.transform = '';
-		document.querySelector('popup content').removeAttribute('i');
 	}
 
 	static ajax(param) {
@@ -135,6 +107,37 @@ class api {
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		xhr.send(param.body);
 	}
+}
+
+class api {
+	static data = { log: [], ticket: [] };
+
+	static clear() {
+		document.querySelector('output pre').innerHTML = '';
+	}
+
+	static open(event) {
+		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
+			ui.popupClose();
+			return;
+		}
+		var id = event.target.getAttribute('i').split('-');
+		var data = ui.data[id[0]][id[1]];
+		var keys = Object.keys(data);
+		var s = '';
+		for (var i = 0; i < keys.length; i++) {
+			if (data[keys[i]])
+				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
+		}
+		document.querySelector('popup content').innerHTML = s;
+		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
+		document.querySelector('popup').style.transform = 'scale(1)';
+	}
+
+	static popupClose() {
+		document.getElementsByTagName('popup')[0].style.transform = '';
+		document.querySelector('popup content').removeAttribute('i');
+	}
 
 	static sanitizeText(s) {
 		return s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
@@ -151,7 +154,7 @@ class api {
 	}
 
 	static renderLog(logs) {
-		var narrowView = api.isNarrowView();
+		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
@@ -163,16 +166,16 @@ class api {
 			s += '<tr>';
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
-			s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + api.formatTime(logs[i].createdAt) + '</td>' +
+			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
 				'<td [[w3]]>' + logs[i].status + '</td>' +
 				'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
 				'<td [[w5]]>' + logs[i].time + '</td>' +
-				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + api.sanitizeText(logs[i].body) : '') + '</td>';
+				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : '') + '</td>';
 			if (!narrowView)
 				s += '<td [[w7]]>' + logs[i].referer + '</td>';
 			s += '</tr>';
 		}
-		document.querySelector('logs').innerHTML = api.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = logs.length + ' log entries';
 	}
 
@@ -184,3 +187,4 @@ class api {
 }
 
 window.api = api;
+window.ui = ui;
