@@ -149,13 +149,14 @@ class ui {
 	static openFilter(event) {
 		var field = event.target.innerText.trim();
 		var s = '';
-		var processed = {};
+		var processed = [];
 		for (var i = 0; i < ui.data.log.length; i++) {
 			if (ui.data.log[i][field])
 				processed[ui.data.log[i][field]] = processed[ui.data.log[i][field]] ? processed[ui.data.log[i][field]] + 1 : 1;
 		}
-		for (var key in processed)
-			s += '<filter><entry>' + key + '</entry><count>' + processed[key] + '</count></filter>';
+		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a]);
+		for (var i = 0; i < sorted.length; i++)
+			s += '<filter><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s);
 	}
 
