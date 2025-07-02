@@ -148,7 +148,7 @@ class ui {
 	}
 
 	static openFilter(event) {
-		ui.popupOpen('' + event.target);
+		ui.popupOpen('' + event.target.innerText);
 	}
 
 	static sanitizeText(s) {
