@@ -154,6 +154,18 @@ tickets {
 	white-space: nowrap;
 }
 
+logs {
+	padding: 0.5em 1em 1em 1em;
+}
+
+input {
+	width: 50em;
+	max-width: 90%;
+	border: none;
+	border-radius: 1em;
+	padding: 0.25em 0.75em;
+}
+
 output {
 	text-align: left;
 	padding: 4em 1em 0 1em;
