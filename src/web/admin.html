@@ -17,7 +17,7 @@
 		<button onclick="api.build('client')">Build Client</button>
 		<button onclick="api.build('server')">Build All</button>
 		<button onclick="api.build('status')">Status</button>
-		<button onclick="api.clear()">Clear</button>
+		<button onclick="ui.clear()">Clear</button>
 		<msg></msg>
 	</buttons>
 	<output><pre></pre></output>
@@ -29,7 +29,7 @@
 		<button onclick="api.init()">Einloggen</button>
 	</login>
 	<popup>
-		<close onclick="api.popupClose()"></close>
+		<close onclick="ui.popupClose()"></close>
 		<content></content>
 	</popup>
 	<progressbar>
