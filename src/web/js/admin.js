@@ -32,7 +32,6 @@ class api {
 				}
 				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				api.renderLog(xhr.logs);
-				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
 	}
@@ -169,6 +168,7 @@ class api {
 			s += '</tr>';
 		}
 		document.querySelector('logs').innerHTML = api.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+		document.querySelector('msg').innerHTML = logs.length + ' log entries';
 	}
 
 	static replaceWidths(widths, s) {
