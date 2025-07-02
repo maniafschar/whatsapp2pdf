@@ -85,7 +85,7 @@ class api {
 
 	static log() {
 		api.ajax({
-			url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="search"]').value),
+			url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
 			success: api.renderLog
 		});
 	}
