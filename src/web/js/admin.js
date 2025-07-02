@@ -144,7 +144,12 @@ class ui {
 	}
 
 	static filter(event, field) {
-		var value = event.target.querySelector('entry').innerText.trim();
+		var e = event.target;
+		while (e && e.nodeName != 'FILTER')
+			e = e.parentElement;
+		if (!e)
+			return;
+		var value = e.querySelector('entry').innerText.trim();
 		var trs = document.querySelectorAll('logs tr th');
 		var position = 0;
 		for (; position < trs.length; position++) {
