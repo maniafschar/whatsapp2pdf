@@ -167,9 +167,9 @@ class ui {
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th [[w3]] onclick="ui.filter(event)">status</th><th [[w4]] onclick="ui.filter(event)">ip</th><th [[w5]]>time</th><th [[w6]] onclick="ui.filter(event)">uri</th>';
+		s += '<th [[w2]]>createdAt</th><th onclick="ui.filter(event)" [[w3]]>status</th><th onclick="ui.filter(event)" [[w4]]>ip</th><th [[w5]]>time</th><th onclick="ui.filter(event)" [[w6]]>uri</th>';
 		if (!narrowView)
-			s += '<th [[w7]] onclick="ui.filter(event)">referer</th>';
+			s += '<th onclick="ui.filter(event)" [[w7]]>referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
 			s += '<tr>';
