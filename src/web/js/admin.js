@@ -155,7 +155,7 @@ class ui {
 				processed[ui.data.log[i][field]] = processed[ui.data.log[i][field]] ? processed[ui.data.log[i][field]] + 1 : 1;
 		}
 		for (var key in processed)
-			s += '<div><value>' + key + '</value><count>' + processed[key] + '</count></div>';
+			s += '<filter><entry>' + key + '</entry><count>' + processed[key] + '</count></filter>';
 		ui.popupOpen(s);
 	}
 
