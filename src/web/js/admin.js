@@ -143,7 +143,17 @@ class ui {
 		document.querySelector('popup content').removeAttribute('i');
 	}
 
-	static filter(token) {
+	static filter(event, field) {
+		var value = event.target.querySelector('entry').innerText.trim();
+		var trs = document.querySelectorAll('logs tr th');
+		var position = 0;
+		for (; position < trs.length; position++) {
+			if (trs[i].innerText.trim() == field)
+				break;
+		}
+		trs = document.querySelectorAll('logs tr');
+		for (var i = 1; i < trs.length; i++)
+			trs[i].style.display = trs[i].querySelector('td')[position] == value ? 'block' : 'none';
 	}
 
 	static openFilter(event) {
@@ -156,7 +166,7 @@ class ui {
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
-			s += '<filter><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
+			s += '<filter onclick="ui.filter(event,&quot;' + field + '&quot;)"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s);
 	}
 
