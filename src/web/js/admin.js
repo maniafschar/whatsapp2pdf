@@ -165,8 +165,15 @@ class ui {
 				break;
 		}
 		trs = document.querySelectorAll('logs tr');
-		for (var i = 1; i < trs.length; i++)
-			trs[i].style.display = trs[i].querySelectorAll('td')[position].innerText.indexOf(value) > -1 ? 'block' : 'none';
+		var count = 0;
+		for (var i = 1; i < trs.length; i++) {
+			if (trs[i].querySelectorAll('td')[position].innerText.trim() == value) {
+				trs[i].style.display = 'block';
+				count++;
+			} else
+				trs[i].style.display = 'none';
+		}
+		document.querySelector('msg').innerHTML = count + ' log entries';
 	}
 
 	static openFilter(event) {
