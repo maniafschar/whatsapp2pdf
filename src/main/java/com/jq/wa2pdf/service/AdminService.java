@@ -88,12 +88,12 @@ public class AdminService {
 			} while (p2 > 0 && "\\".equals(s.substring(p2 - 1, p2)));
 			if (p2 < 0)
 				throw new IllegalArgumentException(
-						"Invalid quote in " + params.getQuery().name() + " search: " + search);
+						"Invalid quote in search: " + search);
 			s.delete(p, p2 + 1);
 		}
 		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("update") > -1
 				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
 			throw new IllegalArgumentException(
-					"Invalid expression in " + params.getQuery().name() + " search: " + search);
+					"Invalid expression in search: " + search);
 	}
 }
