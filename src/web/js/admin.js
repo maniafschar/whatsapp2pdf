@@ -17,7 +17,6 @@ class api {
 			url: api.url + 'init',
 			success: xhr => {
 				ui.data.ticket = xhr.tickets;
-				ui.data.log = xhr.logs;
 				var narrowView = ui.isNarrowView();
 				var s = '<table><thead><tr>';
 				if (!narrowView)
@@ -148,7 +147,16 @@ class ui {
 	}
 
 	static openFilter(event) {
-		ui.popupOpen('' + event.target.innerText);
+		var field = event.target.innerText.trim();
+		var s = '';
+		var processed = {};
+		for (var i = 0; i < ui.data.log.length; i++) {
+			if (ui.data.log[i][field])
+				processed[ui.data.log[i][field]] = processed[ui.data.log[i][field]] ? processed[ui.data.log[i][field]] + 1 : 1;
+		}
+		for (var s in processed)
+			s += '<div><value>' + s + '</value><count>' + processed[s] + '</count></div>';
+		ui.popupOpen(s);
 	}
 
 	static sanitizeText(s) {
@@ -166,6 +174,7 @@ class ui {
 	}
 
 	static renderLog(logs) {
+		ui.data.log = xhr.logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
