@@ -47,9 +47,14 @@ public class AdminService {
 		return new AdminData(
 				this.repository.list(
 						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
-								+ "' as timestamp) and uri<>'/sc/init' order by id desc",
+								+ "' as timestamp) and uri not like '/sc/%' order by id desc",
 						Log.class),
 				this.repository.list("from Ticket where deleted=false order by id desc", Ticket.class));
+	}
+
+	public List<Log> log(final String search) {
+		validateSearch(search);
+		return this.repository.list("from Log where " search + " order by id desc", Log.class);
 	}
 
 	public String build(final String type) throws IOException {
@@ -71,5 +76,24 @@ public class AdminService {
 				.list("from Ticket where note like '" + ticket.getNote().replaceAll("\n", "_") + "'", Ticket.class)
 				.size() == 0)
 			this.repository.save(ticket);
+	}
+
+	private void validateSearch(final String search) {
+		final StringBuilder s = new StringBuilder(search.toLowerCase());
+		int p, p2;
+		while ((p = s.indexOf("'")) > -1) {
+			p2 = p;
+			do {
+				p2 = s.indexOf("'", p2 + 1);
+			} while (p2 > 0 && "\\".equals(s.substring(p2 - 1, p2)));
+			if (p2 < 0)
+				throw new IllegalArgumentException(
+						"Invalid quote in " + params.getQuery().name() + " search: " + search);
+			s.delete(p, p2 + 1);
+		}
+		if (s.indexOf(";") > -1 || s.indexOf("union") > -1 || s.indexOf("update") > -1
+				|| s.indexOf("insert") > -1 || s.indexOf("delete") > -1)
+			throw new IllegalArgumentException(
+					"Invalid expression in " + params.getQuery().name() + " search: " + search);
 	}
 }
