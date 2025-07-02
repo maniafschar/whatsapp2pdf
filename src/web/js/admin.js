@@ -153,8 +153,8 @@ class ui {
 		var trs = document.querySelectorAll('logs tr th');
 		var position = 0;
 		for (; position < trs.length; position++) {
-			var s = trs[i].querySelector('a');
-			s = s ? s.innerText : trs[i].innerText;
+			var s = trs[position].querySelector('a');
+			s = s ? s.innerText : trs[position].innerText;
 			if (s.trim() == field)
 				break;
 		}
