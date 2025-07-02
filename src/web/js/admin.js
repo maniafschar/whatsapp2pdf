@@ -18,7 +18,7 @@ class api {
 			success: xhr => {
 				ui.data.ticket = xhr.tickets;
 				ui.data.log = xhr.logs;
-				var narrowView = ui.isNarrowView(();
+				var narrowView = ui.isNarrowView();
 				var s = '<table><thead><tr>';
 				if (!narrowView)
 					s += '<th [[w1]]>id</th>';
