@@ -24,11 +24,6 @@ class api {
 					d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
 					return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 				};
-				var replaceWidths = function (widths, s) {
-					for (var i = 0; i < widths.length; i++)
-						s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
-					return s;
-				};
 				var narrowView = window.outerWidth < 700;
 				var s = '<table><thead><tr>';
 				if (!narrowView)
@@ -40,28 +35,8 @@ class api {
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
 					s += '<td onclick="api.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				}
-				document.querySelector('tickets').innerHTML = replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
-				s = '<table><thead><tr>';
-				if (!narrowView)
-					s += '<th [[w1]]>id</th>';
-				s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>time</th><th [[w6]]>uri</th>';
-				if (!narrowView)
-					s += '<th [[w7]]>referer</th>';
-				s += '</tr></thead>';
-				for (var i = 0; i < xhr.logs.length; i++) {
-					s += '<tr>';
-					if (!narrowView)
-						s += '<td [[w1]]>' + xhr.logs[i].id + '</td>';
-					s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + formatTime(xhr.logs[i].createdAt) + '</td>' +
-						'<td [[w3]]>' + xhr.logs[i].status + '</td>' +
-						'<td [[w4]]>' + (xhr.logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + xhr.logs[i].ip + '" target="sc_ip">' + xhr.logs[i].ip + '</a>' : '') + '</td>' +
-						'<td [[w5]]>' + xhr.logs[i].time + '</td>' +
-						'<td [[w6]]>' + xhr.logs[i].method + ' ' + xhr.logs[i].uri + (xhr.logs[i].query ? '?' + xhr.logs[i].query : '') + (xhr.logs[i].body ? '<br/>' + api.sanitizeText(xhr.logs[i].body) : '') + '</td>';
-					if (!narrowView)
-						s += '<td [[w7]]>' + xhr.logs[i].referer + '</td>';
-					s += '</tr>';
-				}
-				document.querySelector('logs').innerHTML = replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
+				api.renderLog(xhr.logs);
 				document.querySelector('msg').innerHTML = xhr.logs.length + ' log entries';
 			}
 		});
@@ -113,6 +88,13 @@ class api {
 		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 
+	static log() {
+		api.ajax({
+			url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="search"]').value),
+			success: api.renderLog
+		});
+	}
+
 	static popupClose() {
 		document.getElementsByTagName('popup')[0].style.transform = '';
 		document.querySelector('popup content').removeAttribute('i');
@@ -160,6 +142,37 @@ class api {
 
 	static sanitizeText(s) {
 		return s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
+	}
+
+	static renderLog(logs) {
+		var narrowView = window.outerWidth < 700;
+		var s = '<table><thead><tr>';
+		if (!narrowView)
+			s += '<th [[w1]]>id</th>';
+		s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>time</th><th [[w6]]>uri</th>';
+		if (!narrowView)
+			s += '<th [[w7]]>referer</th>';
+		s += '</tr></thead>';
+		for (var i = 0; i < logs.length; i++) {
+			s += '<tr>';
+			if (!narrowView)
+				s += '<td [[w1]]>' + logs[i].id + '</td>';
+			s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + formatTime(logs[i].createdAt) + '</td>' +
+				'<td [[w3]]>' + logs[i].status + '</td>' +
+				'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
+				'<td [[w5]]>' + logs[i].time + '</td>' +
+				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + api.sanitizeText(logs[i].body) : '') + '</td>';
+			if (!narrowView)
+				s += '<td [[w7]]>' + logs[i].referer + '</td>';
+			s += '</tr>';
+		}
+		document.querySelector('logs').innerHTML = api.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+	}
+
+	static replaceWidths(widths, s) {
+		for (var i = 0; i < widths.length; i++)
+			s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
+		return s;
 	}
 }
 
