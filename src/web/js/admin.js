@@ -109,7 +109,7 @@ class api {
 	}
 }
 
-class api {
+class ui {
 	static data = { log: [], ticket: [] };
 
 	static clear() {
