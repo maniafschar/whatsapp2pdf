@@ -164,6 +164,8 @@ input {
 	border: none;
 	border-radius: 1em;
 	padding: 0.25em 0.75em;
+	outline: none !important;
+	appearance: none !important;
 }
 
 output {
