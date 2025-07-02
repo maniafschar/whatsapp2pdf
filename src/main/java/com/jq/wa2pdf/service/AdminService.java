@@ -27,9 +27,11 @@ public class AdminService {
 	public static class AdminData {
 		private final List<Log> logs;
 		private final List<Ticket> tickets;
+		private final String search;
 
-		private AdminData(final List<Log> logs, final List<Ticket> tickets) {
+		private AdminData(final String search, final List<Log> logs, final List<Ticket> tickets) {
 			super();
+			this.search = search;
 			this.logs = logs;
 			this.tickets = tickets;
 		}
@@ -41,14 +43,17 @@ public class AdminService {
 		public List<Ticket> getTickets() {
 			return this.tickets;
 		}
+
+		public String getSearch() {
+			return this.search;
+		}
 	}
 
 	public AdminData init() {
-		return new AdminData(
-				this.repository.list(
-						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(2)).toString()
-								+ "' as timestamp) and uri not like '/sc/%' order by id desc",
-						Log.class),
+		final String search = "createdAt>cast('" + Instant.now().minus(Duration.ofDays(2)).toString()
+				+ "' as timestamp) and uri not like '/sc/%'";
+		return new AdminData(search,
+				this.repository.list("from Log where " search + " order by id desc", Log.class),
 				this.repository.list("from Ticket where deleted=false order by id desc", Ticket.class));
 	}
 
