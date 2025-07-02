@@ -33,7 +33,7 @@ class api {
 				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				api.renderLog(xhr.logs);
 				var d = new Date();
-				document.querySelector('input[name="searchLogs"]').value = 'createdAt>cast(\'' + new Date(d.setDate(d.getDate() - 5)).toISOString().substring(0, 19) + '\' as timestamp) and uri not like \'/sc/%\'';
+				document.querySelector('input[name="searchLogs"]').value = 'createdAt>cast(\'' + new Date(d.setDat(d.getDate() - 2)).toISOString().substring(0, 19) + '\' as timestamp) and uri not like \'/sc/%\'';
 			}
 		});
 	}
