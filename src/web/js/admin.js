@@ -160,7 +160,7 @@ class ui {
 		}
 		trs = document.querySelectorAll('logs tr');
 		for (var i = 1; i < trs.length; i++)
-			trs[i].style.display = trs[i].querySelector('td')[position] == value ? 'block' : 'none';
+			trs[i].style.display = trs[i].querySelectorAll('td')[position] == value ? 'block' : 'none';
 	}
 
 	static openFilter(event) {
