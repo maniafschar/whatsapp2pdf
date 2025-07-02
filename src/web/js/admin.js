@@ -19,7 +19,7 @@ class api {
 			success: xhr => {
 				api.data.ticket = xhr.tickets;
 				api.data.log = xhr.logs;
-				var narrowView = window.outerWidth < 700;
+				var narrowView = api.isNarrowView(();
 				var s = '<table><thead><tr>';
 				if (!narrowView)
 					s += '<th [[w1]]>id</th>';
@@ -32,8 +32,7 @@ class api {
 				}
 				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				api.renderLog(xhr.logs);
-				var d = new Date();
-				document.querySelector('input[name="searchLogs"]').value = 'createdAt>cast(\'' + new Date(d.setDate(d.getDate() - 2)).toISOString().substring(0, 19) + '\' as timestamp) and uri not like \'/sc/%\'';
+				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 			}
 		});
 	}
@@ -147,8 +146,12 @@ class api {
 		return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
 	}
 
+	static isNarrowView() {
+		return window.outerWidth < 700;
+	}
+
 	static renderLog(logs) {
-		var narrowView = window.outerWidth < 700;
+		var narrowView = api.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
