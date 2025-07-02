@@ -47,7 +47,7 @@ public class AdminService {
 		return new AdminData(
 				this.repository.list(
 						"from Log where createdAt>cast('" + Instant.now().minus(Duration.ofDays(5)).toString()
-								+ "' as timestamp) order by id desc",
+								+ "' as timestamp) and uri<>'/sc/init' order by id desc",
 						Log.class),
 				this.repository.list("from Ticket where deleted=false order by id desc", Ticket.class));
 	}
