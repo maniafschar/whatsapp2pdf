@@ -19,11 +19,6 @@ class api {
 			success: xhr => {
 				api.data.ticket = xhr.tickets;
 				api.data.log = xhr.logs;
-				var formatTime = function (s) {
-					var d = new Date(s.replace('+00:00', ''));
-					d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
-					return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-				};
 				var narrowView = window.outerWidth < 700;
 				var s = '<table><thead><tr>';
 				if (!narrowView)
@@ -33,7 +28,7 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="api.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+					s += '<td onclick="api.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + api.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + api.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = api.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				api.renderLog(xhr.logs);
@@ -144,6 +139,12 @@ class api {
 		return s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
 	}
 
+	static formatTime(s) {
+		var d = new Date(s.replace('+00:00', ''));
+		d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
+		return d.getDate() + '.' + (d.getMonth() + 1) + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+	}
+
 	static renderLog(logs) {
 		var narrowView = window.outerWidth < 700;
 		var s = '<table><thead><tr>';
@@ -157,7 +158,7 @@ class api {
 			s += '<tr>';
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
-			s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + formatTime(logs[i].createdAt) + '</td>' +
+			s += '<td onclick="api.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + api.formatTime(logs[i].createdAt) + '</td>' +
 				'<td [[w3]]>' + logs[i].status + '</td>' +
 				'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
 				'<td [[w5]]>' + logs[i].time + '</td>' +
