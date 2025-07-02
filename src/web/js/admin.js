@@ -174,7 +174,7 @@ class ui {
 	}
 
 	static renderLog(logs) {
-		ui.data.log = xhr.logs;
+		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
