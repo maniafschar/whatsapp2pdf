@@ -54,7 +54,7 @@ public class AdminService {
 
 	public List<Log> log(final String search) {
 		validateSearch(search);
-		return this.repository.list("from Log where " search + " order by id desc", Log.class);
+		return this.repository.list("from Log where " + search + " order by id desc", Log.class);
 	}
 
 	public String build(final String type) throws IOException {
