@@ -46,6 +46,7 @@ class api {
 			}
 		});
 	}
+
 	static deleteTicket(event, id) {
 		api.ajax({
 			url: api.url + 'ticket/' + id,
@@ -129,14 +130,22 @@ class ui {
 			if (data[keys[i]])
 				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
 		}
-		document.querySelector('popup content').innerHTML = s;
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
+		ui.popupOpen(s);
+	}
+
+	static popupOpen(s) {
+		document.querySelector('popup content').innerHTML = s;
 		document.querySelector('popup').style.transform = 'scale(1)';
 	}
 
 	static popupClose() {
 		document.getElementsByTagName('popup')[0].style.transform = '';
 		document.querySelector('popup content').removeAttribute('i');
+	}
+
+	static filter(event) {
+		ui.popupOpen('' + event.target);
 	}
 
 	static sanitizeText(s) {
@@ -158,9 +167,9 @@ class ui {
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th [[w3]]>status</th><th [[w4]]>ip</th><th [[w5]]>time</th><th [[w6]]>uri</th>';
+		s += '<th [[w2]]>createdAt</th><th [[w3]] onclick="ui.filter(event)">status</th><th [[w4]] onclick="ui.filter(event)">ip</th><th [[w5]]>time</th><th [[w6]] onclick="ui.filter(event)">uri</th>';
 		if (!narrowView)
-			s += '<th [[w7]]>referer</th>';
+			s += '<th [[w7]] onclick="ui.filter(event)">referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
 			s += '<tr>';
