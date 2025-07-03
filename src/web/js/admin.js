@@ -135,7 +135,10 @@ class ui {
 
 	static popupOpen(s) {
 		document.querySelector('popup content').innerHTML = s;
-		document.querySelector('popup').style.transform = 'scale(1)';
+		var e = document.querySelector('popup').style;
+		e.transform = 'scale(1)';
+		e.left = '';
+		e.right = '';
 	}
 
 	static popupClose() {
@@ -190,6 +193,9 @@ class ui {
 		for (var i = 0; i < sorted.length; i++)
 			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s);
+		var e = document.querySelector('popup').style;
+		e.left = 'initial';
+		e.right = '1em';
 	}
 
 	static sanitizeText(s) {
