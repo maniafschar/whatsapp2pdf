@@ -133,12 +133,12 @@ class ui {
 		ui.popupOpen(s);
 	}
 
-	static popupOpen(s) {
+	static popupOpen(s, right) {
 		document.querySelector('popup content').innerHTML = s;
 		var e = document.querySelector('popup').style;
 		e.transform = 'scale(1)';
-		e.left = '';
-		e.right = '';
+		e.left = right ? 'initial' : '';
+		e.right = right ? '1em' : '';
 	}
 
 	static popupClose() {
@@ -186,10 +186,7 @@ class ui {
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
 			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
-		ui.popupOpen(s);
-		var e = document.querySelector('popup').style;
-		e.left = 'initial';
-		e.right = '1em';
+		ui.popupOpen(s, true);
 	}
 
 	static sanitizeText(s) {
