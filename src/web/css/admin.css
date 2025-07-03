@@ -232,6 +232,7 @@ popup value {
 popup filter {
 	position: relative;
 	display: block;
+	cursor: pointer;
 }
 
 popup filter entry,
