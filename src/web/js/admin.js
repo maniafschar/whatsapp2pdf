@@ -179,10 +179,12 @@ class ui {
 	static openFilter(event) {
 		var field = event.target.innerText.trim();
 		var s = '<filter onclick="ui.filter(event)"><entry>All</entry><count>' + ui.data.log.length + '</count></filter>';
-		var processed = [];
-		for (var i = 0; i < ui.data.log.length; i++) {
-			if (ui.data.log[i][field])
-				processed[ui.data.log[i][field]] = processed[ui.data.log[i][field]] ? processed[ui.data.log[i][field]] + 1 : 1;
+		var processed = [], value;
+		var trs = document.querySelectorAll('logs tr');
+		for (var i = 1; i < trs.length; i++) {
+			value = trs[i].querySelectorAll('td')[field].innerText;
+			if (value)
+				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
