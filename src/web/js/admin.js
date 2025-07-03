@@ -186,7 +186,7 @@ class ui {
 			if (value)
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
-		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? b > a : processed[b] - processed[a]);
+		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (b > a ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
 			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s);
