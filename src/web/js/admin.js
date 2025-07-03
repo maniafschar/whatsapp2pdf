@@ -178,9 +178,16 @@ class ui {
 
 	static openFilter(event) {
 		var field = event.target.innerText.trim();
+		var trs = document.querySelector('logs tr').querySelectorAll('th');
+		for (var i = 0; i < trs.length; i++) {
+			if (trs[i].innerText == field) {
+				field = i;
+				break;
+			}
+		}
 		var s = '<filter onclick="ui.filter(event)"><entry>All</entry><count>' + ui.data.log.length + '</count></filter>';
 		var processed = [], value;
-		var trs = document.querySelectorAll('logs tr');
+		trs = document.querySelectorAll('logs tr');
 		for (var i = 1; i < trs.length; i++) {
 			value = trs[i].querySelectorAll('td')[field].innerText;
 			if (value)
