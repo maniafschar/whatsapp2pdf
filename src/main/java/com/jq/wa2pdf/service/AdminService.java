@@ -50,7 +50,7 @@ public class AdminService {
 	}
 
 	public AdminData init() {
-		final String search = "createdAt>cast('" + Instant.now().minus(Duration.ofDays(2)).toString().substring(0, 19)
+		final String search = "createdAt>cast('" + Instant.now().minus(Duration.ofDays(1)).toString().substring(0, 10)
 				+ "' as timestamp) and uri not like '/sc/%'";
 		return new AdminData(search,
 				this.repository.list("from Log where " + search + " order by id desc", Log.class),
