@@ -151,25 +151,19 @@ class ui {
 			var trs = document.querySelectorAll('logs tr');
 			for (var i = 1; i < trs.length; i++)
 				trs[i].style.display = 'block';
-			return;
+		} else {
+			var e = event.target;
+			while (e && e.nodeName != 'FILTER')
+				e = e.parentElement;
+			if (!e)
+				return;
+			var value = e.querySelector('entry').innerText.trim();
+			var trs = document.querySelectorAll('logs tr th');
+			trs = document.querySelectorAll('logs tr');
+			for (var i = 1; i < trs.length; i++)
+				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? 'block' : 'none';
 		}
-		var e = event.target;
-		while (e && e.nodeName != 'FILTER')
-			e = e.parentElement;
-		if (!e)
-			return;
-		var value = e.querySelector('entry').innerText.trim();
-		var trs = document.querySelectorAll('logs tr th');
-		trs = document.querySelectorAll('logs tr');
-		var count = 0;
-		for (var i = 1; i < trs.length; i++) {
-			if (trs[i].querySelectorAll('td')[field].innerText.trim() == value) {
-				trs[i].style.display = 'block';
-				count++;
-			} else
-				trs[i].style.display = 'none';
-		}
-		document.querySelector('msg').innerHTML = count + ' log entries';
+		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr[style*="none"]').length) + ' log entries';
 	}
 
 	static openFilter(event) {
