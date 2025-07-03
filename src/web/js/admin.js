@@ -147,11 +147,7 @@ class ui {
 	}
 
 	static filter(event, field) {
-		if (!field) {
-			var trs = document.querySelectorAll('logs tr');
-			for (var i = 1; i < trs.length; i++)
-				trs[i].style.display = 'block';
-		} else {
+		if (field) {
 			var e = event.target;
 			while (e && e.nodeName != 'FILTER')
 				e = e.parentElement;
@@ -162,6 +158,10 @@ class ui {
 			trs = document.querySelectorAll('logs tr');
 			for (var i = 1; i < trs.length; i++)
 				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? 'block' : 'none';
+		} else {
+			var trs = document.querySelectorAll('logs tr');
+			for (var i = 1; i < trs.length; i++)
+				trs[i].style.display = 'block';
 		}
 		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr[style*="none"]').length) + ' log entries';
 	}
