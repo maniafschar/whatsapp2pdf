@@ -157,17 +157,10 @@ class ui {
 			return;
 		var value = e.querySelector('entry').innerText.trim();
 		var trs = document.querySelectorAll('logs tr th');
-		var position = 0;
-		for (; position < trs.length; position++) {
-			var s = trs[position].querySelector('a');
-			s = s ? s.innerText : trs[position].innerText;
-			if (s.trim() == field)
-				break;
-		}
 		trs = document.querySelectorAll('logs tr');
 		var count = 0;
 		for (var i = 1; i < trs.length; i++) {
-			if (trs[i].querySelectorAll('td')[position].innerText.trim() == value) {
+			if (trs[i].querySelectorAll('td')[field].innerText.trim() == value) {
 				trs[i].style.display = 'block';
 				count++;
 			} else
@@ -195,7 +188,7 @@ class ui {
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
-			s += '<filter onclick="ui.filter(event,&quot;' + field + '&quot;)"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
+			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s);
 	}
 
