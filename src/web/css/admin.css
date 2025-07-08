@@ -214,11 +214,11 @@ popup content {
 }
 
 popup label {
-	font-style: italic;
 	position: relative;
 	display: block;
-	padding-left: 1em;
 	color: darkmagenta;
+	font-size: 0.8em;
+	margin-bottom: 0.2em;
 }
 
 popup value {
