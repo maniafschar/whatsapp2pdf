@@ -228,6 +228,7 @@ popup label {
 popup value {
 	position: relative;
 	display: inline-block;
+	min-width: 5em;
 	margin-bottom: 1em;
 	white-space: nowrap;
 	overflow-x: auto;
