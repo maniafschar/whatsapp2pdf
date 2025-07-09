@@ -112,6 +112,7 @@ tr {
 	position: relative;
 	display: block;
 	white-space: nowrap;
+	border-radius: 1em;
 }
 
 td,
@@ -131,7 +132,7 @@ th {
 
 th {
 	font-weight: bold;
-	background: gold;
+	background: rgba(255, 250, 0, 0.2);
 }
 
 tr:nth-child(even) {
