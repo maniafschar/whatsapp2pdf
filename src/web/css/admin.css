@@ -215,18 +215,27 @@ popup content {
 
 popup label {
 	position: relative;
-	display: block;
+	display: inline-block;
 	color: darkmagenta;
 	font-size: 0.8em;
-	margin-bottom: 0.2em;
+	background: rgba(255, 255, 255, 0.4);
+	padding: 0.5em;
+	border-radius: 0.5em 0.5em 0 0;
+	clear: left;
+	float: left;
 }
 
 popup value {
 	position: relative;
-	display: block;
-	padding-bottom: 1em;
+	display: inline-block;
+	margin-bottom: 1em;
 	white-space: nowrap;
 	overflow-x: auto;
+	padding: 0.5em;
+	border-radius: 0 0.5em 0.5em 0.5em;
+	background: rgba(255, 255, 255, 0.4);
+	float: left;
+	clear: left;
 }
 
 popup filter {
