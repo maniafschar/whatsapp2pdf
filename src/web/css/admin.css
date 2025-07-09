@@ -107,6 +107,10 @@ tbody {
 	max-height: 40em;
 }
 
+thead {
+	border-radius: 1em;
+}
+
 tr {
 	width: 100%;
 	position: relative;
