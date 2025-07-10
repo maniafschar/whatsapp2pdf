@@ -301,6 +301,7 @@ popup buttons {
 	clear: left;
 	text-align: center;
 	margin-bottom: 1em;
+	width: 100%;
 }
 
 progressbar {
