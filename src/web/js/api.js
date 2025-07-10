@@ -43,14 +43,12 @@ class api {
 	}
 
 	static buy() {
-		if (document.querySelector('period .spinner,period .download'))
-			return;
-		document.getElementsByTagName('error')[0].innerHTML = '';
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		var period = '';
 		var periods = document.querySelectorAll('period .selected');
 		if (periods.length < 1)
 			return;
+		document.getElementsByTagName('error')[0].innerHTML = '';
+		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		for (var i = 0; i < periods.length; i++)
 			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
 		api.ajax({

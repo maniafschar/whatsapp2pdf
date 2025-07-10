@@ -552,7 +552,9 @@ public class PdfService {
 
 		private void fillMedia(final Cell cell, String mediaId) {
 			try {
-				if (mediaId.endsWith(".mp4")) {
+				final BufferedImage originalImage = ImageIO
+						.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
+				if (originalImage == null) {
 					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 					final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(this.document.getPdfDocument(),
 							IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
@@ -566,11 +568,10 @@ public class PdfService {
 					cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
-					final BufferedImage originalImage = ImageIO
-							.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 					final double max = 800;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
-					if (!mediaId.endsWith(".png") && (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
+					if (!mediaId.endsWith(".png")
+							&& (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
 						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
 						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
 								BufferedImage.TYPE_4BYTE_ABGR);
