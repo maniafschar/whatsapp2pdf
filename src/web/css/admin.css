@@ -182,6 +182,7 @@ tickets {
 
 logs {
 	padding: 0.5em 1em 1em 1em;
+	height: calc(100% - 7em);
 }
 
 input {
