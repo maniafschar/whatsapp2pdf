@@ -28,6 +28,7 @@ class api {
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
 					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
 				}
+				s += '<tr><td>&nbsp;</td></tr>';
 				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				ui.renderLog(xhr.logs);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
@@ -228,6 +229,7 @@ class ui {
 				s += '<td [[w7]]>' + logs[i].referer + '</td>';
 			s += '</tr>';
 		}
+		s += '<tr><td>&nbsp;</td></tr>';
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = logs.length + ' log entries';
 	}

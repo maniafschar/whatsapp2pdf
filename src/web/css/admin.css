@@ -106,6 +106,7 @@ table {
 	overflow: hidden;
 	position: relative;
 	display: block;
+	height: -webkit-fill-available;
 }
 
 thead,
@@ -115,7 +116,6 @@ tbody {
 	overflow-y: auto;
 	width: 100%;
 	position: relative;
-	max-height: 40em;
 }
 
 thead {
@@ -123,7 +123,7 @@ thead {
 }
 
 tbody {
-	height: calc(100% - 2em);
+	height: -webkit-fill-available;
 }
 
 tr {
