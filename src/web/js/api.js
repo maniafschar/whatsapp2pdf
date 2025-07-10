@@ -209,6 +209,11 @@ class api {
 							document.getElementById('chatFile').value = '';
 							error = 'Uploaded chat already deleted. Please upload new chat.';
 						} else {
+							if (period) {
+								var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]').classList;
+								tr.remove('spinner');
+								tr.add('selected');
+							}
 							if (error.indexOf(' ') < 5)
 								error = error.substring(error.indexOf(' ')).trim();
 							error = 'Creation failed: ' + error;

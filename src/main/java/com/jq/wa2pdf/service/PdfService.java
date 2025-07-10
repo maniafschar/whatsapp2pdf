@@ -84,7 +84,8 @@ public class PdfService {
 	@Async
 	public void create(final String id, final String period, final String user, final boolean preview)
 			throws IOException, FontFormatException, ParseException {
-		final Path error = ExtractService.getTempDir(id).resolve(PdfService.filename + "Error");
+		final Path error = ExtractService.getTempDir(id)
+				.resolve(PdfService.filename + "Error" + (period == null ? "" : period));
 		try {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();

@@ -77,12 +77,11 @@ public class ApplicationApi {
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
-			if (Files.exists(ExtractService.getTempDir(id).resolve(PdfService.filename + "Error")))
+			final Path path = ExtractService.getTempDir(id)
+					.resolve(PdfService.filename + "Error" + (period == null ? "" : period));
+			if (Files.exists(path))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
-						IOUtils.toString(
-								ExtractService.getTempDir(id).resolve(PdfService.filename + "Error").toUri()
-										.toURL(),
-								StandardCharsets.UTF_8));
+						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));
 			response.sendError(Log.STATUS_PROCESSING_PDF);
 		} else {
 			response.setHeader("Content-Disposition",
