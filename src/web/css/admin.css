@@ -43,7 +43,7 @@ body>container>element {
 	position: relative;
 }
 
-body>buttons {
+body>container>element>buttons {
 	position: fixed;
 	top: 0.5em;
 	z-index: 8;
