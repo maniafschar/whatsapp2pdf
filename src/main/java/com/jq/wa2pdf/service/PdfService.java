@@ -88,7 +88,7 @@ public class PdfService {
 		try {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
-		} catch (final IOException | FontFormatException | ParseException ex) {
+		} catch (final Throwable ex) {
 			try (final FileOutputStream filename = new FileOutputStream(error.toFile())) {
 				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
 			}
