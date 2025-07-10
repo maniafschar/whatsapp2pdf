@@ -13,17 +13,25 @@
 </head>
 
 <body onload="api.init()">
-	<buttons>
-		<button onclick="api.build('client')">Build Client</button>
-		<button onclick="api.build('server')">Build All</button>
-		<button onclick="api.build('status')">Status</button>
-		<button onclick="ui.clear()">Clear</button>
-		<msg></msg>
-	</buttons>
-	<output><pre></pre></output>
-	<tickets></tickets>
-	<input onkeyup="api.log(event)" name="searchLogs" />
-	<logs></logs>
+	<container>
+		<element>
+			<buttons>
+				<button onclick="api.build('client')">Build Client</button>
+				<button onclick="api.build('server')">Build All</button>
+				<button onclick="api.build('status')">Status</button>
+				<button onclick="ui.clear()">Clear</button>
+				<msg></msg>
+			</buttons>
+			<output><pre></pre></output>
+		</element>
+		<element>
+			<tickets></tickets>
+		</element>
+		<element>
+			<input onkeyup="api.log(event)" name="searchLogs" />
+			<logs></logs>
+		</element>
+	</container>
 	<login style="display:none;">
 		<input />
 		<button onclick="api.init()">Einloggen</button>
