@@ -26,7 +26,7 @@ class api {
 					s += '<tr>';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '<button onclick="api.deleteTicket(event, ' + xhr.tickets[i].id + ')">delete</button></td></tr>';
+					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				ui.renderLog(xhr.logs);
@@ -129,6 +129,8 @@ class ui {
 			if (data[keys[i]])
 				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
 		}
+		if (id[0] == 'ticket')
+			s += '<button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button>';
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
 		ui.popupOpen(s);
 	}
