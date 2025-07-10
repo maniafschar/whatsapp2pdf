@@ -197,8 +197,13 @@ input {
 
 output {
 	text-align: left;
-	padding: 2.5em 2em 0 2em;
+	padding: 3.2em 2em 0 2em;
 	font-family: monospace;
+}
+
+output pre {
+	margin: 0;
+	padding: 0;
 }
 
 popup {
