@@ -294,6 +294,15 @@ popup filter count {
 	text-align: right;
 }
 
+popup buttons {
+	position: relative;
+	display: block;
+	float: left;
+	clear: left;
+	text-align: center;
+	margin-bottom: 1em;
+}
+
 progressbar {
 	position: fixed;
 	left: 0;
