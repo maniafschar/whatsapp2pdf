@@ -16,7 +16,7 @@
 	box-sizing: border-box;
 	text-rendering: optimizelegibility;
 }
-
+	
 *::-webkit-scrollbar {
 	display: none;
 }
@@ -71,13 +71,6 @@ button {
 	border-radius: 1em;
 	outline: none;
 	cursor: pointer;
-}
-
-td button {
-	position: absolute;
-	top: 0.5em;
-	right: 0.5em;
-	padding: 0 0.75em;
 }
 
 a {
