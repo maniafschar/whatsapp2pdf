@@ -31,6 +31,18 @@ body {
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+body>container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
+}
+
+body>container>element {
+	display: block;
+	position: relative;
+}
+
 body>buttons {
 	position: fixed;
 	top: 0.5em;
