@@ -123,6 +123,10 @@ thead {
 	border-radius: 1em;
 }
 
+tbody {
+	height: calc(100% - 2em);
+}
+
 tr {
 	width: 100%;
 	position: relative;
