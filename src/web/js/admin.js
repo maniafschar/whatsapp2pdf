@@ -238,6 +238,10 @@ class ui {
 		return s;
 	}
 }
-
+window.onresize = function () {
+	document.querySelectorAll('body container table').forEach(e => {
+		e.style.height = 'calc(' + e.parentElement.offsetHeight + ')';
+	});
+}
 window.api = api;
 window.ui = ui;
