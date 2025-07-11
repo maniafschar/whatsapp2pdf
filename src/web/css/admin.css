@@ -181,10 +181,6 @@ tickets {
 	max-height: 30vh;
 }
 
-logs {
-	height: calc(100% - 1.8em);
-}
-
 input {
 	width: 50em;
 	max-width: 90%;
