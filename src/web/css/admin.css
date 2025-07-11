@@ -106,7 +106,7 @@ table {
 	overflow: hidden;
 	position: relative;
 	display: block;
-	height: calc(100% - 2em);
+	height: 100%;
 }
 
 thead,
