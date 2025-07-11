@@ -65,8 +65,8 @@ buttons button {
 }
 
 button {
-	background: rgba(255, 255, 255, 0.6);
-	border: solid 1px rgba(0, 0, 0, 0.2);
+	background: rgba(255, 255, 255, 0.4);
+	border: solid 1px rgba(0, 0, 0, 0.1);
 	padding: 0.5em 1em;
 	border-radius: 1em;
 	outline: none;
