@@ -241,7 +241,7 @@ class ui {
 }
 window.onresize = function () {
 	var e = document.querySelector('body container logs');
-	e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 1.8em)';
+	e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 1.1em)';
 	document.querySelectorAll('body container table').forEach(e => {
 		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 1em)';
 	});
