@@ -124,6 +124,7 @@ thead {
 
 tbody {
 	height: calc(100% - 2em);
+	padding-bottom: 2.5em;
 }
 
 tr {
