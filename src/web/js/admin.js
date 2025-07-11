@@ -4,6 +4,7 @@ class api {
 	static url = 'https://wa2pdf.com/rest/sc/';
 
 	static init() {
+		window.onresize();
 		if (document.querySelector('login input').value) {
 			window.localStorage.setItem('credentials', document.querySelector('login input').value);
 			document.querySelector('login').style.display = 'none';
