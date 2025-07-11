@@ -106,7 +106,7 @@ table {
 	overflow: hidden;
 	position: relative;
 	display: block;
-	height: height: calc(100% - 2em);
+	height: calc(100% - 2em);
 }
 
 thead,
@@ -123,7 +123,7 @@ thead {
 }
 
 tbody {
-	height: height: calc(100% - 2em);
+	height: calc(100% - 2em);
 }
 
 tr {
@@ -168,7 +168,6 @@ tickets {
 	width: 100%;
 	position: relative;
 	display: block;
-	overflow-x: auto;
 	padding: 1em;
 	box-sizing: border-box;
 	white-space: nowrap;
