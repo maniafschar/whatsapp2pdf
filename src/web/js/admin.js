@@ -4,7 +4,6 @@ class api {
 	static url = 'https://wa2pdf.com/rest/sc/';
 
 	static init() {
-		window.onresize();
 		if (document.querySelector('login input').value) {
 			window.localStorage.setItem('credentials', document.querySelector('login input').value);
 			document.querySelector('login').style.display = 'none';
@@ -32,6 +31,7 @@ class api {
 				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				ui.renderLog(xhr.logs);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
+				window.onresize();
 			}
 		});
 	}
@@ -241,7 +241,7 @@ class ui {
 }
 window.onresize = function () {
 	document.querySelectorAll('body container table').forEach(e => {
-		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 2em)';
+		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 1em)';
 	});
 }
 window.api = api;

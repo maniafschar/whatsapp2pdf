@@ -171,7 +171,7 @@ tickets {
 	width: 100%;
 	position: relative;
 	display: block;
-	padding: 1em;
+	padding: 0.5em 1em 0 1em;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -182,7 +182,6 @@ tickets {
 }
 
 logs {
-	padding: 0.5em 1em 0 1em;
 	height: calc(100% - 1.8em);
 }
 
