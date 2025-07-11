@@ -171,6 +171,7 @@ tickets {
 	padding: 1em;
 	box-sizing: border-box;
 	white-space: nowrap;
+	overflow: hidden;
 }
 
 tickets {
