@@ -106,7 +106,7 @@ table {
 	overflow: hidden;
 	position: relative;
 	display: block;
-	height: -webkit-fill-available;
+	height: height: calc(100% - 2em);
 }
 
 thead,
@@ -123,7 +123,7 @@ thead {
 }
 
 tbody {
-	height: -webkit-fill-available;
+	height: height: calc(100% - 2em);
 }
 
 tr {
