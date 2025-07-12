@@ -128,12 +128,12 @@ class ui {
 		var s = '';
 		for (var i = 0; i < keys.length; i++) {
 			if (data[keys[i]])
-				s += '<label>' + keys[i] + '</label><br/><value>' + ui.sanitizeText(data[keys[i]]) + '</value><br/>';
+				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
 		}
 		if (id[0] == 'ticket')
 			s += '<buttons><button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button></buttons>';
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
-		ui.popupOpen(s);
+		ui.popupOpen('<div>' + s + '</div>');
 	}
 
 	static popupOpen(s, right) {
