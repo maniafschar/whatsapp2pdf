@@ -44,6 +44,11 @@ body>container>element {
 	flex-grow: 1;
 }
 
+body>container>element:last-child {
+	flex-grow: 2;
+	overflow: hidden;
+}
+
 body>container>element>buttons {
 	position: relative;
 	padding: 0.5em;
