@@ -212,7 +212,6 @@ popup {
 	border-radius: 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
-	overflow: auto;
 	width: fit-content;
 }
 
@@ -235,6 +234,7 @@ popup content {
 	display: block;
 	padding: 1em 1em 0 1em;
 	text-align: left;
+	overflow: auto;
 }
 
 popup label {
