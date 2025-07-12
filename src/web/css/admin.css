@@ -45,7 +45,6 @@ body>container>element {
 }
 
 body>container>element:last-child {
-	flex-grow: 2;
 	overflow: hidden;
 }
 
@@ -239,7 +238,7 @@ popup content {
 	padding: 1em 1em 0 1em;
 	text-align: left;
 	overflow: auto;
-	max-height: 90vh;
+	max-height: 80vh;
 }
 
 popup label {
