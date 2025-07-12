@@ -202,7 +202,6 @@ popup {
 	transform: scale(0);
 	position: fixed;
 	max-width: 90%;
-	max-height: 90%;
 	background-color: blanchedalmond;
 	top: 5%;
 	left: 0;
@@ -235,6 +234,7 @@ popup content {
 	padding: 1em 1em 0 1em;
 	text-align: left;
 	overflow: auto;
+	max-height: 90vh;
 }
 
 popup label {
