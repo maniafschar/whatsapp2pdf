@@ -244,8 +244,6 @@ popup label {
 	background: rgba(255, 255, 255, 0.4);
 	padding: 0.5em;
 	border-radius: 0.5em 0.5em 0 0;
-	clear: left;
-	float: left;
 }
 
 popup value {
@@ -259,8 +257,6 @@ popup value {
 	padding: 0.5em;
 	border-radius: 0 0.5em 0.5em 0.5em;
 	background: rgba(255, 255, 255, 0.4);
-	float: left;
-	clear: left;
 }
 
 popup filter {
