@@ -133,7 +133,7 @@ class ui {
 		if (id[0] == 'ticket')
 			s += '<buttons><button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button></buttons>';
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
-		ui.popupOpen('<div>' + s + '</div>');
+		ui.popupOpen(s);
 	}
 
 	static popupOpen(s, right) {
