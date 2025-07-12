@@ -193,13 +193,14 @@ input {
 
 output {
 	text-align: left;
-	padding: 0 2em;
+	padding: 0 1em;
 	font-family: monospace;
 }
 
 output pre {
 	margin: 0;
 	padding: 0;
+	overflow: auto;
 }
 
 popup {
