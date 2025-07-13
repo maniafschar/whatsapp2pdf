@@ -243,7 +243,7 @@ window.onresize = function () {
 	var e = document.querySelector('body container logs');
 	e.style.height = (e.parentElement.offsetHeight - e.parentElement.children[0].offsetHeight) + 'px';
 	document.querySelectorAll('body container table').forEach(e => {
-		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 1em)';
+		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 0.5em)';
 	});
 }
 window.api = api;
