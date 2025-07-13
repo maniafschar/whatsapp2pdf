@@ -192,8 +192,8 @@ tickets {
 	height: 100%;
 }
 
-tickets {
-	max-height: 30vh;
+logs {
+	padding-top: 2em;
 }
 
 input {
