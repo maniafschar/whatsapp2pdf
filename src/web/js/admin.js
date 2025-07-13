@@ -112,6 +112,7 @@ class api {
 
 class ui {
 	static data = { log: [], ticket: [] };
+	static resizeId;
 
 	static clear() {
 		document.querySelector('output pre').innerHTML = '';
@@ -238,13 +239,17 @@ class ui {
 			s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
 		return s;
 	}
+	static resize() {
+		var e = document.querySelector('body container logs');
+		e.style.height = (e.parentElement.offsetHeight - e.parentElement.children[0].offsetHeight) + 'px';
+		document.querySelectorAll('body container table').forEach(e => {
+			e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 0.5em)';
+		});
+	}
 }
 window.onresize = function () {
-	var e = document.querySelector('body container logs');
-	e.style.height = (e.parentElement.offsetHeight - e.parentElement.children[0].offsetHeight) + 'px';
-	document.querySelectorAll('body container table').forEach(e => {
-		e.style.height = 'calc(' + e.parentElement.offsetHeight + 'px - 0.5em)';
-	});
+	clearTimeout(ui.resizeId);
+	ui.resizeId = setTimeout(ui.resize, 200);
 }
 window.api = api;
 window.ui = ui;
