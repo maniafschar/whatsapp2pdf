@@ -65,7 +65,8 @@ body>container>element>input {
 }
 
 body>container>element>buttons {
-	position: relative;
+	position: absolute;
+	width: 100%;
 	padding: 0.5em;
 	z-index: 8;
 	opacity: 0.8;
@@ -209,7 +210,7 @@ input {
 
 output {
 	text-align: left;
-	padding: 0 1em;
+	padding: 4em 1em 0 1em;
 	font-family: monospace;
 }
 
@@ -217,6 +218,8 @@ output pre {
 	margin: 0;
 	padding: 0;
 	overflow: auto;
+	height: 100%;
+	width: 100%;
 }
 
 popup {
