@@ -248,8 +248,8 @@ class ui {
 	}
 }
 window.onresize = function () {
-	clearTimeout(ui.resizeId);
-	ui.resizeId = setTimeout(ui.resize, 200);
+	//clearTimeout(ui.resizeId);
+	//ui.resizeId = setTimeout(ui.resize, 200);
 }
 window.api = api;
 window.ui = ui;
