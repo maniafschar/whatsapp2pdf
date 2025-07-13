@@ -46,6 +46,7 @@ body>container>element {
 
 body>container>element:last-child {
 	overflow: hidden;
+	flex-grow: 2;
 }
 
 body>container>element>buttons {
