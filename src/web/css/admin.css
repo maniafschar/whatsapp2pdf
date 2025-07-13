@@ -45,12 +45,12 @@ body>container>element {
 	flex-grow: 1;
 }
 
-body>container>element:nth-child(2) {
-	flex-grow: 2;
+body>container>element:nth-child(1) {
+	min-height: 3em;
 }
 
-body>container>element:last-child {
-	flex-grow: 3;
+body>container>element:nth-child(2) {
+	min-height: 30vh;
 }
 
 body>container>element>buttons {
