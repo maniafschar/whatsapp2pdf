@@ -112,7 +112,6 @@ class api {
 
 class ui {
 	static data = { log: [], ticket: [] };
-	static resizeId;
 
 	static clear() {
 		document.querySelector('output pre').innerHTML = '';
@@ -240,16 +239,11 @@ class ui {
 		return s;
 	}
 	static resize() {
-		var e = document.querySelector('body container logs');
-		e.style.height = (e.parentElement.offsetHeight - e.parentElement.children[0].offsetHeight) + 'px';
 		document.querySelectorAll('body container>element').forEach(e => {
 			e.children[0].style.height = e.offsetHeight + 'px';
 		});
 	}
 }
-window.onresize = function () {
-	//clearTimeout(ui.resizeId);
-	//ui.resizeId = setTimeout(ui.resize, 200);
-}
+window.onresize = ui.resize;
 window.api = api;
 window.ui = ui;
