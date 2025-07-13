@@ -42,15 +42,26 @@ body>container>element {
 	display: block;
 	position: relative;
 	overflow: hidden;
-	flex-grow: 1;
 }
 
 body>container>element:nth-child(1) {
+	flex-grow: 1;
 	min-height: 3em;
+	max-height: 20vh;
 }
 
 body>container>element:nth-child(2) {
+	flex-grow: 2;
 	min-height: 30vh;
+	max-height: 40vh;
+}
+
+body>container>element:nth-child(3) {
+	flex-grow: 2;
+}
+
+body>container>element>input {
+	position: absolute;
 }
 
 body>container>element>buttons {
