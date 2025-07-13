@@ -41,7 +41,6 @@ body>container {
 body>container>element {
 	display: block;
 	position: relative;
-	overflow: hidden;
 }
 
 body>container>element:nth-child(1) {
@@ -58,6 +57,7 @@ body>container>element:nth-child(2) {
 
 body>container>element:nth-child(3) {
 	flex-grow: 2;
+	overflow: hidden;
 }
 
 body>container>element>input {
