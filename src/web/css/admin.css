@@ -63,6 +63,7 @@ body>container>element>input {
 	position: absolute;
 	left: 0.5em;
 	right: 0.5em;
+	top: 0;
 }
 
 body>container>element>buttons {
