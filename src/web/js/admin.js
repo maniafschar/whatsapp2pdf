@@ -43,6 +43,7 @@ class api {
 			method: 'POST',
 			success: xhr => {
 				document.querySelector('output pre').innerHTML = ui.sanitizeText(xhr);
+				ui.resize();
 			}
 		});
 	}
@@ -62,11 +63,13 @@ class api {
 	}
 
 	static log(event) {
-		if (event && event.keyCode == 13)
+		if (event && event.keyCode == 13) {
+			ui.resetSize();
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
 				success: ui.renderLog
 			});
+		}
 	}
 
 	static ajax(param) {
@@ -114,6 +117,7 @@ class ui {
 	static data = { log: [], ticket: [] };
 
 	static clear() {
+		ui.resetSize();
 		document.querySelector('output pre').innerHTML = '';
 	}
 
@@ -231,6 +235,7 @@ class ui {
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = logs.length + ' log entries';
+		ui.resetSize();
 	}
 
 	static replaceWidths(widths, s) {
@@ -238,6 +243,14 @@ class ui {
 			s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
 		return s;
 	}
+
+	static resetSize() {
+		document.querySelectorAll('body container>element').forEach(e => {
+			e.children[0].style.height = '';
+		});
+
+	}
+
 	static resize() {
 		document.querySelectorAll('body container>element').forEach(e => {
 			e.children[0].style.height = e.offsetHeight + 'px';
