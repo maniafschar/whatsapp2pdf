@@ -45,12 +45,11 @@ body>container>element {
 
 body>container>element:nth-child(1) {
 	flex-grow: 1;
-	min-height: 3em;
 	max-height: 20vh;
 }
 
 body>container>element:nth-child(2) {
-	flex-grow: 2;
+	flex-grow: 1;
 	min-height: 30vh;
 	max-height: 40vh;
 }
