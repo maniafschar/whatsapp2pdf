@@ -15,6 +15,9 @@
 <body onload="api.init()">
 	<container>
 		<element>
+			<output>
+				<pre></pre>
+			</output>
 			<buttons>
 				<button onclick="api.build('client')">Build Client</button>
 				<button onclick="api.build('server')">Build All</button>
@@ -22,16 +25,13 @@
 				<button onclick="ui.clear()">Clear</button>
 				<msg></msg>
 			</buttons>
-			<output>
-				<pre></pre>
-			</output>
 		</element>
 		<element>
 			<tickets></tickets>
 		</element>
 		<element>
-			<input onkeyup="api.log(event)" name="searchLogs" />
 			<logs></logs>
+			<input onkeyup="api.log(event)" name="searchLogs" />
 		</element>
 	</container>
 	<login style="display:none;">
