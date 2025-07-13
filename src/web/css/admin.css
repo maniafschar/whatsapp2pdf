@@ -193,7 +193,7 @@ tickets {
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
-	height: 100%;
+	height: fit-content;
 }
 
 logs {
