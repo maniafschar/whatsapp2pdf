@@ -252,9 +252,9 @@ class ui {
 	}
 
 	static resize() {
-		document.querySelectorAll('body container>element').forEach(e => {
-			e.children[0].style.height = e.offsetHeight + 'px';
-		});
+		var e = document.querySelectorAll("body container>element");
+		for (var i = e.length - 1; i >= 0; i--)
+			e[i].children[0].style.height = e[i].offsetHeight + 'px';
 	}
 }
 window.onresize = ui.resize;
