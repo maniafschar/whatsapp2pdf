@@ -59,6 +59,13 @@ body>container>element:nth-child(3) {
 	overflow: hidden;
 }
 
+body>container>element>input {
+	position: absolute;
+	left: 1em;
+	right: 1em;
+	top: 1em;
+}
+
 body>container>element>buttons {
 	position: absolute;
 	width: 100%;
@@ -191,13 +198,6 @@ tickets {
 
 logs {
 	padding-top: 3em;
-}
-
-logs>input {
-	position: absolute;
-	left: 1em;
-	right: 1em;
-	top: 1em;
 }
 
 input {
