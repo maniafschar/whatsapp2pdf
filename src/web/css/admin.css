@@ -63,7 +63,7 @@ body>container>element>input {
 	position: absolute;
 	left: 1em;
 	right: 1em;
-	top: 1em;
+	top: 0;
 }
 
 body>container>element>buttons {
@@ -207,7 +207,7 @@ tickets {
 }
 
 logs {
-	padding-top: 3em;
+	padding-top: 2em;
 }
 
 input {
