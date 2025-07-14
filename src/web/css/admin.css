@@ -150,11 +150,10 @@ tbody::after {
 	content: ' ';
 	position: relative;
 	width: 90%;
-	text-align: center;
 	display: block;
-	height: 1em;
+	height: 2em;
 	border-top: 1px solid rgba(0, 200, 255, 0.3);
-	margin-top: 1em;
+	margin-top: 0.5em;
 	left: 5%;
 }
 
