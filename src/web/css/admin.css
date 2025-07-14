@@ -152,7 +152,7 @@ tbody::after {
 	width: 90%;
 	display: block;
 	height: 0.5em;
-	border-top: 1px solid rgba(0, 200, 255, 0.3);
+	border-top: 1px solid rgba(0, 0, 0, 0.2);
 	margin-top: 0.5em;
 	left: 5%;
 }
