@@ -151,7 +151,7 @@ tbody::after {
 	position: relative;
 	width: 90%;
 	display: block;
-	height: 2em;
+	height: 0.5em;
 	border-top: 1px solid rgba(0, 200, 255, 0.3);
 	margin-top: 0.5em;
 	left: 5%;
