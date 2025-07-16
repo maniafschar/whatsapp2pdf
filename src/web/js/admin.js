@@ -253,8 +253,11 @@ class ui {
 
 	static resize() {
 		var e = document.querySelectorAll("body container>element");
-		for (var i = e.length - 1; i >= 0; i--)
-			e[i].children[0].style.height = e[i].offsetHeight + 'px';
+		var heights = [];
+		for (var i = 0; i < e.length; i++)
+			heights.push(e[i].offsetHeight);
+		for (var i = 0; i < e.length; i++)
+			e[i].children[0].style.height = heights[i] + 'px';
 	}
 }
 window.onresize = ui.resize;
