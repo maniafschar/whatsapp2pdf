@@ -615,8 +615,8 @@ public class PdfService {
 				InputStream s = PdfService.class.getResourceAsStream("/emoji/" + id + ".png");
 				if (s == null && id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
-				if (s == null && !id.contains("_"))
-					s = PdfService.class.getResourceAsStream("/emoji/" + id + "_fe0f.png");
+				if (s == null)
+					s = PdfService.class.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
 				if (s == null)
 					PdfService.this.adminService.createTicket(new Ticket(emoji + " " + id + " not found"));
 				else {
