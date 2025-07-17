@@ -297,6 +297,7 @@ popup value {
 	background: rgba(255, 255, 255, 0.4);
 	float: left;
 	clear: left;
+	user-select: text;
 }
 
 popup filter {
