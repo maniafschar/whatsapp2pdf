@@ -72,7 +72,7 @@ public class LogFilter implements Filter {
 			}
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
-			if (log.getStatus() == null)
+			if (log.getStatus() == 0)
 				log.setStatus(res.getStatus());
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			final byte[] b = req.getContentAsByteArray();
