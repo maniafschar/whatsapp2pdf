@@ -613,6 +613,8 @@ public class PdfService {
 						id += "_" + Integer.toHexString(emoji.codePointAt(i));
 				}
 				if (text.indexOf("\ufe0f") < 9) {
+					PdfService.this.adminService
+							.createTicket(new Ticket("strange emoji: " + text));
 					for (int i = emoji.length(); i <= text.indexOf("\ufe0f"); i++)
 						id += "_" + Integer.toHexString(text.codePointAt(i));
 				}
