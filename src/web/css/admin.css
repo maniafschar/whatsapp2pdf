@@ -286,7 +286,7 @@ popup label {
 
 popup value {
 	position: relative;
-	min-width: 5em;
+	min-width: 5.5em;
 	max-height: 20em;
 	max-width: 100%;
 	margin-bottom: 1em;
