@@ -225,7 +225,7 @@ class ui {
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
 			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
-				'<td [[w3]]>' + logs[i].logStatus + '</td>' +
+				'<td [[w3]]>' + logs[i].logStatus + ' · ' + logs[i].status + '</td>' +
 				'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
 				'<td [[w5]]>' + logs[i].time + '</td>' +
 				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : '') + '</td>';
