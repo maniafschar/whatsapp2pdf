@@ -618,7 +618,7 @@ public class PdfService {
 				if (s == null)
 					s = PdfService.class.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
 				if (s == null)
-					PdfService.this.adminService.createTicket(new Ticket(emoji + " " + id + " not found"));
+					PdfService.this.adminService.createTicket(new Ticket("emoji not found: " + emoji + " " + id + "\n" + text));
 				else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
