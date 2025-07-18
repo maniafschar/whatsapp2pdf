@@ -130,8 +130,11 @@ class ui {
 		var keys = Object.keys(data);
 		var s = '';
 		for (var i = 0; i < keys.length; i++) {
-			if (data[keys[i]])
+			if (data[keys[i]]) {
+				if (keys[i] == 'id')
+					id[1] = data[keys[i]];
 				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
+			}
 		}
 		if (id[0] == 'ticket')
 			s += '<buttons><button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button></buttons>';
