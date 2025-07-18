@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
+import org.springframework.http.HttpStatus;
+
 @Entity
 public class Log extends BaseEntity {
 	public static final int STATUS_PROCESSING_PDF = 566;
@@ -22,7 +24,7 @@ public class Log extends BaseEntity {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
 		private static LogStatus map(final int status) {
-			return status < 300 || status == STATUS_PROCESSING_PDF ? Ok : status < 400 ? ErrorRedirection : status < 500 ? ErrorClient : ErrorServer;
+			return status < 300 || status == STATUS_PROCESSING_PDF ? Ok : status == HttpStatus.UNAUTHORIZED.value() ? ErrorAuthentication : status < 400 ? ErrorRedirection : status < 500 ? ErrorClient : ErrorServer;
 		}
 	}
 
