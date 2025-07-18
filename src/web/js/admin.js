@@ -23,7 +23,7 @@ class api {
 					s += '<th [[w1]]>id</th>';
 				s += '<th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
 				for (var i = 0; i < xhr.tickets.length; i++) {
-					s += '<tr>';
+					s += '<tr i="' + xhr.tickets[i].id + '">';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
 					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
@@ -223,7 +223,7 @@ class ui {
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
-			s += '<tr i="' + logs[i].id + '">';
+			s += '<tr>';
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
 			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
