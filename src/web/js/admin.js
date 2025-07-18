@@ -53,11 +53,7 @@ class api {
 			url: api.url + 'ticket/' + id,
 			method: 'DELETE',
 			success: xhr => {
-				var e = event.target;
-				while (e && e.nodeName != 'TR')
-					e = e.parentElement;
-				if (e)
-					e.outerHTML = '';
+				document.querySelector('tickets tr[i="' + id + '"]')?.outerHTML = '';
 			}
 		});
 	}
@@ -224,7 +220,7 @@ class ui {
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
-			s += '<tr>';
+			s += '<tr i="' + logs[i].id + '">';
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
 			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
