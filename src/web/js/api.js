@@ -13,7 +13,7 @@ class api {
 			var formData = new FormData();
 			formData.append('file', event.target.files[0]);
 			api.ajax({
-				url: api.url + '/rest/api/analyse',
+				url: api.url + '/rest/api/pdf/analyse',
 				method: 'POST',
 				body: formData,
 				success: api.postAnalyse,
@@ -32,7 +32,7 @@ class api {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
-			url: api.url + '/rest/api/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/pdf/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
 			error: xhr => {
@@ -52,7 +52,7 @@ class api {
 		for (var i = 0; i < periods.length; i++)
 			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
 		api.ajax({
-			url: api.url + '/rest/api/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.postBuy,
 			error: xhr => {
@@ -62,11 +62,11 @@ class api {
 		});
 	}
 
-	static cleanUp() {
+	static delete() {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
-			url: api.url + '/rest/api/cleanUp/' + document.querySelector('id').innerText,
+			url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText,
 			method: 'DELETE',
 			success: () => {
 				document.getElementsByTagName('progressbar')[0].style.display = null;
@@ -126,7 +126,7 @@ class api {
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('upload')[0].style.display = 'none';
-		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
+		document.querySelector('attributes button[onclick*="delete"]').style.display = '';
 		document.querySelector('attributes id').innerText = data.id;
 		ui.showTab(1);
 		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
@@ -142,7 +142,7 @@ class api {
 					link.click();
 					tr.classList.remove('download');
 					if (document.querySelectorAll('period .spinner,period .download').length == 0)
-						document.querySelector('attributes button[onclick*="cleanUp"]').style.display = '';
+						document.querySelector('attributes button[onclick*="delete"]').style.display = '';
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
 					api.feedbackStatus = '';
@@ -167,7 +167,7 @@ class api {
 
 	static postBuy() {
 		api.feedbackStatus = 'Download one of your printed documents, then you can give feedback.';
-		document.querySelector('attributes button[onclick*="cleanUp"]').style.display = 'none';
+		document.querySelector('attributes button[onclick*="delete"]').style.display = 'none';
 		var periods = document.querySelectorAll('period .selected');
 		for (var i = 0; i < periods.length; i++) {
 			api.download(periods[i].getAttribute('value'));

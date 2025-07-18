@@ -13,8 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -41,8 +43,6 @@ import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.action.PdfAction;
-import com.itextpdf.kernel.pdf.annot.PdfLinkAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
@@ -148,6 +148,7 @@ public class PdfService {
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
+		private final Map<String, java.awt.Color> colors = new HashMap<>();
 		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.53f, 0.53f, 0.53f });
 		private final Color colorChatUser = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.9f, 1f });
 		private final Color colorChatOther = PatternColor.createColorWithColorSpace(new float[] { 1f, 0.9f, 0.7f });
@@ -226,6 +227,8 @@ public class PdfService {
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, time = null;
+				final java.awt.Color[] COLORS = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.BLACK,
+						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
@@ -245,6 +248,8 @@ public class PdfService {
 									u.period = date;
 									this.total.add(u);
 								}
+								if (!colors.containsKey(user))
+									colors.put(user, COLORS[colors.size() % COLORS.length]);
 								this.addMessage(user, time, lastChat);
 								u.chats++;
 								if (lastChat != null) {
@@ -430,7 +435,7 @@ public class PdfService {
 			for (int i = 0; i < totalSumUp.size(); i++) {
 				final Statistics statistics = totalSumUp.get(i);
 				final Cell cell = this.createCell(statistics.user, TextAlignment.RIGHT, 0, 0, 0, 0);
-				final java.awt.Color color = PdfService.this.chartService.nextColor(i);
+				final java.awt.Color color = colors.get(statistics.user);
 				cell.setFontColor(
 						PatternColor.createColorWithColorSpace(new float[] { ((float) color.getRed()) / 255,
 								((float) color.getGreen()) / 255, ((float) color.getBlue()) / 255 }));
@@ -449,7 +454,7 @@ public class PdfService {
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			final String idChart = filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.user);
+			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.colors);
 			final Cell cellChart = this.createCell(idChart, true);
 			cellChart.setPadding(0);
 			cellChart.setWidth(UnitValue.createPercentValue(100f));
@@ -562,11 +567,14 @@ public class PdfService {
 									.toUri().toURL()),
 							"", null);
 					this.document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
-					final Paragraph paragraph = new Paragraph("");
-					paragraph.setDestination(mediaId);
-					paragraph.setAction(PdfAction.createRendition(mediaId, pdfFileSpec, "video/mp4",
-							new PdfLinkAnnotation(new Rectangle(200, 200))));
-					cell.setMinHeight(200f);
+					final Paragraph paragraph = new Paragraph("click to open");
+					// paragraph.setAction(PdfAction.createGoToE(
+					// PdfExplicitDestination.createFit(document.getPdfDocument().getLastPage()),
+					// false,
+					// PdfTarget.create(
+					// new PdfDictionary(Collections.singletonMap(PdfName.F, new
+					// PdfString(mediaId))))));
+					// cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
 					final double max = 800;
@@ -585,10 +593,7 @@ public class PdfService {
 					}
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					if (w > h)
-						image.setAutoScaleWidth(true);
-					else
-						image.setAutoScaleHeight(true);
+					image.setAutoScale(true);
 					cell.add(image);
 				}
 			} catch (final IOException ex) {
@@ -616,9 +621,11 @@ public class PdfService {
 				if (s == null && id.contains("_"))
 					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
 				if (s == null)
-					s = PdfService.class.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
+					s = PdfService.class
+							.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
 				if (s == null)
-					PdfService.this.adminService.createTicket(new Ticket("emoji not found: " + emoji + " " + id + "\n" + text));
+					PdfService.this.adminService
+							.createTicket(new Ticket("emoji not found: " + emoji + " " + id + "\n" + text));
 				else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));

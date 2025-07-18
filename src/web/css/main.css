@@ -176,6 +176,7 @@ table tr.spinner td:first-child::before {
 	text-align: left;
 	font-weight: bold;
 	color: rgba(255, 150, 50, 0.6);
+	line-height: 1;
 }
 
 table tr.download {
@@ -191,6 +192,7 @@ table tr.download td:first-child::before {
 	font-weight: bold;
 	color: rgba(200, 100, 0, 1);
 	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.2);
+	line-height: 1;
 }
 
 table td button {

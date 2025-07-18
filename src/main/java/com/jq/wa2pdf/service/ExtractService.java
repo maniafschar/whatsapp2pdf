@@ -75,11 +75,9 @@ public class ExtractService {
 						targetDir.resolve(PdfService.filename + "Filename").toFile())) {
 			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
 				final Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
-				if (!resolvedPath.startsWith(targetDir)) {
+				if (!resolvedPath.startsWith(targetDir))
 					// Hacker attack!
-					throw new RuntimeException("Entry with an illegal path: "
-							+ ze.getName());
-				}
+					throw new RuntimeException("Entry with an illegal path: " + ze.getName());
 				if (ze.isDirectory())
 					Files.createDirectories(resolvedPath);
 				else {
@@ -93,7 +91,7 @@ public class ExtractService {
 		return this.analyse(id);
 	}
 
-	public void cleanUp(final String id) throws IOException {
+	public void delete(final String id) throws IOException {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 

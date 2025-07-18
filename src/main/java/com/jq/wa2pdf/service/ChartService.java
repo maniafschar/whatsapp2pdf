@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
@@ -27,14 +28,8 @@ import com.jq.wa2pdf.service.PdfService.Statistics;
 
 @Service
 class ChartService {
-	private static Color[] COLORS = { Color.RED, Color.BLUE, Color.BLACK, Color.MAGENTA, Color.DARK_GRAY };
-
-	Color nextColor(final int i) {
-		return COLORS[i % COLORS.length];
-	}
-
-	void createImage(final List<Statistics> data, final Path file, final boolean preview, final String user)
-			throws IOException, ParseException {
+	void createImage(final List<Statistics> data, final Path file, final boolean preview,
+			final Map<String, Color> colors) throws IOException, ParseException {
 		final List<String> periods = this
 				.expandPeriods(data.stream().map(e -> e.getPeriod()).collect(Collectors.toList()));
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
@@ -52,7 +47,7 @@ class ChartService {
 		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
 				periods);
 		this.drawChart(g, marginLegend, marginPlot, heightPlot,
-				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, periods, preview, user));
+				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, periods, preview, colors));
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
@@ -78,7 +73,7 @@ class ChartService {
 
 	private PlotData preparePlotData(final List<Statistics> data, final int marginLegend, final int marginPlot,
 			final int marginX, final int heightPlot, final List<String> periods, final boolean preview,
-			final String user) {
+			final Map<String, Color> colors) {
 		final PlotData plotData = new PlotData();
 		for (final Statistics statistics : data) {
 			if (plotData.chatsMax < statistics.chats)
@@ -92,7 +87,7 @@ class ChartService {
 			final Statistics statistics = data.get(i);
 			Plot plot = plotData.plots.stream().filter(e -> e.user.equals(statistics.user)).findFirst().orElse(null);
 			if (plot == null) {
-				plot = new Plot(statistics.user, this.nextColor(plotData.plots.size()));
+				plot = new Plot(statistics.user, colors.get(statistics.user));
 				plotData.plots.add(plot);
 			}
 			final int index = periods
@@ -118,11 +113,6 @@ class ChartService {
 				e.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
 			}
 		});
-		final Plot userPlot = plotData.plots.stream().filter(e -> e.user.equals(user)).findFirst().orElse(null);
-		if (userPlot != null) {
-			plotData.plots.remove(userPlot);
-			plotData.plots.add(userPlot);
-		}
 		return plotData;
 	}
 

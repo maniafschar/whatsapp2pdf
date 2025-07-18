@@ -52,18 +52,18 @@ public class ApplicationApi {
 	@Autowired
 	private AdminService adminService;
 
-	@PostMapping("analyse")
+	@PostMapping("pdf/analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws IOException {
 		return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
 	}
 
-	@PostMapping("preview/{id}")
+	@PostMapping("pdf/preview/{id}")
 	public void preview(@PathVariable final String id, @RequestParam final String period,
 			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
 		this.pdfService.create(id, period, user, true);
 	}
 
-	@PostMapping("buy/{id}")
+	@PostMapping("pdf/buy/{id}")
 	public void buy(@PathVariable final String id, @RequestParam final String[] periods,
 			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
 		for (final String period : periods)
@@ -92,9 +92,9 @@ public class ApplicationApi {
 		}
 	}
 
-	@DeleteMapping("cleanUp/{id}")
-	public void cleanUp(@PathVariable final String id) throws IOException {
-		this.extractService.cleanUp(id);
+	@DeleteMapping("pdf/{id}")
+	public void delete(@PathVariable final String id) throws IOException {
+		this.extractService.delete(id);
 	}
 
 	@GetMapping("feedback/{id}/{pin}")
