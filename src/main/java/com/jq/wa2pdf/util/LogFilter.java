@@ -9,6 +9,7 @@ import java.time.Instant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
@@ -67,12 +68,12 @@ public class LogFilter implements Filter {
 				chain.doFilter(req, res);
 			else {
 				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
-				log.setStatus(LogStatus.ErrorAuthentication);
+				log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			if (log.getStatus() == null)
-				log.setStatus(LogStatus.get(res.getStatus()));
+				log.setStatus(res.getStatus());
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			final byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
