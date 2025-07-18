@@ -64,7 +64,6 @@ class api {
 
 	static log(event) {
 		if (event && event.keyCode == 13) {
-			ui.resetSize();
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
 				success: ui.renderLog
@@ -211,6 +210,7 @@ class ui {
 	}
 
 	static renderLog(logs) {
+		ui.resetSize();
 		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
