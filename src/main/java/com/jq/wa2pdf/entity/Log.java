@@ -22,7 +22,7 @@ public class Log extends BaseEntity {
 	public enum LogStatus {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
-		public static LogStatus get(final int httpCode) {
+		public static LogStatus map(final int httpCode) {
 			return httpCode < 300 || httpCode == STATUS_PROCESSING_PDF ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
 		}
 	}
