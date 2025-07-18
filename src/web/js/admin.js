@@ -37,11 +37,11 @@ class api {
 	}
 
 	static build(type) {
-		ui.clear();
 		api.ajax({
 			url: api.url + 'build/' + type,
 			method: 'POST',
 			success: xhr => {
+				ui.clear();
 				document.querySelector('output pre').innerHTML = ui.sanitizeText(xhr);
 				ui.resize();
 			}
