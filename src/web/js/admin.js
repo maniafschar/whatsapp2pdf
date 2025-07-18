@@ -56,6 +56,7 @@ class api {
 				var e = document.querySelector('tickets tr[i="' + id + '"]');
 				if (e)
 					e.outerHTML = '';
+				ui.popupClose();
 			}
 		});
 	}
