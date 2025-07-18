@@ -14,16 +14,15 @@ public class Log extends BaseEntity {
 	private String query = "";
 	private String ip = "";
 	private String uri = "";
-	@Enumerated(EnumType.STRING)
-	private LogStatus status;
+	private int status;
 	private int port;
 	private int time;
 
 	public enum LogStatus {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
-		public static LogStatus map(final int httpCode) {
-			return httpCode < 300 || httpCode == STATUS_PROCESSING_PDF ? Ok : httpCode < 400 ? ErrorRedirection : httpCode < 500 ? ErrorClient : ErrorServer;
+		private static LogStatus map(final int status) {
+			return status < 300 || status == STATUS_PROCESSING_PDF ? Ok : status < 400 ? ErrorRedirection : status < 500 ? ErrorClient : ErrorServer;
 		}
 	}
 
@@ -59,12 +58,16 @@ public class Log extends BaseEntity {
 		this.time = time;
 	}
 
-	public LogStatus getStatus() {
+	public int getStatus() {
 		return this.status;
 	}
 
-	public void setStatus(final LogStatus status) {
+	public void setStatus(final int status) {
 		this.status = status;
+	}
+
+	public LogStatus getLogStatus() {
+		return LogStatus.map(this.status);
 	}
 
 	public int getPort() {
