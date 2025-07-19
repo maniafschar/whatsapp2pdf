@@ -362,6 +362,10 @@ public class PdfService {
 				table.addCell(cellMessage);
 				table.addCell(empty);
 			}
+			if (media != null && media.length > 0 && media[0]) {
+				cellMessage.setPadding(0);
+				cellMessage.setBackgroundColor(null);
+			}
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			this.content.add(table);
@@ -577,7 +581,7 @@ public class PdfService {
 					// cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
-					final double max = 800;
+					final double max = 450;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
 					if (!mediaId.endsWith(".png")
 							&& (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
@@ -593,7 +597,7 @@ public class PdfService {
 					}
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					image.setAutoScale(true);
+					image.setAutoScale(false);
 					cell.add(image);
 				}
 			} catch (final IOException ex) {
@@ -612,7 +616,7 @@ public class PdfService {
 					if (emoji.codePointAt(i) != 56614)
 						id += "_" + Integer.toHexString(emoji.codePointAt(i));
 				}
-				int position = text.indexOf("\ufe0f");
+				final int position = text.indexOf("\ufe0f");
 				if (position > emoji.length() && position < 9) {
 					for (int i = emoji.length(); i <= position; i++)
 						id += "_" + Integer.toHexString(text.codePointAt(i));
