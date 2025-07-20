@@ -460,6 +460,7 @@ public class PdfService {
 			final String idChart = filename + UUID.randomUUID().toString() + ".png";
 			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.colors);
 			final Cell cellChart = this.createCell(idChart, true);
+			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);
 			cellChart.setWidth(UnitValue.createPercentValue(100f));
 			table.addCell(cellChart);
@@ -508,6 +509,7 @@ public class PdfService {
 				cellTable.setKeepTogether(true);
 				cellTable.setBorder(Border.NO_BORDER);
 				Cell cell = this.createCell(idWordCloud, true);
+				((Image) cell.getChildren().get(0)).setAutoScaleWidth(true);
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f));
 				cellTable.addCell(cell);
