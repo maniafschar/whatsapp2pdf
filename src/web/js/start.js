@@ -17,6 +17,7 @@ class ui {
 	static init() {
 		window.onresize();
 		api.feedback();
+		setTimeout(function() { document.body.style.opcity = 1; }, 100);
 		if (window.location.search) {
 			var params = new URL(location.href).searchParams;
 			if (params.get('id') && params.get('pin')) {
