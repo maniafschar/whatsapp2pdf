@@ -17,7 +17,7 @@ class ui {
 	static init() {
 		window.onresize();
 		api.feedback();
-		setTimeout(function() { document.body.style.opacity = 1; }, 100);
+		setTimeout(function() { document.querySelector('body>container').style.opacity = 1; }, 400);
 		if (window.location.search) {
 			var params = new URL(location.href).searchParams;
 			if (params.get('id') && params.get('pin')) {
