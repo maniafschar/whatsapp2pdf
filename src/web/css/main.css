@@ -34,12 +34,10 @@ html {
 body {
 	margin: 0;
 	padding: 0;
-	opacity: 0;
 	overflow-x: hidden;
 	text-align: center;
 	background: linear-gradient(135deg, #fff, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9) 50% fixed;
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
-	transition: .4s ease-out;
 }
 
 body>container {
@@ -47,6 +45,8 @@ body>container {
 	flex-direction: column;
 	height: 100%;
 	overflow: hidden;
+	opacity: 0;
+	transition: .4s ease-out;
 }
 
 body>container>element {
