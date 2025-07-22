@@ -142,6 +142,7 @@ tbody {
 
 tbody {
 	height: calc(100% - 2em);
+	background: rgba(255, 255, 255, 0.3);
 }
 
 tbody::after {
