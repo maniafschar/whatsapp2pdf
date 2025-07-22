@@ -146,17 +146,6 @@ tbody {
 	background: rgba(255, 255, 255, 0.3);
 }
 
-tbody::after {
-	content: ' ';
-	position: relative;
-	width: 70%;
-	display: block;
-	height: 0.5em;
-	border-top: 1px solid rgba(0, 0, 0, 0.1);
-	margin-top: 0.5em;
-	left: 15%;
-}
-
 tr {
 	width: 100%;
 	position: relative;
