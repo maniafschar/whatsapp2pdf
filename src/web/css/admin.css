@@ -196,7 +196,7 @@ tickets {
 	width: 100%;
 	position: relative;
 	display: block;
-	padding: 0 1em;
+	padding: 0 0.5em;
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
@@ -219,7 +219,7 @@ input {
 
 output {
 	text-align: left;
-	padding: 3.5em 2em 0.5em 2em;
+	padding: 3.5em 1em 0.5em 1em;
 	font-family: monospace;
 }
 
