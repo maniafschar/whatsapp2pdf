@@ -127,6 +127,7 @@ table {
 	position: relative;
 	display: block;
 	height: 100%;
+	font-size: 1em;
 }
 
 thead,
