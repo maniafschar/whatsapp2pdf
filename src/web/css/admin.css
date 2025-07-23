@@ -205,6 +205,7 @@ input {
 	outline: none !important;
 	appearance: none !important;
 	z-index: 3;
+	font-size: 1em;
 }
 
 output {
