@@ -241,6 +241,7 @@ tabBody element {
 	overflow-y: auto;
 	border: solid 1em transparent;
 	height: 100%;
+	line-height: 1.4;
 }
 
 tabBody img {
