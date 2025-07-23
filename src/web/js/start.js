@@ -53,7 +53,7 @@ class ui {
 		document.querySelectorAll('tab')[i].classList.add('selected');
 		document.querySelectorAll('tabHeader')[0].scrollBy({
 			top: 0,
-			left: i > 1 ? -500 : 500,
+			left: i > 1 ? 500 : -500,
 			behavior: 'smooth',
 		});
 	}
