@@ -226,7 +226,6 @@ tab.selected {
 	cursor: pointer;
 }
 
-output,
 logs,
 tickets {
 	width: 100%;
@@ -249,20 +248,6 @@ input {
 	outline: none !important;
 	appearance: none !important;
 	font-size: 1em;
-}
-
-output {
-	text-align: left;
-	padding: 3.5em 0.5em 0.5em 0.5em;
-	font-family: monospace;
-}
-
-output pre {
-	margin: 0;
-	padding: 0;
-	overflow: auto;
-	height: 100%;
-	width: 100%;
 }
 
 popup {
