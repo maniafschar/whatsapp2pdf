@@ -348,6 +348,15 @@ popup buttons {
 	width: 100%;
 }
 
+popup pre {
+	padding: 0 1em 1em 1em;
+	box-sizing: border-box;
+	display: block;
+	position: relative;
+	margin: 0;
+	overflow: auto;
+}
+
 progressbar {
 	position: fixed;
 	left: 0;
