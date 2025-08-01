@@ -50,13 +50,6 @@ body>container>element:nth-child(1) {
 
 body>container>element:nth-child(2) {
 	flex-grow: 2;
-	min-height: 30vh;
-	max-height: 40vh;
-}
-
-body>container>element:nth-child(3) {
-	flex-grow: 3;
-	overflow: hidden;
 }
 
 body>container>element input {
