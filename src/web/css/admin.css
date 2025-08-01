@@ -137,8 +137,8 @@ tbody {
 }
 
 tbody {
-	height: calc(100% - 2em);
-	background: rgba(255, 255, 255, 0.3);
+	height: 100%;
+	padding-bottom: 6em;
 }
 
 tr {
@@ -234,7 +234,7 @@ tickets {
 	box-sizing: border-box;
 	white-space: nowrap;
 	overflow: hidden;
-	height: fit-content;
+	height: 100%;
 }
 
 logs {
