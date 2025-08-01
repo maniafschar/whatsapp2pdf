@@ -27,11 +27,21 @@
 			</buttons>
 		</element>
 		<element>
-			<tickets></tickets>
-		</element>
-		<element>
-			<logs></logs>
-			<input onkeyup="api.log(event)" name="searchLogs" />
+			<tabHeader>
+				<tab onclick="ui.showTab(0)" class="selected">Log</tab>
+				<tab onclick="ui.showTab(1)">Ticket</tab>
+			</tabHeader>
+			<tabBody>
+				<container>
+					<element>
+						<tickets></tickets>
+					</element>
+					<element style="left: 50%;">
+						<logs></logs>
+						<input onkeyup="api.log(event)" name="searchLogs" />
+					</element>
+				</container>
+			</tabBody>
 		</element>
 	</container>
 	<login style="display:none;">
