@@ -191,43 +191,30 @@ tabHeader {
 tabBody {
 	display: inline-block;
 	width: 100%;
-	max-width: 50em;
 	position: relative;
 	overflow-x: hidden;
 	height: 100%;
-	border-radius: 1em 1em 0 0;
 }
 
 tabBody>container {
-	width: 400%;
+	width: 200%;
 	display: inline-block;
 	position: absolute;
 	height: 100%;
 	transition: all ease-out .4s;
 	left: 0;
-	background: var(--borderColor);
 	overflow-y: hidden;
 }
 
 tabBody element {
 	display: inline-block;
 	position: absolute;
-	width: 25%;
+	width: 50%;
 	min-height: 10em;
 	left: 0;
 	box-sizing: border-box;
 	overflow-y: auto;
-	border: solid 1em transparent;
 	height: 100%;
-	line-height: 1.4;
-}
-
-tabBody img {
-	padding: 1em;
-	background: rgba(255, 255, 255, 0.3);
-	border-radius: 1em;
-	margin-top: 0.5em;
-	max-width: 98%;
 }
 
 tab {
@@ -239,7 +226,7 @@ tab {
 }
 
 tab.selected {
-	background: var(--borderColor);
+	background: lightgrey;
 }
 
 .clickable {
