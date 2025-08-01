@@ -42,7 +42,6 @@ class api {
 			success: xhr => {
 				ui.clear();
 				document.querySelector('output pre').innerHTML = ui.sanitizeText(xhr);
-				ui.resize();
 			}
 		});
 	}
@@ -236,7 +235,6 @@ class ui {
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = logs.length + ' log entries';
-		ui.resize();
 	}
 
 	static replaceWidths(widths, s) {
