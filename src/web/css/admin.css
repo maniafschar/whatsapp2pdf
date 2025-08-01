@@ -44,8 +44,8 @@ body>container>element {
 }
 
 body>container>element:nth-child(1) {
-	flex-grow: 1;
-	max-height: 20vh;
+	flex-grow: 0;
+	height: 3em;
 }
 
 body>container>element:nth-child(2) {
