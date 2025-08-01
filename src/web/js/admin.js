@@ -40,8 +40,7 @@ class api {
 			url: api.url + 'build/' + type,
 			method: 'POST',
 			success: xhr => {
-				ui.clear();
-				document.querySelector('output pre').innerHTML = ui.sanitizeText(xhr);
+				ui.popupOpen('<pre>' + ui.sanitizeText(xhr) + '</pre>');
 			}
 		});
 	}
@@ -78,7 +77,7 @@ class api {
 						xhr.param = param;
 						param.error(xhr);
 					} else
-						document.querySelector('output pre').innerHTML = JSON.stringify(xhr);
+						ui.popupOpen('<pre>' + JSON.stringify(xhr) + '</pre>');
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
@@ -111,11 +110,6 @@ class api {
 
 class ui {
 	static data = { log: [], ticket: [] };
-
-	static clear() {
-		ui.resetSize();
-		document.querySelector('output pre').innerHTML = '';
-	}
 
 	static open(event) {
 		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
