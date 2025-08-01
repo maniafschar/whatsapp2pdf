@@ -261,6 +261,12 @@ class ui {
 		for (var i = 0; i < e.length; i++)
 			e[i].children[0].style.height = heights[i] + 'px';
 	}
+
+	static showTab(i) {
+		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
+		document.querySelector('tab.selected')?.classList.remove('selected');
+		document.querySelectorAll('tab')[i].classList.add('selected');
+	}
 }
 window.onresize = ui.resize;
 window.api = api;
