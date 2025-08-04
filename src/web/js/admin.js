@@ -146,31 +146,34 @@ class ui {
 	}
 
 	static popupClose() {
+		document.querySelector('popup content').innerHTML = '';
 		document.getElementsByTagName('popup')[0].style.transform = '';
 		document.querySelector('popup content').removeAttribute('i');
 	}
 
 	static filter(event, field) {
-		if (field) {
-			var e = event.target;
-			while (e && e.nodeName != 'FILTER')
-				e = e.parentElement;
+		var e = event.target;
+		while (e && e.nodeName != 'FILTER')
+			e = e.parentElement;
+		var value = e && e.querySelector('entry').innerText.trim();
+		if (field && (!value || value != document.querySelector('popup content').getAttribute('v'))) {
 			if (!e)
 				return;
-			var value = e.querySelector('entry').innerText.trim();
-			var trs = document.querySelectorAll('logs tr th');
-			trs = document.querySelectorAll('logs tr');
+			var trs = document.querySelectorAll('logs tr');
 			for (var i = 1; i < trs.length; i++)
 				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? 'block' : 'none';
+			document.querySelector('popup content').setAttribute('v', value);
 		} else {
 			var trs = document.querySelectorAll('logs tr');
 			for (var i = 1; i < trs.length; i++)
 				trs[i].style.display = 'block';
+			document.querySelector('popup content').removeAttribute('v');
 		}
 		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr[style*="none"]').length) + ' log entries';
 	}
 
 	static openFilter(event) {
+		document.querySelector('popup content').removeAttribute('v');
 		var field = event.target.innerText.trim();
 		var trs = document.querySelector('logs tr').querySelectorAll('th');
 		for (var i = 0; i < trs.length; i++) {
