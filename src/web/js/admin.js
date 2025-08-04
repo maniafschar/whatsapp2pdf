@@ -146,9 +146,9 @@ class ui {
 	}
 
 	static popupClose() {
-		document.querySelector('popup content').innerHTML = '';
 		document.getElementsByTagName('popup')[0].style.transform = '';
 		document.querySelector('popup content').removeAttribute('i');
+		setTimeout(function() { document.querySelector('popup content').innerHTML = ''; }, 500);
 	}
 
 	static filter(event, field) {
