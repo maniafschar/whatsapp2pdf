@@ -165,22 +165,24 @@ class ui {
 		ui.renderLog(ui.data.log);
 	}
 
+	static columnIndex(column) {
+		var trs = document.querySelector('logs tr').querySelectorAll('th');
+		column = column.trim();
+		for (var i = 0; i < trs.length; i++) {
+			if (trs[i].innerText == column)
+				return i;
+		}
+	}
+
 	static openFilter(event) {
 		var field = document.querySelector('logs').getAttribute('filter');
 		document.querySelector('logs').removeAttribute('filter');
 		if (field)
 			ui.renderLog(ui.data.log);
-		field = event.target.innerText.trim();
-		var trs = document.querySelector('logs tr').querySelectorAll('th');
-		for (var i = 0; i < trs.length; i++) {
-			if (trs[i].innerText == field) {
-				field = i;
-				break;
-			}
-		}
+		field = ui.columnIndex(event.target.innerText);
 		var s = '';
 		var processed = [], value;
-		trs = document.querySelectorAll('logs tr');
+		var trs = document.querySelectorAll('logs tr');
 		for (var i = 1; i < trs.length; i++) {
 			value = trs[i].querySelectorAll('td')[field].innerText;
 			if (value)
@@ -207,7 +209,6 @@ class ui {
 	}
 
 	static renderLog(logs) {
-		var sort = document.querySelector('logs').getAttribute('sort');
 		var filter = document.querySelector('logs').getAttribute('filter');
 		ui.data.log = logs;
 		var d = [];
@@ -230,6 +231,12 @@ class ui {
 		if (!narrowView)
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
+		var sort = document.querySelector('logs').getAttribute('sort');
+		if (sort) {
+			var column = parseInt(sort.substring(0, sort.indexOf('-')));
+			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
+			d = d.sort((a, b) => (a[column] - b[column]) * factor);
+		}
 		for (var i = 0; i < d.length; i++) {
 			if (!filter || d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)] == filter.substring(filter.indexOf('-') + 1)) {
 				s += '<tr>';
@@ -269,7 +276,7 @@ class ui {
 	}
 
 	static sortColumn(event) {
-		var field = event.target.innerText;
+		var field = ui.columnIndex(event.target.innerText);
 		var sort = document.querySelector('logs').getAttribute('sort');
 		if (!sort)
 			document.querySelector('logs').setAttribute('sort', field + '-asc');
