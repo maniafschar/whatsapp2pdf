@@ -155,30 +155,24 @@ class ui {
 		var e = event.target;
 		while (e && e.nodeName != 'FILTER')
 			e = e.parentElement;
-		var value = e && e.querySelector('entry').innerText.trim();
-		if (field && (!value || value != document.querySelector('popup content').getAttribute('v'))) {
+		var value = e && field + '-' + e.querySelector('entry').innerText.trim();
+		if (field && (!value || value != document.querySelector('logs').getAttribute('filter'))) {
 			if (!e)
 				return;
-			var trs = document.querySelectorAll('logs tr');
-			for (var i = 1; i < trs.length; i++)
-				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? '' : 'none';
-			document.querySelector('popup content').setAttribute('v', value);
-		} else {
-			var trs = document.querySelectorAll('logs tr');
-			for (var i = 1; i < trs.length; i++)
-				trs[i].style.display = 'block';
-			document.querySelector('popup content').removeAttribute('v');
-		}
-		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr[style*="none"]').length) + ' log entries';
+			document.querySelector('logs').setAttribute('filter', value);
+		} else
+			document.querySelector('logs').removeAttribute('filter');
+		ui.renderLog(ui.data.log);
+		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr').length) + ' log entries';
 	}
 
 	static openFilter(event) {
-		document.querySelector('popup content').removeAttribute('v');
-		var field = event.target.innerText.trim();
+		document.querySelector('logs').removeAttribute('filter');
+		var field = event.target.innerText.trim(), fieldIndex;
 		var trs = document.querySelector('logs tr').querySelectorAll('th');
 		for (var i = 0; i < trs.length; i++) {
 			if (trs[i].innerText == field) {
-				field = i;
+				fieldIndex = i;
 				break;
 			}
 		}
@@ -186,13 +180,13 @@ class ui {
 		var processed = [], value;
 		trs = document.querySelectorAll('logs tr');
 		for (var i = 1; i < trs.length; i++) {
-			value = trs[i].querySelectorAll('td')[field].innerText;
+			value = trs[i].querySelectorAll('td')[fieldIndex].innerText;
 			if (value)
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
-			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
+			s += '<filter onclick="ui.filter(event,&quot;' + field + '&quot;)"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		ui.popupOpen(s, true);
 	}
 
@@ -212,7 +206,7 @@ class ui {
 
 	static renderLog(logs) {
 		var sort = document.querySelector('logs').getAttribute('sort');
-		var trs = document.querySelectorAll('logs tr');
+		var filter = document.querySelector('logs').getAttribute('filter');
 		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
@@ -223,17 +217,19 @@ class ui {
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
-			s += '<tr' + (trs[i + 1]?.style.display == 'none' ? ' style="display:none;"' : '') + '>';
-			if (!narrowView)
-				s += '<td [[w1]]>' + logs[i].id + '</td>';
-			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
-				'<td [[w3]]>' + logs[i].logStatus + '</td>' +
-				'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
-				'<td [[w5]]>' + logs[i].time + '</td>' +
-				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : '') + '</td>';
-			if (!narrowView)
-				s += '<td [[w7]]>' + logs[i].referer + '</td>';
-			s += '</tr>';
+			if (!filter || logs[i][filter.substring(0, filter.indexOf('-'))] == filter.substring(filter.indexOf('-') + 1)) {
+				s += '<tr>';
+				if (!narrowView)
+					s += '<td [[w1]]>' + logs[i].id + '</td>';
+				s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
+					'<td [[w3]]>' + logs[i].logStatus + '</td>' +
+					'<td [[w4]]>' + (logs[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + logs[i].ip + '" target="sc_ip">' + logs[i].ip + '</a>' : '') + '</td>' +
+					'<td [[w5]]>' + logs[i].time + '</td>' +
+					'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : '') + '</td>';
+				if (!narrowView)
+					s += '<td [[w7]]>' + logs[i].referer + '</td>';
+				s += '</tr>';
+			}
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = logs.length + ' log entries';
