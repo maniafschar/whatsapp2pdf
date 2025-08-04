@@ -124,6 +124,7 @@ class api {
 
 	static postAnalyse(data) {
 		if (!data) {
+			document.getElementsByTagName('progressbar')[0].style.display = null;
 			document.getElementsByTagName('error')[0].innerHTML = 'PDF creation failed. Is it a WhatsApp exported chat file?';
 			return;
 		}
@@ -274,4 +275,5 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
