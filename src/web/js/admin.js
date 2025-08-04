@@ -169,7 +169,7 @@ class ui {
 		var field = document.querySelector('logs').getAttribute('filter');
 		document.querySelector('logs').removeAttribute('filter');
 		if (field)
-			ui.renderLog();
+			ui.renderLog(ui.data.log);
 		field = event.target.innerText.trim();
 		var trs = document.querySelector('logs tr').querySelectorAll('th');
 		for (var i = 0; i < trs.length; i++) {
