@@ -123,6 +123,10 @@ class api {
 	}
 
 	static postAnalyse(data) {
+		if (!data) {
+			document.getElementsByTagName('error')[0].innerHTML = 'PDF creation failed. Is it a WhatsApp exported chat file?';
+			return;
+		}
 		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('upload')[0].style.display = 'none';
@@ -270,3 +274,4 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
