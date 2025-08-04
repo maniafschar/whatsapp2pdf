@@ -212,12 +212,7 @@ class ui {
 
 	static renderLog(logs) {
 		var sort = document.querySelector('logs').getAttribute('sort');
-		var hidden = [];
 		var trs = document.querySelectorAll('logs tr');
-		if (trs) {
-			for (var i = 1; i < trs.length; i++)
-				hidden.push(trs[i].style.display == 'none');
-		}
 		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
@@ -228,7 +223,7 @@ class ui {
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
 		for (var i = 0; i < logs.length; i++) {
-			s += '<tr' + (hidden[i] ? ' style="display:none;"' : '') + '>';
+			s += '<tr' + (trs[i + 1]?.style.display == 'none' ? ' style="display:none;"' : '') + '>';
 			if (!narrowView)
 				s += '<td [[w1]]>' + logs[i].id + '</td>';
 			s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(logs[i].createdAt) + '</td>' +
