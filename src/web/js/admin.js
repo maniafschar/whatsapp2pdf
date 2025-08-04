@@ -166,8 +166,11 @@ class ui {
 	}
 
 	static openFilter(event) {
+		var field = document.querySelector('logs').getAttribute('filter');
 		document.querySelector('logs').removeAttribute('filter');
-		var field = event.target.innerText.trim();
+		if (field)
+			ui.renderLog();
+		field = event.target.innerText.trim();
 		var trs = document.querySelector('logs tr').querySelectorAll('th');
 		for (var i = 0; i < trs.length; i++) {
 			if (trs[i].innerText == field) {
@@ -225,7 +228,7 @@ class ui {
 				'<td [[w5]]>' + logs[i].time + '</td>' +
 				'<td [[w6]]>' + logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : '') + '</td>';
 			if (!narrowView)
-				row += '<td [[w7]]>' + logs[i].referer + '<';
+				row += '<td [[w7]]>' + logs[i].referer + '</td>';
 			row += '</tr>';
 			if (!filter || row.indexOf('>' + filter.substring(filter.indexOf('-') + 1) + '</td>') > -1)
 				s += row;
