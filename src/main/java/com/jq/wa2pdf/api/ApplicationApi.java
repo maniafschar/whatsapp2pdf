@@ -53,8 +53,12 @@ public class ApplicationApi {
 	private AdminService adminService;
 
 	@PostMapping("pdf/analyse")
-	public Attributes analyse(@RequestParam("file") final MultipartFile file) throws IOException {
-		return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
+	public Attributes analyse(@RequestParam("file") final MultipartFile file) {
+		try {
+			return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
+		} catch(IOException e) {
+			return null;
+		}
 	}
 
 	@PostMapping("pdf/preview/{id}")
