@@ -230,7 +230,7 @@ class ui {
 			if (!narrowView)
 				row += '<td [[w7]]>' + logs[i].referer + '</td>';
 			row += '</tr>';
-			if (!filter || row.indexOf('>' + filter.substring(filter.indexOf('-') + 1) + '</td>') > -1)
+			if (!filter || row.indexOf('>' + filter.substring(filter.indexOf('-') + 1) + '</') > -1)
 				s += row;
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
