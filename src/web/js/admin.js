@@ -134,6 +134,10 @@ class ui {
 	}
 
 	static popupOpen(s, right) {
+		if (document.querySelector('popup content').innerHTML == s) {
+			ui.popupClose();
+			return;
+		}
 		document.querySelector('popup content').innerHTML = s;
 		var e = document.querySelector('popup').style;
 		e.transform = 'scale(1)';
