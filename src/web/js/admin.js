@@ -210,7 +210,6 @@ class ui {
 		var sort = document.querySelector('logs').getAttribute('sort');
 		var filter = document.querySelector('logs').getAttribute('filter');
 		ui.data.log = logs;
-		var narrowView = ui.isNarrowView();
 		var d = [];
 		for (var i = 0; i < logs.length; i++) {
 			var row = [];
@@ -223,6 +222,7 @@ class ui {
 			row.push(logs[i].referer);
 			d.push(row);
 		}
+		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
