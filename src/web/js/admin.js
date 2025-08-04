@@ -211,7 +211,7 @@ class ui {
 	}
 
 	static renderLog(logs) {
-		ui.resetSize();
+		var sort = document.querySelector('logs').getAttribute('sort');
 		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
@@ -258,6 +258,15 @@ class ui {
 	}
 
 	static sortColumn(event) {
+		var field = event.target.innerText;
+		var sort = document.querySelector('logs').getAttribute('sort');
+		if (!sort)
+			document.querySelector('logs').setAttribute('sort', field + '-asc');
+		else if (sort == field + '-asc')
+			document.querySelector('logs').setAttribute('sort', field + '-dsc');
+		else
+			document.querySelector('logs').removeAttribute('sort');
+		ui.renderLog(ui.data.log);
 	}
 }
 
