@@ -163,7 +163,6 @@ class ui {
 		} else
 			document.querySelector('logs').removeAttribute('filter');
 		ui.renderLog(ui.data.log);
-		document.querySelector('msg').innerHTML = (ui.data.log.length - document.querySelectorAll('logs tr').length) + ' log entries';
 	}
 
 	static openFilter(event) {
@@ -209,6 +208,7 @@ class ui {
 		var filter = document.querySelector('logs').getAttribute('filter');
 		ui.data.log = logs;
 		var narrowView = ui.isNarrowView();
+		var count = 0;
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
@@ -228,11 +228,13 @@ class ui {
 			if (!narrowView)
 				row += '<td [[w7]]>' + logs[i].referer + '<';
 			row += '</tr>';
-			if (!filter || row.indexOf('>' + filter.substring(filter.indexOf('-') + 1) + '</td>') > -1)
-				s += row
+			if (!filter || row.indexOf('>' + filter.substring(filter.indexOf('-') + 1) + '</td>') > -1) {
+				s += row;
+				count++;
+			}
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
-		document.querySelector('msg').innerHTML = logs.length + ' log entries';
+		document.querySelector('msg').innerHTML = count + ' log entries';
 	}
 
 	static replaceWidths(widths, s) {
