@@ -233,7 +233,7 @@ class ui {
 		s += '</tr></thead>';
 		var sort = document.querySelector('logs').getAttribute('sort');
 		if (sort) {
-			var column = parseInt(sort.substring(0, sort.indexOf('-')));
+			var column = parseInt(sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
 			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
 			d = d.sort((a, b) => (a[column] - b[column]) * factor);
 		}
