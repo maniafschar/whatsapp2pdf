@@ -161,7 +161,7 @@ class ui {
 				return;
 			var trs = document.querySelectorAll('logs tr');
 			for (var i = 1; i < trs.length; i++)
-				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? 'block' : 'none';
+				trs[i].style.display = trs[i].querySelectorAll('td')[field].innerText.trim() == value ? '' : 'none';
 			document.querySelector('popup content').setAttribute('v', value);
 		} else {
 			var trs = document.querySelectorAll('logs tr');
