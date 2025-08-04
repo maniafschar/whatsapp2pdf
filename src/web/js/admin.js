@@ -182,7 +182,7 @@ class ui {
 				break;
 			}
 		}
-		var s = '<filter onclick="ui.filter(event)"><entry>All</entry><count>' + ui.data.log.length + '</count></filter>';
+		var s = '';
 		var processed = [], value;
 		trs = document.querySelectorAll('logs tr');
 		for (var i = 1; i < trs.length; i++) {
