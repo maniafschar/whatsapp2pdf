@@ -217,7 +217,7 @@ class ui {
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th onclick="ui.openFilter(event)" class="clickable" [[w3]]>status</th><th onclick="ui.openFilter(event)" class="clickable" [[w4]]>ip</th><th [[w5]]>time</th><th onclick="ui.openFilter(event)" class="clickable" [[w6]]>uri</th>';
+		s += '<th [[w2]]>createdAt</th><th onclick="ui.openFilter(event)" class="clickable" [[w3]]>status</th><th onclick="ui.openFilter(event)" class="clickable" [[w4]]>ip</th><th onclick="ui.sortColumn(event)" class="clickable" [[w5]]>time</th><th onclick="ui.openFilter(event)" class="clickable" [[w6]]>uri</th>';
 		if (!narrowView)
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
@@ -255,6 +255,9 @@ class ui {
 		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
 		document.querySelectorAll('tab')[i].classList.add('selected');
+	}
+
+	static sortColumn(event) {
 	}
 }
 
