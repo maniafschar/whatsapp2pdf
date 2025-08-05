@@ -170,6 +170,18 @@ tr:nth-child(even) {
 	background-color: rgba(255, 255, 255, 0.4);
 }
 
+th.asc::before {
+	content: '↑';
+	margin-right: 0.2em;
+	color: grey;
+}
+
+th.desc::before {
+	content: '↓';
+	margin-right: 0.2em;
+	color: grey;
+}
+
 tabHeader {
 	white-space: nowrap;
 	overflow-x: auto;
