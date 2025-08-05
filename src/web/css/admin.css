@@ -171,13 +171,13 @@ tr:nth-child(even) {
 }
 
 th.asc::before {
-	content: '↑';
+	content: '↓';
 	margin-right: 0.2em;
 	color: grey;
 }
 
 th.desc::before {
-	content: '↓';
+	content: '↑';
 	margin-right: 0.2em;
 	color: grey;
 }
