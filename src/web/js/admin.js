@@ -254,6 +254,9 @@ class ui {
 		}
 		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		document.querySelector('msg').innerHTML = (document.querySelectorAll('logs tr').length - 1) + ' log entries';
+		document.querySelector('logs tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
+		if (sort)
+			document.querySelector('logs tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
 	}
 
 	static replaceWidths(widths, s) {
@@ -281,7 +284,7 @@ class ui {
 		if (!sort)
 			document.querySelector('logs').setAttribute('sort', field + '-asc');
 		else if (sort == field + '-asc')
-			document.querySelector('logs').setAttribute('sort', field + '-dsc');
+			document.querySelector('logs').setAttribute('sort', field + '-desc');
 		else
 			document.querySelector('logs').removeAttribute('sort');
 		ui.renderLog(ui.data.log);
