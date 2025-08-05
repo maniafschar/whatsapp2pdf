@@ -29,7 +29,8 @@ class api {
 					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
-				ui.renderLog(xhr.logs);
+				ui.data.log = xhr.logs;
+				ui.renderLog();
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 			}
 		});
@@ -162,7 +163,7 @@ class ui {
 			document.querySelector('logs').setAttribute('filter', value);
 		} else
 			document.querySelector('logs').removeAttribute('filter');
-		ui.renderLog(ui.data.log);
+		ui.renderLog();
 	}
 
 	static columnIndex(column) {
@@ -175,16 +176,13 @@ class ui {
 	}
 
 	static openFilter(event) {
-		var field = document.querySelector('logs').getAttribute('filter');
 		document.querySelector('logs').removeAttribute('filter');
-		if (field)
-			ui.renderLog(ui.data.log);
-		field = ui.columnIndex(event.target.innerText);
+		var field = ui.columnIndex(event.target.innerText) + (ui.isNarrowView() ? 1 : 0);
 		var s = '';
 		var processed = [], value;
-		var trs = document.querySelectorAll('logs tr');
-		for (var i = 1; i < trs.length; i++) {
-			value = trs[i].querySelectorAll('td')[field].innerText;
+		var logs = ui.convertLogData();
+		for (var i = 1; i < logs.length; i++) {
+			value = logs[field];
 			if (value)
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
@@ -208,21 +206,25 @@ class ui {
 		return window.outerWidth < 700;
 	}
 
-	static renderLog(logs) {
-		var filter = document.querySelector('logs').getAttribute('filter');
-		ui.data.log = logs;
+	static convertLogData() {
 		var d = [];
-		for (var i = 0; i < logs.length; i++) {
+		for (var i = 0; i < ui.data.log.length; i++) {
 			var row = [];
-			row.push(logs[i].id);
-			row.push(ui.formatTime(logs[i].createdAt));
-			row.push(logs[i].logStatus);
-			row.push(logs[i].ip);
-			row.push(logs[i].time);
-			row.push(logs[i].method + ' ' + logs[i].uri + (logs[i].query ? '?' + logs[i].query : '') + (logs[i].body ? '<br/>' + ui.sanitizeText(logs[i].body) : ''));
-			row.push(logs[i].referer);
+			row.push(ui.data.log[i].id);
+			row.push(ui.formatTime(ui.data.log[i].createdAt));
+			row.push(ui.data.log[i].logStatus);
+			row.push(ui.data.log[i].ip);
+			row.push(ui.data.log[i].time);
+			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + (ui.data.log[i].body ? '<br/>' + ui.sanitizeText(ui.data.log[i].body) : ''));
+			row.push(ui.data.log[i].referer);
 			d.push(row);
 		}
+		return d;
+	}
+	
+	static renderLog() {
+		var filter = document.querySelector('logs').getAttribute('filter');
+		var d = ui.convertLogData();
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
@@ -287,7 +289,7 @@ class ui {
 			document.querySelector('logs').setAttribute('sort', field + '-desc');
 		else
 			document.querySelector('logs').removeAttribute('sort');
-		ui.renderLog(ui.data.log);
+		ui.renderLog();
 	}
 }
 
