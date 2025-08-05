@@ -181,8 +181,8 @@ class ui {
 		var s = '';
 		var processed = [], value;
 		var logs = ui.convertLogData();
-		for (var i = 1; i < logs.length; i++) {
-			value = logs[field];
+		for (var i = 0; i < logs.length; i++) {
+			value = logs [i][field];
 			if (value)
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
