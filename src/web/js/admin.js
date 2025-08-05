@@ -177,12 +177,12 @@ class ui {
 
 	static openFilter(event) {
 		document.querySelector('logs').removeAttribute('filter');
-		var field = ui.columnIndex(event.target.innerText) + (ui.isNarrowView() ? 1 : 0);
+		var field = ui.columnIndex(event.target.innerText);
 		var s = '';
 		var processed = [], value;
 		var logs = ui.convertLogData();
 		for (var i = 0; i < logs.length; i++) {
-			value = logs [i][field];
+			value = logs [i][field + (ui.isNarrowView() ? 1 : 0)];
 			if (value)
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 		}
