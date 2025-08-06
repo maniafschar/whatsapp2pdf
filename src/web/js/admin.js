@@ -26,7 +26,7 @@ class api {
 					s += '<tr i="' + xhr.tickets[i].id + '">';
 					if (!narrowView)
 						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="ui.open(event)" i="ticket-' + i + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
+					s += '<td onclick="ui.open(event)" i="ticket-' + xhr.tickets[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
 				}
 				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 				ui.data.log = xhr.logs;
@@ -121,7 +121,13 @@ class ui {
 			return;
 		}
 		var id = event.target.getAttribute('i').split('-');
-		var data = ui.data[id[0]][id[1]];
+		var data;
+		for (var i = 0; i < ui.data[id[0]].length; i++) {
+			if (ui.data[id[0]][i].id == id[1]) {
+				data = ui.data[id[0]][i];
+				break;
+			}
+		}
 		var keys = Object.keys(data);
 		var s = '';
 		for (var i = 0; i < keys.length; i++) {
@@ -247,7 +253,7 @@ class ui {
 				s += '<tr>';
 				if (!narrowView)
 					s += '<td [[w1]]>' + d[i][0] + '</td>';
-				s += '<td onclick="ui.open(event)" i="log-' + i + '" class="clickable" [[w2]]>' + d[i][1] + '</td>' +
+				s += '<td onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td>' +
 					'<td [[w3]]>' + d[i][2] + '</td>' +
 					'<td [[w4]]>' + (d[i][3] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][3] + '" target="sc_ip">' + d[i][3] + '</a>' : '') + '</td>' +
 					'<td [[w5]]>' + d[i][4] + '</td>' +
