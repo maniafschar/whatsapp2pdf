@@ -63,7 +63,10 @@ class api {
 		if (event && event.keyCode == 13) {
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
-				success: ui.renderLog
+				success: xhr => {
+					ui.data.log = xhr;
+					ui.renderLog();
+				}
 			});
 		}
 	}
