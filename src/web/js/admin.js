@@ -246,7 +246,7 @@ class ui {
 		if (sort) {
 			var column = parseInt(sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
 			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
-			d = d.sort((a, b) => (a[column] - b[column]) * factor);
+			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
 		for (var i = 0; i < d.length; i++) {
 			if (!filter || d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)] == filter.substring(filter.indexOf('-') + 1)) {
