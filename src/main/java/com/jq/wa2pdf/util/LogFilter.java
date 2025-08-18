@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.ContentCachingRequestWrapper;
+import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.jq.wa2pdf.entity.Log;
 import com.jq.wa2pdf.entity.Log.LogStatus;
@@ -38,7 +39,7 @@ public class LogFilter implements Filter {
 	public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
 			throws IOException, ServletException {
 		final ContentCachingRequestWrapper req = new ContentCachingRequestWrapper((HttpServletRequest) request);
-		final HttpServletResponse res = (HttpServletResponse) response;
+		final ContentCachingResponseWrapper res = new ContentCachingResponseWrapper((HttpServletResponse) response);
 		final Log log = new Log();
 		log.setUri(req.getRequestURI());
 		log.setMethod(req.getMethod());
@@ -75,7 +76,10 @@ public class LogFilter implements Filter {
 			if (log.getStatus() == 0)
 				log.setStatus(res.getStatus());
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
-			final byte[] b = req.getContentAsByteArray();
+			byte[] b = req.getContentAsByteArray();
+			if (b != null && b.length > 0)
+				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
+			b = res.getContentAsByteArray();
 			if (b != null && b.length > 0)
 				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
 			try {
