@@ -237,8 +237,8 @@ class ui {
 		var narrowView = ui.isNarrowView();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
-			s += '<th [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th onclick="ui.openFilter(event)" class="clickable" [[w3]]>status</th><th onclick="ui.openFilter(event)" class="clickable" [[w4]]>ip</th><th onclick="ui.sortColumn(event)" class="clickable" [[w5]]>time</th><th onclick="ui.openFilter(event)" class="clickable" [[w6]]>uri</th>';
+			s += '<th onclick="ui.sortColumn(event)" class="clickable" [[w1]]>id</th>';
+		s += '<th onclick="ui.sortColumn(event)" class="clickable" [[w2]]>createdAt</th><th onclick="ui.openFilter(event)" class="clickable" [[w3]]>status</th><th onclick="ui.openFilter(event)" class="clickable" [[w4]]>ip</th><th onclick="ui.sortColumn(event)" class="clickable" [[w5]]>time</th><th onclick="ui.openFilter(event)" class="clickable" [[w6]]>uri</th>';
 		if (!narrowView)
 			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
 		s += '</tr></thead>';
