@@ -85,7 +85,7 @@ public class Log extends BaseEntity {
 	}
 
 	public void setBody(final String body) {
-		this.body = body;
+		this.body = body != null && body.length() > 255 ? body.substring(0, 254) + "…" : body;
 	}
 
 	public String getIp() {
