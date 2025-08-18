@@ -17,7 +17,7 @@ public class Utilities {
 
 	public static String trim(String s, final int length) {
 		if (s != null)
-			s = s.replaceAll("\r", "").replaceAll("\n\n", "\n");
+			s = s.replaceAll("\r", "").replaceAll("\n\n", "\n").trim();
 		return s != null && s.length() > length ? s.substring(0, length - 1) + "…" : s;
 	}
 }
