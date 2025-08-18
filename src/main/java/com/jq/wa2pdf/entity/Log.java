@@ -6,6 +6,8 @@ import jakarta.persistence.Enumerated;
 
 import org.springframework.http.HttpStatus;
 
+import com.jq.wa2pdf.util.Utilities;
+
 @Entity
 public class Log extends BaseEntity {
 	public static final int STATUS_PROCESSING_PDF = 566;
@@ -85,7 +87,7 @@ public class Log extends BaseEntity {
 	}
 
 	public void setBody(final String body) {
-		this.body = body != null && body.length() > 255 ? body.substring(0, 254) + "…" : body;
+		this.body = Utilities.trim(body, 255);
 	}
 
 	public String getIp() {
