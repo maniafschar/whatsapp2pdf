@@ -23,7 +23,7 @@ public class Ticket extends BaseEntity {
 	}
 
 	public void setNote(final String note) {
-		this.note = note.length() > 2000 ? note.substring(0, 1999) + "…" : note;
+		this.note = note != null && note.length() > 2000 ? note.substring(0, 1999) + "…" : note;
 	}
 
 	public boolean isDeleted() {
