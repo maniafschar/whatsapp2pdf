@@ -3,6 +3,8 @@ package com.jq.wa2pdf.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 
+import com.jq.wa2pdf.util.Utilities;
+
 @Entity
 public class Ticket extends BaseEntity {
 	@Column(columnDefinition = "TEXT")
@@ -23,7 +25,7 @@ public class Ticket extends BaseEntity {
 	}
 
 	public void setNote(final String note) {
-		this.note = note != null && note.length() > 2000 ? note.substring(0, 1999) + "…" : note;
+		this.note = Utilities.trim(note, 2000);
 	}
 
 	public boolean isDeleted() {
