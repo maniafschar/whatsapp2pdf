@@ -82,6 +82,7 @@ public class LogFilter implements Filter {
 			b = res.getContentAsByteArray();
 			if (b != null && b.length > 0)
 				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
+			res.copyBodyToResponse();
 			try {
 				this.repository.save(log);
 			} catch (final Exception e) {
