@@ -19,7 +19,9 @@ class api {
 				success: api.postAnalyse,
 				error: xhr => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
-					document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
+					document.getElementsByTagName('error')[0].innerHTML = 
+						xhr.status == 403 ? 'The file was blocked by your proxy. Please try a correct WhatsApp exported chat file.' :
+						xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
 				}
 			});
 		} else
@@ -275,5 +277,6 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
 
