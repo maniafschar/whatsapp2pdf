@@ -101,12 +101,11 @@ h1 {
 error {
 	position: relative;
 	display: block;
-	margin-top: -0.6em;
-	height: 3.3em;
+	padding: 0.5em;
+	height: 3em;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	font-size: 0.8em;
-	line-height: 3;
 }
 
 header error {
@@ -465,3 +464,4 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
