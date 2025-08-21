@@ -276,7 +276,7 @@ class ui {
 			s += '<tr i="' + ui.data.ticket[i].id + '">';
 			if (!narrowView)
 				s += '<td [[w1]]>' + ui.data.ticket[i].id + '</td>';
-			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
+			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td onclick="ui.sortColumn(event)" class="clickable" [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
 		}
 		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 	}
