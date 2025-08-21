@@ -341,6 +341,7 @@ popup filter count {
 
 popup filter entry {
 	width: 80%;
+	white-space: nowrap;
 }
 
 popup filter count {
