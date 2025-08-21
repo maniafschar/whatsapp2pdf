@@ -17,18 +17,7 @@ class api {
 			url: api.url + 'init',
 			success: xhr => {
 				ui.data.ticket = xhr.tickets;
-				var narrowView = ui.isNarrowView();
-				var s = '<table><thead><tr>';
-				if (!narrowView)
-					s += '<th [[w1]]>id</th>';
-				s += '<th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
-				for (var i = 0; i < xhr.tickets.length; i++) {
-					s += '<tr i="' + xhr.tickets[i].id + '">';
-					if (!narrowView)
-						s += '<td [[w1]]>' + xhr.tickets[i].id + '</td>';
-					s += '<td onclick="ui.open(event)" i="ticket-' + xhr.tickets[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(xhr.tickets[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(xhr.tickets[i].note) + '</td></tr>';
-				}
-				document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
+				ui.renderTicket();
 				ui.data.log = xhr.logs;
 				ui.renderLog();
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
@@ -205,7 +194,10 @@ class ui {
 	}
 
 	static sanitizeText(s) {
-		return s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
+		s = s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
+		if (!ui.data.multiline && s.indexOf('<br/>') > -1)
+			s = s.substring(0, s.indexOf('<br/>'));
+		return s;
 	}
 
 	static formatTime(s) {
@@ -227,7 +219,7 @@ class ui {
 			row.push(ui.data.log[i].logStatus);
 			row.push(ui.data.log[i].ip);
 			row.push(ui.data.log[i].time);
-			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + (ui.data.multiline && ui.data.log[i].body ? '<br/>' + ui.sanitizeText(ui.data.log[i].body) : ''));
+			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + ui.sanitizeText(ui.data.log[i].body ? '<br/>' + ui.data.log[i].body : ''));
 			row.push(ui.data.log[i].referer);
 			d.push(row);
 		}
@@ -272,6 +264,21 @@ class ui {
 		document.querySelector('logs tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (sort)
 			document.querySelector('logs tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
+	}
+
+	static renderTicket() {
+		var narrowView = ui.isNarrowView();
+		var s = '<table><thead><tr>';
+		if (!narrowView)
+			s += '<th [[w1]]>id</th>';
+		s += '<th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
+		for (var i = 0; i < ui.data.ticket.length; i++) {
+			s += '<tr i="' + ui.data.ticket[i].id + '">';
+			if (!narrowView)
+				s += '<td [[w1]]>' + ui.data.ticket[i].id + '</td>';
+			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
+		}
+		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 	}
 
 	static replaceWidths(widths, s) {
