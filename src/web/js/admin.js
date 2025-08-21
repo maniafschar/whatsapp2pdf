@@ -191,9 +191,12 @@ class ui {
 		var processed = [], value;
 		var logs = ui.convertLogData();
 		for (var i = 0; i < logs.length; i++) {
-			value = logs [i][field + (ui.isNarrowView() ? 1 : 0)];
-			if (value)
+			value = logs[i][field + (ui.isNarrowView() ? 1 : 0)];
+			if (value) {
+				if (value.indexOf('<br/>') > -1)
+					value = value.substring(0, value.indexOf('<br/>'));
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
+			}
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
@@ -249,7 +252,8 @@ class ui {
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
 		for (var i = 0; i < d.length; i++) {
-			if (!filter || d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)] == filter.substring(filter.indexOf('-') + 1)) {
+			if (!filter || d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)] == filter.substring(filter.indexOf('-') + 1)
+			   	|| d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)].indexOf(filter.substring(filter.indexOf('-') + 1) + '<br/>') == 0) {
 				s += '<tr>';
 				if (!narrowView)
 					s += '<td [[w1]]>' + d[i][0] + '</td>';
