@@ -318,11 +318,11 @@ class ui {
 			   	|| d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)].indexOf(data.filter.substring(data.filter.indexOf('-') + 1) + '<br/>') == 0) {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
-					if (!narrowView || !data.columns[i].excludeNarrow)
+					if (!narrowView || !data.columns[i2].excludeNarrow)
 						s += '<td' +
-								(data.columns[i].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') +
+								(data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') +
 								' [[w' + (i + 1) + ']]>' +
-								(data.columns[i].label == 'ip' && d[i][i2] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][i2] + '" target="sc_ip">' + d[i][i2] + '</a>' : d[i][i2]) +
+								(data.columns[i2].label == 'ip' && d[i][i2] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][i2] + '" target="sc_ip">' + d[i][i2] + '</a>' : d[i][i2]) +
 								'</td>';
 				}
 				s += '</tr>';
