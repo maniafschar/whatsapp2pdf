@@ -301,15 +301,22 @@ class ui {
 	}
 
 	static sortColumn(event) {
-		var field = ui.columnIndex(event.target.innerText);
-		var sort = document.querySelector('logs').getAttribute('sort');
+		var e = event.target;
+		var field = ui.columnIndex(e.innerText);
+		while (e.nodeName != 'TABLE')
+			e = e.parentElement;
+		e = e.parentElement;
+		var sort = e.getAttribute('sort');
 		if (!sort)
-			document.querySelector('logs').setAttribute('sort', field + '-asc');
+			e.setAttribute('sort', field + '-asc');
 		else if (sort == field + '-asc')
-			document.querySelector('logs').setAttribute('sort', field + '-desc');
+			e.setAttribute('sort', field + '-desc');
 		else
-			document.querySelector('logs').removeAttribute('sort');
-		ui.renderLog();
+			e.removeAttribute('sort');
+		if (e.nodeName == 'LOGS')
+			ui.renderLog();
+		else
+			ui.renderTicket();
 	}
 
 	static toggleMultiline() {
