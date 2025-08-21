@@ -16,10 +16,10 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				ui.data.ticket = xhr.tickets;
-				ui.renderTicket();
-				ui.data.log = xhr.logs;
-				ui.renderLog();
+				ui.data.ticket.list = xhr.tickets;
+				ui.render(ui.data.ticket);
+				ui.data.log.list = xhr.logs;
+				ui.render(ui.data.log);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 			}
 		});
@@ -53,8 +53,8 @@ class api {
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
 				success: xhr => {
-					ui.data.log = xhr;
-					ui.renderLog();
+					ui.data.log.list = xhr;
+					ui.render(ui.data.log);
 				}
 			});
 		}
@@ -107,6 +107,7 @@ class ui {
 			list: [],
 			filter: null,
 			sort: null,
+			selector: 'logs',
 			columns: [
 				{
 					label: 'id',
@@ -137,12 +138,28 @@ class ui {
 					label: 'referer',
 					excludeNarrow: true
 				}
-			]
+			],
+			convert() {
+				var d = [];
+				for (var i = 0; i < ui.data.log.list.length; i++) {
+					var row = [];
+					row.push(ui.data.log.list[i].id);
+					row.push(ui.formatTime(ui.data.log.list[i].createdAt));
+					row.push(ui.data.log.list[i].logStatus);
+					row.push(ui.data.log.list[i].ip);
+					row.push(ui.data.log.list[i].time);
+					row.push(ui.data.log.list[i].method + ' ' + ui.data.log.list[i].uri + (ui.data.log.list[i].query ? '?' + ui.data.log.list[i].query : '') + ui.sanitizeText(ui.data.log.list[i].body ? '<br/>' + ui.data.log.list[i].body : ''));
+					row.push(ui.data.log.list[i].referer);
+					d.push(row);
+				}
+				return d;
+			}
 		},
 		ticket: {
 			list: [],
 			filter: null,
 			sort: null,
+			selector: 'tickets',
 			columns: [
 				{
 					label: 'id',
@@ -157,7 +174,18 @@ class ui {
 					label: 'note',
 					filter: true
 				}
-			]
+			],
+			convert() {
+				var d = [];
+				for (var i = 0; i < ui.data.ticket.list.length; i++) {
+					var row = [];
+					row.push(ui.data.ticket.list[i].id);
+					row.push(ui.formatTime(ui.data.ticket.list[i].createdAt));
+					row.push(ui.data.ticke.list[i].note);
+					d.push(row);
+				}
+				return d;
+			}
 		},
 		multiline: true
 	};
@@ -219,7 +247,7 @@ class ui {
 			document.querySelector('logs').setAttribute('filter', value);
 		} else
 			document.querySelector('logs').removeAttribute('filter');
-		ui.renderLog();
+		ui.render(ui.data.log);
 	}
 
 	static columnIndex(column, e) {
@@ -236,7 +264,7 @@ class ui {
 		var field = ui.columnIndex(event.target.innerText);
 		var s = '';
 		var processed = [], value;
-		var logs = ui.convertLogData();
+		var logs = ui.data.log.convert();
 		for (var i = 0; i < logs.length; i++) {
 			value = logs[i][field + (ui.isNarrowView() ? 1 : 0)];
 			if (value) {
@@ -267,35 +295,47 @@ class ui {
 	static isNarrowView() {
 		return window.outerWidth < 700;
 	}
-
-	static convertLogData() {
-		var d = [];
-		for (var i = 0; i < ui.data.log.length; i++) {
-			var row = [];
-			row.push(ui.data.log[i].id);
-			row.push(ui.formatTime(ui.data.log[i].createdAt));
-			row.push(ui.data.log[i].logStatus);
-			row.push(ui.data.log[i].ip);
-			row.push(ui.data.log[i].time);
-			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + ui.sanitizeText(ui.data.log[i].body ? '<br/>' + ui.data.log[i].body : ''));
-			row.push(ui.data.log[i].referer);
-			d.push(row);
-		}
-		return d;
-	}
-
-	static convertTicketData() {
-		var d = [];
-		for (var i = 0; i < ui.data.ticket.length; i++) {
-			var row = [];
-			row.push(ui.data.ticket[i].id);
-			row.push(ui.formatTime(ui.data.ticket[i].createdAt));
-			row.push(ui.data.ticket[i].note);
-			d.push(row);
-		}
-		return d;
-	}
 	
+	static render(data) {
+		var d = data.convert();
+		var narrowView = ui.isNarrowView();
+		var s = '<table><thead><tr>';
+		for (var i = 0; i < data.columns.length; i++) {
+			if (!narrowView || !data.columns[i].excludeNarrow)
+				s += '<th' + 
+						(data.columns[i].sort ? ' onclick="ui.sortColumn(event)" class="clickable"' : '') +
+						(data.columns[i].filter ? ' onclick="ui.sortFilter(event)" class="clickable"' : '') +
+						' [[w' + (i + 1) + ']]>' + data.columns[i].label + '</th>';
+		}
+		s += '</tr></thead>';
+		if (data.sort) {
+			var column = parseInt(data.sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
+			var factor = data.sort.indexOf('-asc') > 0 ? 1 : -1;
+			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
+		}
+		for (var i = 0; i < d.length; i++) {
+			if (!data.filter || d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)] == data.filter.substring(data.filter.indexOf('-') + 1)
+			   	|| d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)].indexOf(data.filter.substring(data.filter.indexOf('-') + 1) + '<br/>') == 0) {
+				s += '<tr>';
+				for (var i2 = 0; i2 < data.columns.length; i2++) {
+					if (!narrowView || !data.columns[i].excludeNarrow)
+						s += '<td' +
+								(data.columns[i].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') +
+								' [[w' + (i + 1) + ']]>' +
+								(data.columns[i].label == 'ip' && d[i][i2] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][i2] + '" target="sc_ip">' + d[i][i2] + '</a>' : d[i][i2]) +
+								'</td>';
+				}
+				s += '</tr>';
+			}
+		}
+		document.querySelector(data.selector).innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+		if (data.selector == 'logs')
+			document.querySelector('msg').innerHTML = (document.querySelectorAll(data.selector + ' tr').length - 1) + ' log entries';
+		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
+		if (sort)
+			document.querySelector(data.selector + ' tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
+	}
+
 	static renderLog() {
 		var filter = document.querySelector('logs').getAttribute('filter');
 		var d = ui.convertLogData();
@@ -394,15 +434,15 @@ class ui {
 		else
 			e.removeAttribute('sort');
 		if (e.nodeName == 'LOGS')
-			ui.renderLog();
+			ui.render(ui.data.log);
 		else
-			ui.renderTicket();
+			ui.render(ui.data.ticket);
 	}
 
 	static toggleMultiline() {
 		ui.data.multiline = !ui.data.multiline;
-		ui.renderLog();
-		ui.renderTicket();
+		ui.render(ui.data.log);
+		ui.render(ui.data.ticket);
 	}
 }
 
