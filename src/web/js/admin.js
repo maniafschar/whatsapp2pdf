@@ -342,12 +342,6 @@ class ui {
 		return s;
 	}
 
-	static resetSize() {
-		document.querySelectorAll('body container>element').forEach(e => {
-			e.children[0].style.height = '';
-		});
-	}
-
 	static showTab(i) {
 		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
