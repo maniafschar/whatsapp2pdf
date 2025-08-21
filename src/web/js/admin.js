@@ -331,7 +331,7 @@ class ui {
 			}
 		}
 		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(data.widths(narrowView), s) + '</table>';
-		if (data.selector == 'logs')
+		if (data.selector == 'log')
 			document.querySelector('msg').innerHTML = (document.querySelectorAll(data.selector + ' tr').length - 1) + ' log entries';
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (data.sort)
@@ -363,7 +363,7 @@ class ui {
 			e = e.parentElement;
 		e = e.parentElement;
 		field = ui.columnIndex(field, e);
-		var data = e.nodeName == 'LOGS' ? ui.data.log : ui.data.ticket;
+		var data = e.nodeName == 'LOG' ? ui.data.log : ui.data.ticket;
 		if (!data.sort)
 			data.sort = field + '-asc';
 		else if (data.sort == field + '-asc')
