@@ -325,7 +325,7 @@ class ui {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
-						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2]) + '</td>';
+						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2] + '</td>';
 				}
 				s += '</tr>';
 			}
