@@ -113,7 +113,7 @@ class api {
 }
 
 class ui {
-	static data = { log: [], ticket: [] };
+	static data = { log: [], ticket: [], multiline: true };
 
 	static open(event) {
 		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
@@ -227,7 +227,7 @@ class ui {
 			row.push(ui.data.log[i].logStatus);
 			row.push(ui.data.log[i].ip);
 			row.push(ui.data.log[i].time);
-			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + (ui.data.log[i].body ? '<br/>' + ui.sanitizeText(ui.data.log[i].body) : ''));
+			row.push(ui.data.log[i].method + ' ' + ui.data.log[i].uri + (ui.data.log[i].query ? '?' + ui.data.log[i].query : '') + (ui.data.multiline && ui.data.log[i].body ? '<br/>' + ui.sanitizeText(ui.data.log[i].body) : ''));
 			row.push(ui.data.log[i].referer);
 			d.push(row);
 		}
@@ -302,6 +302,11 @@ class ui {
 			document.querySelector('logs').setAttribute('sort', field + '-desc');
 		else
 			document.querySelector('logs').removeAttribute('sort');
+		ui.renderLog();
+	}
+
+	static toggleMultiline() {
+		ui.data.multiline = !ui.data.multiline;
 		ui.renderLog();
 	}
 }
