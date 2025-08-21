@@ -295,7 +295,7 @@ class ui {
 			s += '<tr i="' + d[i].id + '">';
 			if (!narrowView)
 				s += '<td [[w1]]>' + d[i][0] + '</td>';
-			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + ui.formatTime(d[i][1]) + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
+			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
 		}
 		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 	}
