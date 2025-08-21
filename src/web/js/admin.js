@@ -115,8 +115,7 @@ class ui {
 					excludeNarrow: true
 				},
 				{
-					label: 'createdAt',
-					filter: true
+					label: 'createdAt'
 				},
 				{
 					label: 'status',
@@ -170,12 +169,11 @@ class ui {
 					excludeNarrow: true
 				},
 				{
-					label: 'createdAt',
-					filter: true
+					label: 'createdAt'
 				},
 				{
 					label: 'note',
-					filter: true
+					sort: true
 				}
 			],
 			convert() {
@@ -267,7 +265,7 @@ class ui {
 
 	static openFilter(event) {
 		ui.data.log.filter = null;
-		var field = ui.columnIndex(event.target.innerText);
+		var field = ui.columnIndex(event.target.innerText, document.querySelector(ui.data.log.selector));
 		var s = '';
 		var processed = [], value;
 		var logs = ui.data.log.convert();
