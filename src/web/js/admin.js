@@ -299,7 +299,7 @@ class ui {
 	static render(data) {
 		var d = data.convert();
 		var narrowView = ui.isNarrowView();
-		var s = '<table><thead><tr>';
+		var s = '<thead><tr>';
 		for (var i = 0; i < data.columns.length; i++) {
 			if (!narrowView || !data.columns[i].excludeNarrow)
 				s += '<th' + 
@@ -321,14 +321,14 @@ class ui {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
 						s += '<td' +
 								(data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') +
-								' [[w' + (i + 1) + ']]>' +
+								' [[w' + (i2 + 1) + ']]>' +
 								(data.columns[i2].label == 'ip' && d[i][i2] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][i2] + '" target="sc_ip">' + d[i][i2] + '</a>' : d[i][i2]) +
 								'</td>';
 				}
 				s += '</tr>';
 			}
 		}
-		document.querySelector(data.selector).innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
 		if (data.selector == 'logs')
 			document.querySelector('msg').innerHTML = (document.querySelectorAll(data.selector + ' tr').length - 1) + ' log entries';
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
