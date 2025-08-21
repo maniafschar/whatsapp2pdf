@@ -315,7 +315,7 @@ class ui {
 		}
 		s += '</tr></thead>';
 		if (data.sort) {
-			var column = parseInt(data.sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
+			var column = parseInt(data.sort.substring(0, data.sort.indexOf('-'))) + (narrowView ? 1 : 0);
 			var factor = data.sort.indexOf('-asc') > 0 ? 1 : -1;
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
