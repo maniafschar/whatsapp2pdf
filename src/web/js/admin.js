@@ -271,12 +271,12 @@ class ui {
 		var s = '<table><thead><tr>';
 		if (!narrowView)
 			s += '<th [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th [[w3]]>note</th></tr></thead>';
+		s += '<th [[w2]]>createdAt</th><th onclick="ui.sortColumn(event)" class="clickable" [[w3]]>note</th></tr></thead>';
 		for (var i = 0; i < ui.data.ticket.length; i++) {
 			s += '<tr i="' + ui.data.ticket[i].id + '">';
 			if (!narrowView)
 				s += '<td [[w1]]>' + ui.data.ticket[i].id + '</td>';
-			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td onclick="ui.sortColumn(event)" class="clickable" [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
+			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
 		}
 		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 	}
