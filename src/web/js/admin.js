@@ -225,6 +225,18 @@ class ui {
 		}
 		return d;
 	}
+
+	static convertTicketData() {
+		var d = [];
+		for (var i = 0; i < ui.data.ticket.length; i++) {
+			var row = [];
+			row.push(ui.data.ticket[i].id);
+			row.push(ui.formatTime(ui.data.ticket[i].createdAt));
+			row.push(ui.data.ticket[i].note);
+			d.push(row);
+		}
+		return d;
+	}
 	
 	static renderLog() {
 		var filter = document.querySelector('logs').getAttribute('filter');
@@ -268,15 +280,22 @@ class ui {
 
 	static renderTicket() {
 		var narrowView = ui.isNarrowView();
+		var sort = document.querySelector('tickets').getAttribute('sort');
+		var d = ui.convertTicketData();
 		var s = '<table><thead><tr>';
 		if (!narrowView)
-			s += '<th [[w1]]>id</th>';
+			s += '<th onclick="ui.sortColumn(event)" class="clickable" [[w1]]>id</th>';
 		s += '<th [[w2]]>createdAt</th><th onclick="ui.sortColumn(event)" class="clickable" [[w3]]>note</th></tr></thead>';
-		for (var i = 0; i < ui.data.ticket.length; i++) {
-			s += '<tr i="' + ui.data.ticket[i].id + '">';
+		if (sort) {
+			var column = parseInt(sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
+			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
+			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
+		}
+		for (var i = 0; i < d.length; i++) {
+			s += '<tr i="' + d[i].id + '">';
 			if (!narrowView)
-				s += '<td [[w1]]>' + ui.data.ticket[i].id + '</td>';
-			s += '<td onclick="ui.open(event)" i="ticket-' + ui.data.ticket[i].id + '" class="clickable" [[w2]]>' + ui.formatTime(ui.data.ticket[i].createdAt) + '</td><td [[w3]]>' + ui.sanitizeText(ui.data.ticket[i].note) + '</td></tr>';
+				s += '<td [[w1]]>' + d[i][0] + '</td>';
+			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + ui.formatTime(d[i][1]) + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
 		}
 		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
 	}
