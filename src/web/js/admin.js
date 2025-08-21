@@ -140,15 +140,15 @@ class ui {
 			],
 			convert() {
 				var d = [];
-				for (var i = 0; i < ui.data.log.list.length; i++) {
+				for (var i = 0; i < this.list.length; i++) {
 					var row = [];
-					row.push(ui.data.log.list[i].id);
-					row.push(ui.formatTime(ui.data.log.list[i].createdAt));
-					row.push(ui.data.log.list[i].logStatus);
-					row.push(ui.data.log.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + ui.data.log.list[i].ip + '" target="sc_ip">' + ui.data.log.list[i].ip + '</a>' : '');
-					row.push(ui.data.log.list[i].time);
-					row.push(ui.data.log.list[i].method + ' ' + ui.data.log.list[i].uri + (ui.data.log.list[i].query ? '?' + ui.data.log.list[i].query : '') + ui.sanitizeText(ui.data.log.list[i].body ? '<br/>' + ui.data.log.list[i].body : ''));
-					row.push(ui.data.log.list[i].referer);
+					row.push(this.list[i].id);
+					row.push(ui.formatTime(this.list[i].createdAt));
+					row.push(this.list[i].logStatus);
+					row.push(this.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + this.list[i].ip + '" target="sc_ip">' + this.list[i].ip + '</a>' : '');
+					row.push(this.list[i].time);
+					row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : ''));
+					row.push(this.list[i].referer);
 					d.push(row);
 				}
 				return d;
@@ -178,11 +178,11 @@ class ui {
 			],
 			convert() {
 				var d = [];
-				for (var i = 0; i < ui.data.ticket.list.length; i++) {
+				for (var i = 0; i < this.list.length; i++) {
 					var row = [];
-					row.push(ui.data.ticket.list[i].id);
-					row.push(ui.formatTime(ui.data.ticket.list[i].createdAt));
-					row.push(ui.sanitizeText(ui.data.ticket.list[i].note));
+					row.push(this.list[i].id);
+					row.push(ui.formatTime(this.list[i].createdAt));
+					row.push(ui.sanitizeText(this.list[i].note));
 					d.push(row);
 				}
 				return d;
