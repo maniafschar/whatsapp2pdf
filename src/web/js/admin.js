@@ -164,8 +164,8 @@ class ui {
 		ui.renderLog();
 	}
 
-	static columnIndex(column) {
-		var trs = document.querySelector('logs tr').querySelectorAll('th');
+	static columnIndex(column, e) {
+		var trs = e.querySelector('tr').querySelectorAll('th');
 		column = column.trim();
 		for (var i = 0; i < trs.length; i++) {
 			if (trs[i].innerText == column)
@@ -302,10 +302,11 @@ class ui {
 
 	static sortColumn(event) {
 		var e = event.target;
-		var field = ui.columnIndex(e.innerText);
+		var field = e.innerText;
 		while (e.nodeName != 'TABLE')
 			e = e.parentElement;
 		e = e.parentElement;
+		field = ui.columnIndex(field, e);
 		var sort = e.getAttribute('sort');
 		if (!sort)
 			e.setAttribute('sort', field + '-asc');
