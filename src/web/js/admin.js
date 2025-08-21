@@ -153,6 +153,9 @@ class ui {
 					d.push(row);
 				}
 				return d;
+			},
+			widths(narrowView) {
+				return narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35];
 			}
 		},
 		ticket: {
@@ -185,6 +188,9 @@ class ui {
 					d.push(row);
 				}
 				return d;
+			},
+			widths(narrowView) {
+				return narrowView ? [0, 20, 80] : [5, 10, 85];
 			}
 		},
 		multiline: true
@@ -328,76 +334,12 @@ class ui {
 				s += '</tr>';
 			}
 		}
-		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
+		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(data.widths(narrowView), s) + '</table>';
 		if (data.selector == 'logs')
 			document.querySelector('msg').innerHTML = (document.querySelectorAll(data.selector + ' tr').length - 1) + ' log entries';
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (data.sort)
 			document.querySelector(data.selector + ' tr').querySelectorAll('th')[parseInt(data.sort.substring(0, data.sort.indexOf('-')))].classList.add(data.sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
-	}
-
-	static renderLog() {
-		var filter = document.querySelector('logs').getAttribute('filter');
-		var d = ui.convertLogData();
-		var narrowView = ui.isNarrowView();
-		var s = '<table><thead><tr>';
-		if (!narrowView)
-			s += '<th onclick="ui.sortColumn(event)" class="clickable" [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th onclick="ui.openFilter(event)" class="clickable" [[w3]]>status</th><th onclick="ui.openFilter(event)" class="clickable" [[w4]]>ip</th><th onclick="ui.sortColumn(event)" class="clickable" [[w5]]>time</th><th onclick="ui.openFilter(event)" class="clickable" [[w6]]>uri</th>';
-		if (!narrowView)
-			s += '<th onclick="ui.openFilter(event)" class="clickable" [[w7]]>referer</th>';
-		s += '</tr></thead>';
-		var sort = document.querySelector('logs').getAttribute('sort');
-		if (sort) {
-			var column = parseInt(sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
-			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
-			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
-		}
-		for (var i = 0; i < d.length; i++) {
-			if (!filter || d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)] == filter.substring(filter.indexOf('-') + 1)
-			   	|| d[i][parseInt(filter.substring(0, filter.indexOf('-'))) + (narrowView ? 1 : 0)].indexOf(filter.substring(filter.indexOf('-') + 1) + '<br/>') == 0) {
-				s += '<tr>';
-				if (!narrowView)
-					s += '<td [[w1]]>' + d[i][0] + '</td>';
-				s += '<td onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td>' +
-					'<td [[w3]]>' + d[i][2] + '</td>' +
-					'<td [[w4]]>' + (d[i][3] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][3] + '" target="sc_ip">' + d[i][3] + '</a>' : '') + '</td>' +
-					'<td [[w5]]>' + d[i][4] + '</td>' +
-					'<td [[w6]]>' + d[i][5] + '</td>';
-				if (!narrowView)
-					s += '<td [[w7]]>' + d[i][6] + '</td>';
-				s += '</tr>';
-			}
-		}
-		document.querySelector('logs').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35], s) + '</table>';
-		document.querySelector('msg').innerHTML = (document.querySelectorAll('logs tr').length - 1) + ' log entries';
-		document.querySelector('logs tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
-		if (sort)
-			document.querySelector('logs tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
-	}
-
-	static renderTicket() {
-		var narrowView = ui.isNarrowView();
-		var sort = document.querySelector('tickets').getAttribute('sort');
-		var d = ui.convertTicketData();
-		var s = '<table><thead><tr>';
-		if (!narrowView)
-			s += '<th onclick="ui.sortColumn(event)" class="clickable" [[w1]]>id</th>';
-		s += '<th [[w2]]>createdAt</th><th onclick="ui.sortColumn(event)" class="clickable" [[w3]]>note</th></tr></thead>';
-		if (sort) {
-			var column = parseInt(sort.substring(0, sort.indexOf('-'))) + (narrowView ? 1 : 0);
-			var factor = sort.indexOf('-asc') > 0 ? 1 : -1;
-			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
-		}
-		for (var i = 0; i < d.length; i++) {
-			s += '<tr i="' + d[i][0] + '">';
-			if (!narrowView)
-				s += '<td [[w1]]>' + d[i][0] + '</td>';
-			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
-		}
-		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
-		if (sort)
-			document.querySelector('tickets tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
 	}
 
 	static replaceWidths(widths, s) {
@@ -410,7 +352,6 @@ class ui {
 		document.querySelectorAll('body container>element').forEach(e => {
 			e.children[0].style.height = '';
 		});
-
 	}
 
 	static showTab(i) {
