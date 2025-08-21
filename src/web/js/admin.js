@@ -102,7 +102,65 @@ class api {
 }
 
 class ui {
-	static data = { log: [], ticket: [], multiline: true };
+	static data = {
+		log: {
+			list: [],
+			filter: null,
+			sort: null,
+			columns: [
+				{
+					label: 'id',
+					sort: true,
+					excludeNarrow: true
+				},
+				{
+					label: 'createdAt',
+					filter: true
+				},
+				{
+					label: 'status',
+					filter: true
+				},
+				{
+					label: 'ip',
+					filter: true
+				},
+				{
+					label: 'time',
+					sort: true
+				},
+				{
+					label: 'uri',
+					filter: true
+				},
+				{
+					label: 'referer',
+					excludeNarrow: true
+				}
+			]
+		},
+		ticket: {
+			list: [],
+			filter: null,
+			sort: null,
+			columns: [
+				{
+					label: 'id',
+					sort: true,
+					excludeNarrow: true
+				},
+				{
+					label: 'createdAt',
+					filter: true
+				},
+				{
+					label: 'note',
+					filter: true
+				}
+			]
+		},
+		multiline: true
+	};
 
 	static open(event) {
 		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
@@ -111,9 +169,9 @@ class ui {
 		}
 		var id = event.target.getAttribute('i').split('-');
 		var data;
-		for (var i = 0; i < ui.data[id[0]].length; i++) {
-			if (ui.data[id[0]][i].id == id[1]) {
-				data = ui.data[id[0]][i];
+		for (var i = 0; i < ui.data[id[0]].list.length; i++) {
+			if (ui.data[id[0]].list[i].id == id[1]) {
+				data = ui.data[id[0]].list[i];
 				break;
 			}
 		}
@@ -292,7 +350,7 @@ class ui {
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
 		for (var i = 0; i < d.length; i++) {
-			s += '<tr i="' + d[i].id + '">';
+			s += '<tr i="' + d[i][0] + '">';
 			if (!narrowView)
 				s += '<td [[w1]]>' + d[i][0] + '</td>';
 			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
