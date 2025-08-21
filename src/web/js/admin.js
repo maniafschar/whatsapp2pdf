@@ -146,7 +146,7 @@ class ui {
 					row.push(ui.data.log.list[i].id);
 					row.push(ui.formatTime(ui.data.log.list[i].createdAt));
 					row.push(ui.data.log.list[i].logStatus);
-					row.push(ui.data.log.list[i].ip);
+					row.push(ui.data.log.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + ui.data.log.list[i].ip + '" target="sc_ip">' + ui.data.log.list[i].ip + '</a>' : '');
 					row.push(ui.data.log.list[i].time);
 					row.push(ui.data.log.list[i].method + ' ' + ui.data.log.list[i].uri + (ui.data.log.list[i].query ? '?' + ui.data.log.list[i].query : '') + ui.sanitizeText(ui.data.log.list[i].body ? '<br/>' + ui.data.log.list[i].body : ''));
 					row.push(ui.data.log.list[i].referer);
@@ -184,7 +184,7 @@ class ui {
 					var row = [];
 					row.push(ui.data.ticket.list[i].id);
 					row.push(ui.formatTime(ui.data.ticket.list[i].createdAt));
-					row.push(ui.data.ticket.list[i].note);
+					row.push(ui.sanitizeText(ui.data.ticket.list[i].note));
 					d.push(row);
 				}
 				return d;
@@ -325,11 +325,7 @@ class ui {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
-						s += '<td' +
-								(data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') +
-								' [[w' + (i2 + 1) + ']]>' +
-								(data.columns[i2].label == 'ip' && d[i][i2] ? '<a href="https://whatismyipaddress.com/ip/' + d[i][i2] + '" target="sc_ip">' + d[i][i2] + '</a>' : d[i][i2]) +
-								'</td>';
+						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="log-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2]) + '</td>';
 				}
 				s += '</tr>';
 			}
