@@ -94,6 +94,7 @@ a {
 
 msg {
 	font-size: 0.7em;
+	cursor: pointer;
 }
 
 login {
