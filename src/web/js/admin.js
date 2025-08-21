@@ -298,6 +298,8 @@ class ui {
 			s += '<td onclick="ui.open(event)" i="ticket-' + d[i][0] + '" class="clickable" [[w2]]>' + d[i][1] + '</td><td [[w3]]>' + ui.sanitizeText(d[i][2]) + '</td></tr>';
 		}
 		document.querySelector('tickets').innerHTML = ui.replaceWidths(narrowView ? [0, 20, 80] : [5, 10, 85], s) + '</table>';
+		if (sort)
+			document.querySelector('tickets tr').querySelectorAll('th')[parseInt(sort.substring(0, sort.indexOf('-')))].classList.add(sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
 	}
 
 	static replaceWidths(widths, s) {
