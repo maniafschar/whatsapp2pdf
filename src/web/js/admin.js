@@ -247,12 +247,12 @@ class ui {
 		while (e && e.nodeName != 'FILTER')
 			e = e.parentElement;
 		var value = e && field + '-' + e.querySelector('entry').innerText.trim();
-		if ((field || field == 0) && (!value || value != document.querySelector('logs').getAttribute('filter'))) {
+		if ((field || field == 0) && (!value || value != ui.data.log.filter)) {
 			if (!e)
 				return;
-			document.querySelector('logs').setAttribute('filter', value);
+			ui.data.log.filter = value;
 		} else
-			document.querySelector('logs').removeAttribute('filter');
+			ui.data.log.filter = null;
 		ui.render(ui.data.log);
 	}
 
@@ -266,7 +266,7 @@ class ui {
 	}
 
 	static openFilter(event) {
-		document.querySelector('logs').removeAttribute('filter');
+		ui.data.log.filter = null;
 		var field = ui.columnIndex(event.target.innerText);
 		var s = '';
 		var processed = [], value;
@@ -363,17 +363,14 @@ class ui {
 			e = e.parentElement;
 		e = e.parentElement;
 		field = ui.columnIndex(field, e);
-		var sort = e.getAttribute('sort');
-		if (!sort)
-			e.setAttribute('sort', field + '-asc');
-		else if (sort == field + '-asc')
-			e.setAttribute('sort', field + '-desc');
+		var data = e.nodeName == 'LOGS' ? ui.data.log : ui.data.ticket;
+		if (!data.sort)
+			data.sort = field + '-asc';
+		else if (data.sort == field + '-asc')
+			data.sort = field + '-desc';
 		else
-			e.removeAttribute('sort');
-		if (e.nodeName == 'LOGS')
-			ui.render(ui.data.log);
-		else
-			ui.render(ui.data.ticket);
+			data.sort = null;
+		ui.render(data);
 	}
 
 	static toggleMultiline() {
