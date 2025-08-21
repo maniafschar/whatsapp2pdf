@@ -181,7 +181,7 @@ class ui {
 					var row = [];
 					row.push(ui.data.ticket.list[i].id);
 					row.push(ui.formatTime(ui.data.ticket.list[i].createdAt));
-					row.push(ui.data.ticke.list[i].note);
+					row.push(ui.data.ticket.list[i].note);
 					d.push(row);
 				}
 				return d;
