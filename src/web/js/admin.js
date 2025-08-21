@@ -315,6 +315,7 @@ class ui {
 	static toggleMultiline() {
 		ui.data.multiline = !ui.data.multiline;
 		ui.renderLog();
+		ui.renderTicket();
 	}
 }
 
