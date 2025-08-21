@@ -310,7 +310,7 @@ class ui {
 			if (!narrowView || !data.columns[i].excludeNarrow)
 				s += '<th' + 
 						(data.columns[i].sort ? ' onclick="ui.sortColumn(event)" class="clickable"' : '') +
-						(data.columns[i].filter ? ' onclick="ui.sortFilter(event)" class="clickable"' : '') +
+						(data.columns[i].filter ? ' onclick="ui.openFilter(event)" class="clickable"' : '') +
 						' [[w' + (i + 1) + ']]>' + data.columns[i].label + '</th>';
 		}
 		s += '</tr></thead>';
