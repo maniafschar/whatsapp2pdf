@@ -153,7 +153,7 @@ class ui {
 					row.push(this.list[i].logStatus);
 					row.push(this.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + this.list[i].ip + '" target="sc_ip">' + this.list[i].ip + '</a>' : '');
 					row.push(this.list[i].time);
-					row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : ''));
+					row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.trim(ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : '')));
 					row.push(this.list[i].referer);
 					d.push(row);
 				}
@@ -188,7 +188,7 @@ class ui {
 					var row = [];
 					row.push(this.list[i].id);
 					row.push(ui.formatTime(this.list[i].createdAt));
-					row.push(ui.sanitizeText(this.list[i].note));
+					row.push(ui.trim(ui.sanitizeText(this.list[i].note)));
 					d.push(row);
 				}
 				return d;
@@ -290,10 +290,11 @@ class ui {
 	}
 
 	static sanitizeText(s) {
-		s = s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
-		if (!ui.multiline && s.indexOf('<br/>') > -1)
-			s = s.substring(0, s.indexOf('<br/>'));
-		return s;
+		return s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
+	}
+
+	static trim(s) {
+		return !ui.multiline && s.indexOf('<br/>') > -1 ? s.substring(0, s.indexOf('<br/>')) : s;
 	}
 
 	static formatTime(s) {
