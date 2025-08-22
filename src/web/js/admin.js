@@ -280,6 +280,8 @@ class ui {
 			if (value) {
 				if (value.indexOf('<br/>') > -1)
 					value = value.substring(0, value.indexOf('<br/>'));
+				if (value.indexOf('<a ') == 0)
+					value = value.replaceAll(/<[^>]*>/g, '');
 				processed[value] = processed[value] ? processed[value] + 1 : 1;
 			}
 		}
