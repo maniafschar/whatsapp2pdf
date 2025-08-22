@@ -362,7 +362,7 @@ class ui {
 			e = e.parentElement;
 		e = e.parentElement;
 		field = ui.columnIndex(field, e);
-		var data = e.nodeName == 'LOG' ? ui.data[0] : ui.data[1];
+		var data = ui.data[parseInt(document.querySelector('tab.selected').getAttribute('onclick').replace(/[^0-9]/g, ''))];
 		if (!data.sort)
 			data.sort = field + '-asc';
 		else if (data.sort == field + '-asc')
