@@ -16,12 +16,14 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				document.querySelector('tabHeader').addEventListener('changed', event => { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[event.detail.index].selector + ' tr').length - 1) + ' entries'; });
+				var msg = function(i) { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[i].selector + ' tr').length - 1) + ' entries'; };
+				document.querySelector('tabHeader').addEventListener('changed', event => { msg(event.detail.index) });
 				ui.data[1].list = xhr.tickets;
 				ui.renderTable(ui.data[1]);
 				ui.data[0].list = xhr.logs;
 				ui.renderTable(ui.data[0]);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
+				msg(0);
 			}
 		});
 	}
