@@ -326,11 +326,17 @@ class ui {
 			var factor = data.sort.indexOf('-asc') > 0 ? 1 : -1;
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
+		var isFiltered = function(data) {
+			if (data.filter) {
+				var field = d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)];
+				var filterValue = data.filter.substring(data.filter.indexOf('-') + 1);
+				return field != filterValue && field.indexOf(filterValue + '<br/>') != 0
+					&& (field.indexOf('<a ') < 0 || field.indexOf('>' + filterValue + '</a>') < 0);
+			}
+			return false;
+		};
 		for (var i = 0; i < d.length; i++) {
-			var field = d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)];
-			if (!data.filter || field == data.filter.substring(data.filter.indexOf('-') + 1)
-			   		|| field.indexOf(data.filter.substring(data.filter.indexOf('-') + 1) + '<br/>') == 0
-					|| field.indexOf('<a ') == 0 && field.indexOf('>' + data.filter + '</a>') == 0) {
+			if (!isFiltered(data)) {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
