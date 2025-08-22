@@ -237,8 +237,8 @@ tab.selected {
 	cursor: pointer;
 }
 
-logs,
-tickets {
+log,
+ticket {
 	width: 100%;
 	position: relative;
 	display: block;
@@ -248,7 +248,7 @@ tickets {
 	height: 100%;
 }
 
-logs {
+log {
 	padding-top: 1.6em;
 }
 
