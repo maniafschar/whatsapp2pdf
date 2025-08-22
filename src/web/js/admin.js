@@ -327,8 +327,10 @@ class ui {
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
 		for (var i = 0; i < d.length; i++) {
-			if (!data.filter || d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)] == data.filter.substring(data.filter.indexOf('-') + 1)
-			   	|| d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)].indexOf(data.filter.substring(data.filter.indexOf('-') + 1) + '<br/>') == 0) {
+			var field = d[i][parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)];
+			if (!data.filter || field == data.filter.substring(data.filter.indexOf('-') + 1)
+			   		|| field.indexOf(data.filter.substring(data.filter.indexOf('-') + 1) + '<br/>') == 0
+					|| field.indexOf('<a ') == 0 && field.indexOf('>' + data.filter + '</a>') == 0) {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
