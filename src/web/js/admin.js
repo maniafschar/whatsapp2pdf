@@ -16,10 +16,11 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				ui.data.ticket.list = xhr.tickets;
-				ui.render(ui.data.ticket);
-				ui.data.log.list = xhr.logs;
-				ui.render(ui.data.log);
+				document.querySelector('tabHeader').addEventListener('changed', event => { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[event.detail.index].selector + ' tr').length - 1) + ' entries'; });
+				ui.data[1].list = xhr.tickets;
+				ui.renderTable(ui.data[1]);
+				ui.data[0].list = xhr.logs;
+				ui.renderTable(ui.data[0]);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 			}
 		});
@@ -53,8 +54,8 @@ class api {
 			api.ajax({
 				url: api.url + 'log?search=' + encodeURIComponent(document.querySelector('input[name="searchLogs"]').value),
 				success: xhr => {
-					ui.data.log.list = xhr;
-					ui.render(ui.data.log);
+					ui.data[0].list = xhr;
+					ui.renderTable(ui.data[0]);
 				}
 			});
 		}
@@ -102,8 +103,9 @@ class api {
 }
 
 class ui {
-	static data = {
-		log: {
+	static data =
+	[
+		{
 			list: [],
 			filter: null,
 			sort: null,
@@ -157,7 +159,7 @@ class ui {
 				return narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35];
 			}
 		},
-		ticket: {
+		{
 			list: [],
 			filter: null,
 			sort: null,
@@ -190,9 +192,9 @@ class ui {
 			widths(narrowView) {
 				return narrowView ? [0, 20, 80] : [5, 10, 85];
 			}
-		},
-		multiline: true
-	};
+		}
+	];
+	static multiline = true;
 
 	static open(event) {
 		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
@@ -245,13 +247,13 @@ class ui {
 		while (e && e.nodeName != 'FILTER')
 			e = e.parentElement;
 		var value = e && field + '-' + e.querySelector('entry').innerText.trim();
-		if ((field || field == 0) && (!value || value != ui.data.log.filter)) {
+		if ((field || field == 0) && (!value || value != ui.data[0].filter)) {
 			if (!e)
 				return;
-			ui.data.log.filter = value;
+			ui.data[0].filter = value;
 		} else
-			ui.data.log.filter = null;
-		ui.render(ui.data.log);
+			ui.data[0].filter = null;
+		ui.renderTable(ui.data[0]);
 	}
 
 	static columnIndex(column, e) {
@@ -264,11 +266,11 @@ class ui {
 	}
 
 	static openFilter(event) {
-		ui.data.log.filter = null;
-		var field = ui.columnIndex(event.target.innerText, document.querySelector(ui.data.log.selector));
+		ui.data[0].filter = null;
+		var field = ui.columnIndex(event.target.innerText, document.querySelector(ui.data[0].selector));
 		var s = '';
 		var processed = [], value;
-		var logs = ui.data.log.convert();
+		var logs = ui.data[0].convert();
 		for (var i = 0; i < logs.length; i++) {
 			value = logs[i][field + (ui.isNarrowView() ? 1 : 0)];
 			if (value) {
@@ -285,7 +287,7 @@ class ui {
 
 	static sanitizeText(s) {
 		s = s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
-		if (!ui.data.multiline && s.indexOf('<br/>') > -1)
+		if (!ui.multiline && s.indexOf('<br/>') > -1)
 			s = s.substring(0, s.indexOf('<br/>'));
 		return s;
 	}
@@ -300,7 +302,7 @@ class ui {
 		return window.outerWidth < 700;
 	}
 	
-	static render(data) {
+	static renderTable(data) {
 		var d = data.convert();
 		var narrowView = ui.isNarrowView();
 		var s = '<thead><tr>';
@@ -323,14 +325,12 @@ class ui {
 				s += '<tr>';
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow)
-						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="' + data.selector + '-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2] + '</td>';
+						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.open(event)" i="' + ui.data.indexOf(data) + '-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2] + '</td>';
 				}
 				s += '</tr>';
 			}
 		}
 		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(data.widths(narrowView), s) + '</table>';
-		if (data.selector == 'log')
-			document.querySelector('msg').innerHTML = (document.querySelectorAll(data.selector + ' tr').length - 1) + ' log entries';
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (data.sort)
 			document.querySelector(data.selector + ' tr').querySelectorAll('th')[parseInt(data.sort.substring(0, data.sort.indexOf('-')))].classList.add(data.sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
@@ -346,6 +346,7 @@ class ui {
 		document.querySelector('tabBody container').style.marginLeft = -(i * 100) + '%';
 		document.querySelector('tab.selected')?.classList.remove('selected');
 		document.querySelectorAll('tab')[i].classList.add('selected');
+		document.querySelector('tabHeader').dispatchEvent(new CustomEvent('changed', { detail: { index: i } }));
 	}
 
 	static sortColumn(event) {
@@ -355,20 +356,20 @@ class ui {
 			e = e.parentElement;
 		e = e.parentElement;
 		field = ui.columnIndex(field, e);
-		var data = e.nodeName == 'LOG' ? ui.data.log : ui.data.ticket;
+		var data = e.nodeName == 'LOG' ? ui.data[0] : ui.data[1];
 		if (!data.sort)
 			data.sort = field + '-asc';
 		else if (data.sort == field + '-asc')
 			data.sort = field + '-desc';
 		else
 			data.sort = null;
-		ui.render(data);
+		ui.renderTable(data);
 	}
 
 	static toggleMultiline() {
-		ui.data.multiline = !ui.data.multiline;
-		ui.render(ui.data.log);
-		ui.render(ui.data.ticket);
+		ui.multiline = !ui.multiline;
+		ui.renderTable(ui.data[0]);
+		ui.renderTable(ui.data[1]);
 	}
 }
 
