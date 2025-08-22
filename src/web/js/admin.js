@@ -25,6 +25,7 @@ class api {
 				document.querySelector('tabHeader').addEventListener('changed', event => { msg(event.detail.index) });
 				document.querySelector('log').addEventListener('changed', event => { msg(0) });
 				document.querySelector('ticket').addEventListener('changed', event => { msg(1) });
+				msg(0);
 			}
 		});
 	}
