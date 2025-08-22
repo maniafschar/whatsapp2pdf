@@ -374,8 +374,8 @@ class ui {
 	static toggleMultiline() {
 		ui.multiline = !ui.multiline;
 		var i = parseInt(document.querySelector('tab.selected').getAttribute('onclick').replace(/[^0-9]/g, ''));
-		ui.renderTable(ui.data[i % ui.data.length]);
-		ui.renderTable(ui.data[++i % ui.data.length]);
+		for (var i2 = 0; i2 < ui.data.length; i2++)
+			ui.renderTable(ui.data[++i % ui.data.length]);
 	}
 }
 
