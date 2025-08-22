@@ -16,14 +16,15 @@ class api {
 		api.ajax({
 			url: api.url + 'init',
 			success: xhr => {
-				var msg = function(i) { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[i].selector + ' tr').length - 1) + ' entries'; };
-				document.querySelector('tabHeader').addEventListener('changed', event => { msg(event.detail.index) });
 				ui.data[1].list = xhr.tickets;
 				ui.renderTable(ui.data[1]);
 				ui.data[0].list = xhr.logs;
 				ui.renderTable(ui.data[0]);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
-				msg(0);
+				var msg = function(i) { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[i].selector + ' tr').length - 1) + ' entries'; };
+				document.querySelector('tabHeader').addEventListener('changed', event => { msg(event.detail.index) });
+				document.querySelector('log').addEventListener('changed', event => { msg(0) });
+				document.querySelector('ticket').addEventListener('changed', event => { msg(1) });
 			}
 		});
 	}
@@ -336,6 +337,7 @@ class ui {
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (data.sort)
 			document.querySelector(data.selector + ' tr').querySelectorAll('th')[parseInt(data.sort.substring(0, data.sort.indexOf('-')))].classList.add(data.sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
+		document.querySelector(data.selector).dispatchEvent(new CustomEvent('changed'));
 	}
 
 	static replaceWidths(widths, s) {
