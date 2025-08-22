@@ -277,6 +277,3 @@ class api {
 		xhr.send(param.body);
 	}
 }
-
-
-
