@@ -198,7 +198,7 @@ class ui {
 			}
 		}
 	];
-	static multiline = true;
+	static multiline = false;
 
 	static open(event) {
 		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
