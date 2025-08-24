@@ -219,15 +219,15 @@ public class PdfService {
 		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(
 					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
-				final String pattern = "^.?\\[{date}, \\d{1,2}:\\d{1,2}:\\d{1,2}(|\\u202fAM|\\u202fPM)\\] ([^:].*?)";
+				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia());
 				final Pattern patternStart = Pattern
-						.compile(pattern.replace("{date}", this.period.replaceAll("[0-9]", "\\\\d")));
-				final Pattern patternMedia = PdfService.this.extractService.createMadiaPattern();
-				final Pattern patternMonth = Pattern.compile(pattern.replace("{date}", this.period));
+						.compile(PdfService.this.extractService.getPatternStart().replace("{date}",
+								this.period.replaceAll("[0-9]", "\\\\d")));
+				final Pattern patternMonth = Pattern
+						.compile(PdfService.this.extractService.getPatternStart().replace("{date}", this.period));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
-				String line;
-				String lastChat = null, user = null, date = null, time = null;
+				String line, lastChat = null, user = null, date = null, time = null, separator = null;
 				final java.awt.Color[] COLORS = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.BLACK,
 						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				while ((line = chat.readLine()) != null) {
@@ -264,8 +264,12 @@ public class PdfService {
 								}
 							}
 							this.addDate(date = line.split(" ")[0].replace("[", "").replace(",", "").trim());
-							user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
-							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
+							if (separator == null)
+								separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
+							user = line
+									.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
+									.trim();
+							time = line.substring(line.indexOf(' '), line.indexOf(separator)).trim();
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
 							if (patternMedia.matcher(line).matches()) {

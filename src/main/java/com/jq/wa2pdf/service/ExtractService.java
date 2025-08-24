@@ -62,9 +62,17 @@ public class ExtractService {
 
 	public Path getFilenameChat(final String id) throws IOException {
 		final Path tempDir = getTempDir(id);
+		if (tempDir.resolve("_chat.txt").toFile().exists())
+			return tempDir.resolve("_chat.txt");
 		String filename = this.getFilename(id);
 		filename = filename.substring(0, filename.lastIndexOf('.')) + ".txt";
-		return tempDir.resolve(tempDir.resolve(filename).toFile().exists() ? filename : "_chat.txt");
+		if (tempDir.resolve(filename).toFile().exists())
+			return tempDir.resolve(filename);
+		for (final String file : tempDir.toFile().list()) {
+			if (file.toLowerCase().startsWith("whatsapp chat") && file.toLowerCase().endsWith(".txt"))
+				return tempDir.resolve(file);
+		}
+		throw new IOException("Chat file not found!");
 	}
 
 	@SuppressWarnings("null")
@@ -95,23 +103,27 @@ public class ExtractService {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 
-	Pattern createMadiaPattern() {
-		return Pattern.compile(
-				".?<[a-zA-Z]{4,10}: [0-9]{8}-[A-Z]{4,10}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}\\.[a-z0-9]{3,4}>");
+	String getPatternMadia() {
+		return ".?<[a-zA-Z]{4,10}: [0-9]{8}-[A-Z]{4,10}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}\\.[a-z0-9]{3,4}>";
+	}
 
+	String getPatternStart() {
+		return "^.?((\\[{date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)])|({date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm) -)) ([^:].*?):.*";
 	}
 
 	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
 		this.unzip(file, id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
-			final Pattern start = Pattern.compile("^.?\\[[0-9/:-\\\\,\\\\. (|\\u202fAM|\\u202fPM)]+\\] ([^:].*?)");
-			final Pattern media = this.createMadiaPattern();
-			String s[], currentDate = null, lastChat = null, line;
+			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
+			final Pattern media = Pattern.compile(this.getPatternMadia());
+			String s[], currentDate = null, lastChat = null, line, separator = null;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
-					final String user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]")))
-							.trim();
+					if (separator == null)
+						separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
+					final String user = line
+							.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator))).trim();
 					if (lastChat != null) {
 						Statistics u = attributes.users.stream().filter(e -> e.user.equals(user)).findFirst()
 								.orElse(null);
