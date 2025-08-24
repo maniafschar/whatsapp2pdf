@@ -40,6 +40,20 @@ public class PdfServiceTest {
 	}
 
 	@Test
+	public void regex3() {
+		// given
+		final String text = "<attached: 00000064-PHOTO-2015-09-29-01-06-36.jpg>";
+		final Pattern p = Pattern.compile(
+				".?<[a-zA-Z]{4,10}: [0-9]{8}-[A-Z]{4,10}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}\\.[a-z0-9]{3,4}>");
+
+		// when
+		final boolean match = p.matcher(text).matches();
+
+		// then
+		assertTrue(match);
+	}
+
+	@Test
 	public void regex_false() {
 		// given
 		final String text = "Die braucht Nachhilfe. In allen Bereichen …";

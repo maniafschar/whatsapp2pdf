@@ -153,10 +153,9 @@ class api {
 					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
 						tr.classList.add('selected');
 					api.feedbackStatus = '';
-				} else if (tr.classList.contains('selected')) {
-					if (document.querySelectorAll('period .selected').length > 1)
-						tr.classList.remove('selected');
-				} else if (!tr.classList.contains('spinner'))
+				} else if (tr.classList.contains('selected'))
+					tr.classList.remove('selected');
+				else if (!tr.classList.contains('spinner'))
 					tr.classList.add('selected');
 			});
 		});

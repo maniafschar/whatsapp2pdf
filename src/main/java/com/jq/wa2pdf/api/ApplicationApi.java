@@ -83,7 +83,7 @@ public class ApplicationApi {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
 			final Path path = ExtractService.getTempDir(id)
-					.resolve(PdfService.filename + "Error" + (period == null ? "" : period));
+					.resolve(PdfService.filename + "Error" + (period == null ? "" : DateHandler.periodSuffix(period)));
 			if (Files.exists(path))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));
@@ -91,7 +91,7 @@ public class ApplicationApi {
 		} else {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +
-							DateHandler.sanatizePeriod(period) + ".pdf\"");
+							DateHandler.periodSuffix(period) + ".pdf\"");
 			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 			response.flushBuffer();
 		}

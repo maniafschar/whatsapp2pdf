@@ -43,8 +43,6 @@ import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.kernel.pdf.action.PdfAction;
-import com.itextpdf.kernel.pdf.annot.PdfAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
@@ -55,6 +53,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.IElement;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
@@ -88,7 +87,7 @@ public class PdfService {
 	public void create(final String id, final String period, final String user, final boolean preview)
 			throws IOException, FontFormatException, ParseException {
 		final Path error = ExtractService.getTempDir(id)
-				.resolve(PdfService.filename + "Error" + (period == null ? "" : period));
+				.resolve(PdfService.filename + "Error" + (preview ? "" : DateHandler.periodSuffix(period)));
 		try {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
@@ -109,7 +108,7 @@ public class PdfService {
 	}
 
 	private String getFilename(final String period) {
-		return filename + DateHandler.sanatizePeriod(period);
+		return filename + DateHandler.periodSuffix(period);
 	}
 
 	public static class Statistics {
@@ -223,6 +222,7 @@ public class PdfService {
 				final String pattern = "^.?\\[{date}, \\d{1,2}:\\d{1,2}:\\d{1,2}(|\\u202fAM|\\u202fPM)\\] ([^:].*?)";
 				final Pattern patternStart = Pattern
 						.compile(pattern.replace("{date}", this.period.replaceAll("[0-9]", "\\\\d")));
+				final Pattern patternMedia = PdfService.this.extractService.createMadiaPattern();
 				final Pattern patternMonth = Pattern.compile(pattern.replace("{date}", this.period));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
@@ -267,13 +267,13 @@ public class PdfService {
 							user = line.substring(line.indexOf("]") + 1, line.indexOf(":", line.indexOf("]"))).trim();
 							time = line.substring(line.indexOf(' '), line.indexOf(']')).trim();
 							users.add(user);
-							if (line.indexOf("<Anhang: ") < 0 || !line.endsWith(">"))
-								lastChat = line.substring(line.indexOf(": ") + 2);
-							else {
+							line = line.substring(line.indexOf(": ") + 2);
+							if (patternMedia.matcher(line).matches()) {
 								lastChat = null;
 								this.addMessage(user, time,
-										line.substring(line.indexOf("<Anhang: ") + 9, line.length() - 1).trim(), true);
-							}
+										line.substring(line.indexOf(": ") + 2, line.length() - 1).trim(), true);
+							} else
+								lastChat = line;
 						}
 					} else if (foundMonth)
 						lastChat += "\n" + line;
@@ -288,21 +288,22 @@ public class PdfService {
 			final PdfOutline root = this.document.getPdfDocument().getOutlines(true);
 			for (final Table table : this.content) {
 				if (table.getNumberOfRows() == 2 && table.getNumberOfColumns() == 2) {
-					final Paragraph paragraph = (Paragraph) table
+					final IElement element = table
 							.getCell(1, table.getColumnWidth(0).getValue() < 50 ? 1 : 0).getChildren().get(0);
-					if (paragraph.getChildren().get(0) instanceof Text) {
-						final Text text = (Text) paragraph.getChildren().get(0);
+					if (element instanceof Paragraph && ((Paragraph) element).getChildren().get(0) instanceof Text) {
+						final Text text = (Text) ((Paragraph) element).getChildren().get(0);
 						if (text.getText().startsWith("media://")) {
 							final String mediaId = text.getText().substring(8);
 							final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(
 									this.document.getPdfDocument(),
-									IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
-											.toUri().toURL()),
+									IOUtils.toByteArray(
+											ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL()),
 									"", null);
 							this.document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
 							System.out.println(text.getText());
-							table.setAction(PdfAction.createRendition("abc.mp4", pdfFileSpec, "video/mp4",
-									PdfAnnotation.makeAnnotation(null)));
+							// table.setAction(PdfAction.createRendition("abc.mp4", pdfFileSpec,
+							// "video/mp4",
+							// PdfAnnotation.makeAnnotation(null)));
 							text.setText("click");
 						}
 					}

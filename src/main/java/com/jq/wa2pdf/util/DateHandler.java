@@ -11,7 +11,7 @@ public class DateHandler {
 		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
 
-	public static String sanatizePeriod(String period) {
+	public static String periodSuffix(String period) {
 		if (period == null)
 			return "";
 		if (period.contains("/"))

@@ -95,11 +95,18 @@ public class ExtractService {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 
+	Pattern createMadiaPattern() {
+		return Pattern.compile(
+				".?<[a-zA-Z]{4,10}: [0-9]{8}-[A-Z]{4,10}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}\\.[a-z0-9]{3,4}>");
+
+	}
+
 	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
 		this.unzip(file, id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
 			final Pattern start = Pattern.compile("^.?\\[[0-9/:-\\\\,\\\\. (|\\u202fAM|\\u202fPM)]+\\] ([^:].*?)");
+			final Pattern media = this.createMadiaPattern();
 			String s[], currentDate = null, lastChat = null, line;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
@@ -146,7 +153,7 @@ public class ExtractService {
 						period.words += lastChat.split(" ").length;
 						period.letters += lastChat.replaceAll(" ", "").length();
 					}
-					if (line.indexOf("<Anhang: ") < 0)
+					if (!media.matcher(line).matches())
 						lastChat = line.substring(line.indexOf(": ") + 2);
 				} else
 					lastChat += " " + line;
