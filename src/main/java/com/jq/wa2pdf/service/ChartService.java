@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import org.springframework.stereotype.Service;
 
 import com.jq.wa2pdf.service.PdfService.Statistics;
+import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 class ChartService {
@@ -55,8 +56,7 @@ class ChartService {
 	}
 
 	private List<String> expandPeriods(final List<String> periods) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat(
-				periods.get(0).contains("/") ? "MM/dd/yy" : periods.get(0).contains(".") ? "dd.MM.yy" : "yy-MM-dd");
+		SimpleDateFormat formatter = new SimpleDateFormat(DateHandler.dateFormat(periods.get(0)));
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(periods.get(0)));
 		gc.set(Calendar.DATE, 1);

@@ -58,7 +58,7 @@ public class AdminService {
 	}
 
 	public List<Log> log(final String search) {
-		validateSearch(search);
+		this.validateSearch(search);
 		return this.repository.list("from Log where " + search + " order by id desc", Log.class);
 	}
 
@@ -78,7 +78,8 @@ public class AdminService {
 
 	public void createTicket(final Ticket ticket) {
 		if (this.repository
-				.list("from Ticket where note like '" + ticket.getNote().replaceAll("\n", "_") + "'", Ticket.class)
+				.list("from Ticket where note like '" + ticket.getNote().replaceAll("\n", "_").replaceAll("'", "_")
+						+ "'", Ticket.class)
 				.size() == 0)
 			this.repository.save(ticket);
 	}

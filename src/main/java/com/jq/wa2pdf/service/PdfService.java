@@ -43,6 +43,8 @@ import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.annot.PdfAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
@@ -63,6 +65,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.WordCloudService.Token;
+import com.jq.wa2pdf.util.DateHandler;
 import com.vdurmont.emoji.EmojiParser;
 
 @Component
@@ -106,8 +109,7 @@ public class PdfService {
 	}
 
 	private String getFilename(final String period) {
-		return filename + (period == null ? ""
-				: "_" + period.replace("-\\d\\d", "").replace("/\\d\\d", "").replace("\\d\\d.", ""));
+		return filename + DateHandler.sanatizePeriod(period);
 	}
 
 	public static class Statistics {
@@ -217,16 +219,15 @@ public class PdfService {
 
 		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(
-					new FileReader(extractService.getFilenameChat(id).toFile()))) {
+					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
+				final String pattern = "^.?\\[{date}, \\d{1,2}:\\d{1,2}:\\d{1,2}(|\\u202fAM|\\u202fPM)\\] ([^:].*?)";
 				final Pattern patternStart = Pattern
-						.compile(
-								"^.?\\[" + this.period.replaceAll("[0-9]", "\\\\d")
-										+ ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
-				final Pattern patternMonth = Pattern
-						.compile("^.?\\[" + this.period + ", \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
+						.compile(pattern.replace("{date}", this.period.replaceAll("[0-9]", "\\\\d")));
+				final Pattern patternMonth = Pattern.compile(pattern.replace("{date}", this.period));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
-				String line, lastChat = null, user = null, date = null, time = null;
+				String line;
+				String lastChat = null, user = null, date = null, time = null;
 				final java.awt.Color[] COLORS = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.BLACK,
 						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				while ((line = chat.readLine()) != null) {
@@ -248,8 +249,8 @@ public class PdfService {
 									u.period = date;
 									this.total.add(u);
 								}
-								if (!colors.containsKey(user))
-									colors.put(user, COLORS[colors.size() % COLORS.length]);
+								if (!this.colors.containsKey(user))
+									this.colors.put(user, COLORS[this.colors.size() % COLORS.length]);
 								this.addMessage(user, time, lastChat);
 								u.chats++;
 								if (lastChat != null) {
@@ -285,13 +286,34 @@ public class PdfService {
 		private void writeContent() throws IOException {
 			int i = 0;
 			final PdfOutline root = this.document.getPdfDocument().getOutlines(true);
-			for (final Table e : this.content) {
-				this.document.add(e);
-				if (e.getNumberOfColumns() == 1 && e.getHeight() == null)
+			for (final Table table : this.content) {
+				if (table.getNumberOfRows() == 2 && table.getNumberOfColumns() == 2) {
+					final Paragraph paragraph = (Paragraph) table
+							.getCell(1, table.getColumnWidth(0).getValue() < 50 ? 1 : 0).getChildren().get(0);
+					if (paragraph.getChildren().get(0) instanceof Text) {
+						final Text text = (Text) paragraph.getChildren().get(0);
+						if (text.getText().startsWith("media://")) {
+							final String mediaId = text.getText().substring(8);
+							final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(
+									this.document.getPdfDocument(),
+									IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
+											.toUri().toURL()),
+									"", null);
+							this.document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
+							System.out.println(text.getText());
+							table.setAction(PdfAction.createRendition("abc.mp4", pdfFileSpec, "video/mp4",
+									PdfAnnotation.makeAnnotation(null)));
+							text.setText("click");
+						}
+					}
+				}
+				this.document.add(table);
+				if (table.getNumberOfColumns() == 1 && table.getHeight() == null)
 					root.addOutline(this.outline.get(i++))
 							.addDestination(new PdfNamedDestination(
-									this.sanitizeDestination(((Text) ((Paragraph) e.getCell(0, 0).getChildren().get(0))
-											.getChildren().get(0)).getText())));
+									this.sanitizeDestination(
+											((Text) ((Paragraph) table.getCell(0, 0).getChildren().get(0))
+													.getChildren().get(0)).getText())));
 				if (this.preview && this.document.getPdfDocument().getNumberOfPages() > 4)
 					break;
 			}
@@ -439,7 +461,7 @@ public class PdfService {
 			for (int i = 0; i < totalSumUp.size(); i++) {
 				final Statistics statistics = totalSumUp.get(i);
 				final Cell cell = this.createCell(statistics.user, TextAlignment.RIGHT, 0, 0, 0, 0);
-				final java.awt.Color color = colors.get(statistics.user);
+				final java.awt.Color color = this.colors.get(statistics.user);
 				cell.setFontColor(
 						PatternColor.createColorWithColorSpace(new float[] { ((float) color.getRed()) / 255,
 								((float) color.getGreen()) / 255, ((float) color.getBlue()) / 255 }));
@@ -567,20 +589,8 @@ public class PdfService {
 				final BufferedImage originalImage = ImageIO
 						.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				if (originalImage == null) {
-					System.out.println(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
-					final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(this.document.getPdfDocument(),
-							IOUtils.toByteArray(ExtractService.getTempDir(this.id).resolve(mediaId)
-									.toUri().toURL()),
-							"", null);
-					this.document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
-					final Paragraph paragraph = new Paragraph("click to open");
-					// paragraph.setAction(PdfAction.createGoToE(
-					// PdfExplicitDestination.createFit(document.getPdfDocument().getLastPage()),
-					// false,
-					// PdfTarget.create(
-					// new PdfDictionary(Collections.singletonMap(PdfName.F, new
-					// PdfString(mediaId))))));
-					// cell.setMinHeight(200f);
+					final Paragraph paragraph = new Paragraph("media://" + mediaId);
+					cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
 					final double max = 450;

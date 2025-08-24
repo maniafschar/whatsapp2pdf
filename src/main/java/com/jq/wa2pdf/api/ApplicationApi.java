@@ -34,6 +34,7 @@ import com.jq.wa2pdf.service.ExtractService;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.FeedbackService;
 import com.jq.wa2pdf.service.PdfService;
+import com.jq.wa2pdf.util.DateHandler;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -55,8 +56,8 @@ public class ApplicationApi {
 	@PostMapping("pdf/analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file) {
 		try {
-			return this.extractService.unzip(file, "" + System.currentTimeMillis() + Math.random());
-		} catch(IOException e) {
+			return this.extractService.analyse(file, "" + System.currentTimeMillis() + Math.random());
+		} catch (final IOException e) {
 			return null;
 		}
 	}
@@ -90,7 +91,7 @@ public class ApplicationApi {
 		} else {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +
-							this.sanatizePeriod(period) + ".pdf\"");
+							DateHandler.sanatizePeriod(period) + ".pdf\"");
 			IOUtils.copy(new FileInputStream(file.toAbsolutePath().toFile()), response.getOutputStream());
 			response.flushBuffer();
 		}
@@ -131,17 +132,5 @@ public class ApplicationApi {
 		if (filename.contains("."))
 			filename = filename.substring(0, filename.lastIndexOf('.'));
 		return filename.replaceAll("[^a-zA-Z0-9.\\-_]", "");
-	}
-
-	private String sanatizePeriod(String period) {
-		if (period == null)
-			return "";
-		if (period.contains("/"))
-			period = period.replace("/\\d\\d", "").replace("/", "_");
-		else if (period.contains("."))
-			period = period.replace("\\d\\d.", "").replace(".", "_");
-		else if (period.contains("-"))
-			period = period.substring(0, period.lastIndexOf('-')).replace("-", "_");
-		return "_" + period;
 	}
 }

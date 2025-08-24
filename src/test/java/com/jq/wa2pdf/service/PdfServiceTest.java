@@ -13,14 +13,27 @@ import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
 public class PdfServiceTest {
+	private final Pattern start = Pattern.compile("^.?\\[[0-9/:-\\\\,\\\\. (|\u202fAM|\u202fPM)]+\\] ([^:].*?)");
+
 	@Test
 	public void regex() {
 		// given
 		final String text = "[22.01.25, 16:31:54] Osagie Ogbomo: ‎Nachrichten und Anrufe sind Ende-zu-Ende-verschlüsselt. Nur Personen in diesem Chat können sie lesen, anhören oder teilen.";
-		final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 
 		// when
-		final boolean match = start.matcher(text).matches();
+		final boolean match = this.start.matcher(text).matches();
+
+		// then
+		assertTrue(match);
+	}
+
+	@Test
+	public void regex2() {
+		// given
+		final String text = "[23/08/2025, 1:53:45 AM] 8.92/B/OC/3/Peter/63/Poland: ‎Messages and calls are end-to-end encrypted. Only people in this chat can read, listen to, or share them.";
+
+		// when
+		final boolean match = this.start.matcher(text).matches();
 
 		// then
 		assertTrue(match);
@@ -30,10 +43,9 @@ public class PdfServiceTest {
 	public void regex_false() {
 		// given
 		final String text = "Die braucht Nachhilfe. In allen Bereichen …";
-		final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 
 		// when
-		final boolean match = start.matcher(text).matches();
+		final boolean match = this.start.matcher(text).matches();
 
 		// then
 		assertFalse(match);
@@ -43,10 +55,9 @@ public class PdfServiceTest {
 	public void regex_falseBlank() {
 		// given
 		final String text = "";
-		final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
 
 		// when
-		final boolean match = start.matcher(text).matches();
+		final boolean match = this.start.matcher(text).matches();
 
 		// then
 		assertFalse(match);

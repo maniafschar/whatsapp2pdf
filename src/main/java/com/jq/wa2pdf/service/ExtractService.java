@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.wa2pdf.service.PdfService.Statistics;
+import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 public class ExtractService {
@@ -67,7 +68,7 @@ public class ExtractService {
 	}
 
 	@SuppressWarnings("null")
-	public Attributes unzip(final MultipartFile file, final String id) throws IOException {
+	private void unzip(final MultipartFile file, final String id) throws IOException {
 		final Path targetDir = getTempDir(id).toAbsolutePath();
 		Files.createDirectories(targetDir);
 		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
@@ -88,17 +89,17 @@ public class ExtractService {
 			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
 					.getBytes(StandardCharsets.UTF_8));
 		}
-		return this.analyse(id);
 	}
 
 	public void delete(final String id) throws IOException {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 
-	private Attributes analyse(final String id) throws IOException {
+	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
+		this.unzip(file, id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
-			final Pattern start = Pattern.compile("^.?\\[\\d\\d.\\d\\d.\\d\\d, \\d\\d:\\d\\d:\\d\\d\\] ([^:].*?)");
+			final Pattern start = Pattern.compile("^.?\\[[0-9/:-\\\\,\\\\. (|\\u202fAM|\\u202fPM)]+\\] ([^:].*?)");
 			String s[], currentDate = null, lastChat = null, line;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
@@ -124,13 +125,7 @@ public class ExtractService {
 						}
 					}
 					s = line.split(" ");
-					s[0] = s[0].replace("[", "").replace(",", "").trim();
-					if (s[0].contains("/"))
-						s[0] = s[0].split("/")[0] + "/\\d\\d/" + s[0].split("/")[2];
-					else if (s[0].contains("."))
-						s[0] = "\\d\\d" + s[0].substring(s[0].indexOf('.'));
-					else if (s[0].contains("-"))
-						s[0] = s[0].substring(0, s[0].lastIndexOf('-') + 1) + "\\d\\d";
+					s[0] = DateHandler.replaceDay(s[0].replace("[", "").replace(",", "").trim());
 					if (currentDate == null || !currentDate.equals(s[0])) {
 						currentDate = s[0];
 						if (attributes.periods.size() == 0
