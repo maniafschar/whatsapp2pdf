@@ -232,7 +232,7 @@ public class PdfService {
 						.compile(PdfService.this.extractService.getPatternStart().replace("{date}", this.period));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
-				String line, lastChat = null, user = null, date = null, time = null, separator = null;
+				String line, lastChat = null, user = null, date = null, separator = null;
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
@@ -242,19 +242,19 @@ public class PdfService {
 						foundMonth = inMonth;
 						if (foundMonth) {
 							if (lastChat != null)
-								this.addMessage(user, time, lastChat);
-							this.addDate(date = line.split(" ")[0].replace("[", "").replace(",", "").trim());
+								this.addMessage(user, date, lastChat);
+							this.addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							if (separator == null)
 								separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
 							user = line
 									.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
 									.trim();
-							time = line.substring(line.indexOf(' '), line.indexOf(separator)).trim();
+							date = line.substring(0, line.indexOf(separator)).trim();
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
 							if (patternMedia.matcher(line).matches()) {
 								lastChat = null;
-								this.addMessage(user, time,
+								this.addMessage(user, date,
 										line.substring(line.indexOf(": ") + 2, line.length() - 1).trim(), true);
 							} else
 								lastChat = line;
@@ -262,18 +262,19 @@ public class PdfService {
 					} else if (foundMonth)
 						lastChat += "\n" + line;
 				}
-				this.addMessage(user, time, lastChat);
+				this.addMessage(user, date, lastChat);
 				this.addDate(null);
 			}
 		}
 
-		private Statistics getUserStatistics(final String user) {
+		private Statistics getUserStatistics(final String user, final String date) {
 			Statistics u = this.total.stream()
-					.filter(e -> e.user.equals(user))
+					.filter(e -> e.user.equals(user) && e.period.equals(date))
 					.findFirst().orElse(null);
 			if (u == null) {
 				u = new Statistics();
 				u.user = user;
+				u.period = date;
 				this.total.add(u);
 			}
 			if (!this.colors.containsKey(user)) {
@@ -359,10 +360,10 @@ public class PdfService {
 			}
 		}
 
-		private void addMessage(final String user, final String time, final String message, final boolean... media) {
+		private void addMessage(final String user, final String date, final String message, final boolean... media) {
 			final Cell cellMessage = this.createCell(message, media);
 
-			final Cell cellTime = this.createCell(time + (this.groupChat ? " · " + user : ""));
+			final Cell cellTime = this.createCell(time.split(" ")[1] + (this.groupChat ? " · " + user : ""));
 			cellTime.setFontSize(8.5f);
 			cellTime.setFontColor(this.colorDate);
 			cellTime.setPaddingBottom(0);
@@ -394,7 +395,7 @@ public class PdfService {
 			table.setKeepTogether(true);
 			this.content.add(table);
 			this.addEmptyLine();
-			final Statistics u = getUserStatistics(user);
+			final Statistics u = getUserStatistics(user, date.split(" ")[0]);
 			u.chats++;
 			if (media == null || media.length == 0 || !media[0]) {
 				Statistics wordCloud = this.wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()
