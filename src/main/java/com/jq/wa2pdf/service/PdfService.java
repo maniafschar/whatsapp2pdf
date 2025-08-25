@@ -117,6 +117,7 @@ public class PdfService {
 		int chats = 0;
 		int words = 0;
 		int letters = 0;
+		int media = 0;
 		StringBuilder text;
 
 		public int getChats() {
@@ -129,6 +130,10 @@ public class PdfService {
 
 		public int getLetters() {
 			return this.letters;
+		}
+
+		public int getMedia() {
+			return this.media;
 		}
 
 		public String getUser() {
