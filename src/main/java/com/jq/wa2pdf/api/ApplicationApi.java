@@ -83,7 +83,7 @@ public class ApplicationApi {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
 			final Path path = ExtractService.getTempDir(id)
-					.resolve(PdfService.filename + "Error" + (period == null ? "" : DateHandler.periodSuffix(period)));
+					.resolve(ExtractService.filename + "Error" + (period == null ? "" : DateHandler.periodSuffix(period)));
 			if (Files.exists(path))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));
