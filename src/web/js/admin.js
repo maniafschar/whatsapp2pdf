@@ -45,9 +45,9 @@ class api {
 			url: api.url + 'ticket/' + id,
 			method: 'DELETE',
 			success: xhr => {
-				var e = document.querySelector('ticket tr[i="' + id + '"]');
+				var e = document.querySelector('ticket td[i="1-' + id + '"]');
 				if (e)
-					e.outerHTML = '';
+					e.parentElement.outerHTML = '';
 				ui.popupClose();
 			}
 		});
