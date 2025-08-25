@@ -75,9 +75,9 @@ public class ApplicationApi {
 			this.pdfService.create(id, period, user, false);
 	}
 
-	@GetMapping("pdf/{id}")
-	public void pdf(@PathVariable final String id, @RequestParam(required = false) final String period,
-			final HttpServletResponse response) throws IOException {
+	@GetMapping("pdf/{id}/{sendFile}")
+	public void pdf(@PathVariable final String id, @PathVariable final boolean sendFile,
+			@RequestParam(required = false) final String period, final HttpServletResponse response) throws IOException {
 		final Path file = this.pdfService.get(id, period);
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
@@ -88,7 +88,7 @@ public class ApplicationApi {
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));
 			response.sendError(Log.STATUS_PROCESSING_PDF);
-		} else {
+		} else if (sendFile) {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +
 							DateHandler.periodSuffix(period) + ".pdf\"");
