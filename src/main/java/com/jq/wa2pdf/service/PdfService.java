@@ -69,8 +69,6 @@ import com.vdurmont.emoji.EmojiParser;
 
 @Component
 public class PdfService {
-	public static final String filename = "wa";
-
 	@Autowired
 	private ExtractService extractService;
 
@@ -87,7 +85,7 @@ public class PdfService {
 	public void create(final String id, final String period, final String user, final boolean preview)
 			throws IOException, FontFormatException, ParseException {
 		final Path error = ExtractService.getTempDir(id)
-				.resolve(PdfService.filename + "Error" + (preview ? "" : DateHandler.periodSuffix(period)));
+				.resolve(ExtractService.filename + "Error" + (preview ? "" : DateHandler.periodSuffix(period)));
 		try {
 			Files.deleteIfExists(error);
 			new PDF(id, period, user, preview).create();
@@ -101,7 +99,7 @@ public class PdfService {
 
 	public Path get(final String id, final String period) throws IOException {
 		final Path pdfPath = ExtractService.getTempDir(id)
-				.resolve(filename + DateHandler.periodSuffix(period) + ".pdf");
+				.resolve(ExtractService.filename + DateHandler.periodSuffix(period) + ".pdf");
 		if (Files.exists(pdfPath))
 			return pdfPath;
 		return null;
@@ -169,12 +167,12 @@ public class PdfService {
 			this.preview = preview;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 			this.groupChat = new ObjectMapper().readValue(
-					ExtractService.getTempDir(id).resolve(PdfService.filename + "Attributes").toFile(),
+					ExtractService.getTempDir(id).resolve(ExtractService.filename + "Attributes").toFile(),
 					Attributes.class).getUsers().size() > 2;
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
-			final String filename = PdfService.filename + (this.preview ? "" : DateHandler.periodSuffix(this.period));
+			final String filename = ExtractService.filename + (this.preview ? "" : DateHandler.periodSuffix(this.period));
 			Files.deleteIfExists(this.dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(this.dir.resolve(filename + ".pdf"));
 			this.writer = new PdfWriter(
@@ -487,7 +485,7 @@ public class PdfService {
 			final Table table = new Table(1);
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
-			final String idChart = filename + UUID.randomUUID().toString() + ".png";
+			final String idChart = ExtractService.filename + UUID.randomUUID().toString() + ".png";
 			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.colors);
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
@@ -532,7 +530,7 @@ public class PdfService {
 			}
 			for (int i = 0; i < tokens.size(); i++) {
 				final List<Token> token = tokens.get(i);
-				final String idWordCloud = filename + UUID.randomUUID().toString() + ".png";
+				final String idWordCloud = ExtractService.filename + UUID.randomUUID().toString() + ".png";
 				PdfService.this.wordCloudService.createImage(token, max, min, this.dir.resolve(idWordCloud));
 				final Table cellTable = new Table(1);
 				cellTable.setWidth(UnitValue.createPercentValue(100f));
