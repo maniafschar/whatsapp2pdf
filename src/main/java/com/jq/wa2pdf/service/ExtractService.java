@@ -20,12 +20,45 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jq.wa2pdf.service.PdfService.Statistics;
 import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 public class ExtractService {
 	public static final String filename = "wa";
+
+	public static class Statistics {
+		String user;
+		String period;
+		int chats = 0;
+		int words = 0;
+		int letters = 0;
+		int media = 0;
+		StringBuilder text;
+
+		public int getChats() {
+			return this.chats;
+		}
+
+		public int getWords() {
+			return this.words;
+		}
+
+		public int getLetters() {
+			return this.letters;
+		}
+
+		public int getMedia() {
+			return this.media;
+		}
+
+		public String getUser() {
+			return this.user;
+		}
+
+		public String getPeriod() {
+			return this.period;
+		}
+	}
 
 	public static class Attributes {
 		private final List<Statistics> users = new ArrayList<>();
