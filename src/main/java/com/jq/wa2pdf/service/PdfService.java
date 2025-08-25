@@ -105,40 +105,6 @@ public class PdfService {
 		return null;
 	}
 
-	public static class Statistics {
-		String user;
-		String period;
-		int chats = 0;
-		int words = 0;
-		int letters = 0;
-		int media = 0;
-		StringBuilder text;
-
-		public int getChats() {
-			return this.chats;
-		}
-
-		public int getWords() {
-			return this.words;
-		}
-
-		public int getLetters() {
-			return this.letters;
-		}
-
-		public int getMedia() {
-			return this.media;
-		}
-
-		public String getUser() {
-			return this.user;
-		}
-
-		public String getPeriod() {
-			return this.period;
-		}
-	}
-
 	private class PDF {
 		private static PdfFont fontMessage;
 		private final Path dir;
