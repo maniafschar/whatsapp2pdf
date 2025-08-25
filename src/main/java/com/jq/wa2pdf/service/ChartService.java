@@ -88,7 +88,7 @@ class ChartService {
 				plotData.plots.add(plot);
 			}
 			final int index = xAxis.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
-			for (int i2 = 0; i2 < index - plot.lastIndex; i2++) {
+			for (int i2 = 1; i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);
 				plot.chats.addPoint(x, heightPlot);
 				plot.words.addPoint(x, 2 * heightPlot + marginPlot);
