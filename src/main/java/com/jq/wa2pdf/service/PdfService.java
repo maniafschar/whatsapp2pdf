@@ -398,6 +398,12 @@ public class PdfService {
 			final Statistics u = getUserStatistics(user, date.split(" ")[0].replace("[", "").replace(",", "").trim());
 			u.chats++;
 			if (media == null || media.length == 0 || !media[0]) {
+				String s = message.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
+				while (s.indexOf("  ") > -1)
+					s = s.replaceAll("  ", " ");
+				s = s.trim();
+				u.words += s.split(" ").length;
+				u.letters += s.replaceAll(" ", "").length();
 				Statistics wordCloud = this.wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()
 						.orElse(null);
 				if (wordCloud == null) {
@@ -406,12 +412,7 @@ public class PdfService {
 					wordCloud.text = new StringBuilder();
 					this.wordClouds.add(wordCloud);
 				}
-				wordCloud.text.append(message).append(" ");
-				String s = message.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
-				while (s.indexOf("  ") > -1)
-					s = s.replaceAll("  ", " ");
-				u.words += s.trim().split(" ").length;
-				u.letters += s.replaceAll(" ", "").length();
+				wordCloud.text.append(s).append(" ");
 			} else
 				u.media++;
 		}
