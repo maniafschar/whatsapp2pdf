@@ -153,8 +153,8 @@ public class ExtractService {
 					} else {
 						line = line.replaceAll("\t", " ");
 						while (line.indexOf("  ") > -1)
-							line = line.replaceAll("  ", "");
-						final int words = line.split(" ").length;
+							line = line.replaceAll("  ", " ");
+						final int words = line.trim().split(" ").length;
 						final int letters = line.replaceAll(" ", "").length();
 						user.words += words;
 						user.letters += letters;
