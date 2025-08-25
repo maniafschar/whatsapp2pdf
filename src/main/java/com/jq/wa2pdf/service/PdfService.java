@@ -281,6 +281,7 @@ public class PdfService {
 						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				this.colors.put(user, COLORS[this.colors.size() % COLORS.length]);
 			}
+			return u;
 		}
 
 		private void writeContent() throws IOException {
