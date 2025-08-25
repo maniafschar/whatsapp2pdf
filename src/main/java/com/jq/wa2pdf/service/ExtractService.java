@@ -142,7 +142,7 @@ public class ExtractService {
 						}
 					}
 					period = attributes.periods.get(attributes.periods.size() - 1);
-					line = line.substring(line.indexOf(':') + 1);
+					line = line.substring(line.indexOf(':', line.indexOf(separator)) + 1);
 				}
 				if (user != null) {
 					user.chats++;
