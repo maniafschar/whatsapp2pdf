@@ -31,8 +31,7 @@ import com.jq.wa2pdf.util.DateHandler;
 class ChartService {
 	void createImage(final List<Statistics> data, final Path file, final boolean preview,
 			final Map<String, Color> colors) throws IOException, ParseException {
-		final List<String> periods = this
-				.expandPeriods(data.stream().map(e -> e.getPeriod()).collect(Collectors.toList()));
+		final List<String> x = this.createX(data.get(0).getPeriod());
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -44,26 +43,24 @@ class ChartService {
 		final int marginLegend = 40;
 		final int marginPlot = 10;
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
-		final int marginX = (image.getWidth() - marginLegend) / periods.size();
-		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
-				periods);
+		final int marginX = (image.getWidth() - marginLegend) / x.size();
+		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot, x);
 		this.drawChart(g, marginLegend, marginPlot, heightPlot,
-				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, periods, preview, colors));
+				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, x, preview, colors));
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private List<String> expandPeriods(final List<String> periods) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat(DateHandler.dateFormat(periods.get(0)));
+	private List<String> createX(final String period) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat(DateHandler.dateFormat(period));
 		final GregorianCalendar gc = new GregorianCalendar();
-		gc.setTime(formatter.parse(periods.get(0)));
+		gc.setTime(formatter.parse(period));
 		gc.set(Calendar.DATE, 1);
 		final int month = gc.get(Calendar.MONTH);
 		final List<String> result = new ArrayList<>();
-		formatter = new SimpleDateFormat(
-				formatter.toPattern().replace("/yy", "").replace(".yy", "").replace("yy-", ""));
+		formatter = new SimpleDateFormat(DateHandler.removeYear(formatter.toPattern()));
 		while (month == gc.get(Calendar.MONTH)) {
 			result.add(formatter.format(gc.getTime()));
 			gc.add(Calendar.DATE, 1);
@@ -72,7 +69,7 @@ class ChartService {
 	}
 
 	private PlotData preparePlotData(final List<Statistics> data, final int marginLegend, final int marginPlot,
-			final int marginX, final int heightPlot, final List<String> periods, final boolean preview,
+			final int marginX, final int heightPlot, final List<String> x, final boolean preview,
 			final Map<String, Color> colors) {
 		final PlotData plotData = new PlotData();
 		for (final Statistics statistics : data) {
@@ -90,9 +87,8 @@ class ChartService {
 				plot = new Plot(statistics.user, colors.get(statistics.user));
 				plotData.plots.add(plot);
 			}
-			final int index = periods
-					.indexOf(periods.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
-			for (int i2 = 1; i2 < index - plot.lastIndex; i2++) {
+			final int index = x.indexOf(x.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
+			for (int i2 = 0; i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);
 				plot.chats.addPoint(x, heightPlot);
 				plot.words.addPoint(x, 2 * heightPlot + marginPlot);
@@ -106,7 +102,7 @@ class ChartService {
 			plot.lastIndex = index;
 		}
 		plotData.plots.stream().forEach(e -> {
-			for (int i = 1; i < periods.size() - e.lastIndex; i++) {
+			for (int i = 1; i < x.size() - e.lastIndex; i++) {
 				final int x = marginLegend + marginX * (1 + e.lastIndex + i);
 				e.chats.addPoint(x, heightPlot);
 				e.words.addPoint(x, 2 * heightPlot + marginPlot);
