@@ -25,6 +25,8 @@ import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 public class ExtractService {
+	public static final String filename = "wa";
+
 	public static class Attributes {
 		private final List<Statistics> users = new ArrayList<>();
 		private final List<Statistics> periods = new ArrayList<>();
@@ -56,7 +58,7 @@ public class ExtractService {
 	}
 
 	public String getFilename(final String id) throws IOException {
-		return IOUtils.toString(ExtractService.getTempDir(id).resolve(PdfService.filename + "Filename").toUri().toURL(),
+		return IOUtils.toString(ExtractService.getTempDir(id).resolve(ExtractService.filename + "Filename").toUri().toURL(),
 				StandardCharsets.UTF_8);
 	}
 
@@ -81,7 +83,7 @@ public class ExtractService {
 		Files.createDirectories(targetDir);
 		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
 				final FileOutputStream filename = new FileOutputStream(
-						targetDir.resolve(PdfService.filename + "Filename").toFile())) {
+						targetDir.resolve(ExtractService.filename + "Filename").toFile())) {
 			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
 				final Path resolvedPath = targetDir.resolve(ze.getName()).normalize();
 				if (!resolvedPath.startsWith(targetDir))
@@ -164,7 +166,7 @@ public class ExtractService {
 				}
 			}
 			new ObjectMapper().writeValue(
-					ExtractService.getTempDir(id).resolve(PdfService.filename + "Attributes").toFile(), attributes);
+					ExtractService.getTempDir(id).resolve(ExtractService.filename + "Attributes").toFile(), attributes);
 			return attributes;
 		}
 	}
