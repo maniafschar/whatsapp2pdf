@@ -46,8 +46,10 @@ class api {
 			method: 'DELETE',
 			success: xhr => {
 				var e = document.querySelector('ticket td[i="1-' + id + '"]');
-				if (e)
+				if (e) {
 					e.parentElement.outerHTML = '';
+					document.querySelector('ticket').dispatchEvent(new CustomEvent('changed'));
+				}
 				ui.popupClose();
 			}
 		});
