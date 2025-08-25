@@ -243,31 +243,8 @@ public class PdfService {
 							break;
 						foundMonth = inMonth;
 						if (foundMonth) {
-							if (lastChat != null) {
-								final String s = user, d = date;
-								Statistics u = this.total.stream()
-										.filter(e -> e.user.equals(s) && e.period.equals(d))
-										.findFirst().orElse(null);
-								if (u == null) {
-									u = new Statistics();
-									u.user = user;
-									u.period = date;
-									this.total.add(u);
-								}
-								if (!this.colors.containsKey(user))
-									this.colors.put(user, COLORS[this.colors.size() % COLORS.length]);
+							if (lastChat != null)
 								this.addMessage(user, time, lastChat);
-								u.chats++;
-								if (lastChat != null) {
-									lastChat = lastChat.replaceAll("\t", " ");
-									lastChat = lastChat.replaceAll("\r", " ");
-									lastChat = lastChat.replaceAll("\n", " ");
-									while (lastChat.indexOf("  ") > -1)
-										lastChat = lastChat.replaceAll("  ", " ");
-									u.words += lastChat.split(" ").length;
-									u.letters += lastChat.replaceAll(" ", "").length();
-								}
-							}
 							this.addDate(date = line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							if (separator == null)
 								separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
@@ -290,6 +267,19 @@ public class PdfService {
 				this.addMessage(user, time, lastChat);
 				this.addDate(null);
 			}
+		}
+
+		private Statistics getUserStatistics(final String user) {
+			Statistics u = this.total.stream()
+					.filter(e -> e.user.equals(user))
+					.findFirst().orElse(null);
+			if (u == null) {
+				u = new Statistics();
+				u.user = user;
+				this.total.add(u);
+			}
+			if (!this.colors.containsKey(user))
+				this.colors.put(user, COLORS[this.colors.size() % COLORS.length]);
 		}
 
 		private void writeContent() throws IOException {
@@ -402,6 +392,8 @@ public class PdfService {
 			table.setKeepTogether(true);
 			this.content.add(table);
 			this.addEmptyLine();
+			final Statistics u = getUserStatistics(user);
+			u.chats++;
 			if (media == null || media.length == 0 || !media[0]) {
 				Statistics wordCloud = this.wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()
 						.orElse(null);
@@ -412,7 +404,13 @@ public class PdfService {
 					this.wordClouds.add(wordCloud);
 				}
 				wordCloud.text.append(message).append(" ");
-			}
+				String s = message.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
+				while (s.indexOf("  ") > -1)
+					s = s.replaceAll("  ", " ");
+				u.words += s.trim().split(" ").length;
+				u.letters += s.replaceAll(" ", "").length();
+			} else
+				u.media++;
 		}
 
 		private void addEmptyLine() {
