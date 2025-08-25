@@ -222,7 +222,7 @@ class ui {
 				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
 			}
 		}
-		if (id[0] == 'ticket')
+		if (id[0] == '1')
 			s += '<buttons><button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button></buttons>';
 		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
 		ui.popupOpen(s);
