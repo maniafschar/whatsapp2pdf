@@ -233,8 +233,6 @@ public class PdfService {
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, time = null, separator = null;
-				final java.awt.Color[] COLORS = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.BLACK,
-						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				while ((line = chat.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
@@ -278,8 +276,11 @@ public class PdfService {
 				u.user = user;
 				this.total.add(u);
 			}
-			if (!this.colors.containsKey(user))
+			if (!this.colors.containsKey(user)) {
+				final java.awt.Color[] COLORS = { java.awt.Color.RED, java.awt.Color.BLUE, java.awt.Color.BLACK,
+						java.awt.Color.MAGENTA, java.awt.Color.DARK_GRAY };
 				this.colors.put(user, COLORS[this.colors.size() % COLORS.length]);
+			}
 		}
 
 		private void writeContent() throws IOException {
