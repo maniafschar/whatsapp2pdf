@@ -69,7 +69,7 @@ class ChartService {
 	}
 
 	private PlotData preparePlotData(final List<Statistics> data, final int marginLegend, final int marginPlot,
-			final int marginX, final int heightPlot, final List<String> x, final boolean preview,
+			final int marginX, final int heightPlot, final List<String> xAxis, final boolean preview,
 			final Map<String, Color> colors) {
 		final PlotData plotData = new PlotData();
 		for (final Statistics statistics : data) {
@@ -87,7 +87,7 @@ class ChartService {
 				plot = new Plot(statistics.user, colors.get(statistics.user));
 				plotData.plots.add(plot);
 			}
-			final int index = x.indexOf(x.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
+			final int index = xAxis.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
 			for (int i2 = 0; i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);
 				plot.chats.addPoint(x, heightPlot);
@@ -102,7 +102,7 @@ class ChartService {
 			plot.lastIndex = index;
 		}
 		plotData.plots.stream().forEach(e -> {
-			for (int i = 1; i < x.size() - e.lastIndex; i++) {
+			for (int i = 1; i < xAxis.size() - e.lastIndex; i++) {
 				final int x = marginLegend + marginX * (1 + e.lastIndex + i);
 				e.chats.addPoint(x, heightPlot);
 				e.words.addPoint(x, 2 * heightPlot + marginPlot);
