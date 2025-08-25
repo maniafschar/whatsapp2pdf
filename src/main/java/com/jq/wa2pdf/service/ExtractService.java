@@ -117,36 +117,23 @@ public class ExtractService {
 			final Attributes attributes = new Attributes(id);
 			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
 			final Pattern media = Pattern.compile(this.getPatternMadia());
-			String s[], currentDate = null, lastChat = null, line, separator = null;
+			String date, currentDate = null, line, separator = null;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
 					if (separator == null)
 						separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
 					final String user = line
 							.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator))).trim();
-					if (lastChat != null) {
-						Statistics u = attributes.users.stream().filter(e -> e.user.equals(user)).findFirst()
-								.orElse(null);
-						if (u == null) {
-							u = new Statistics();
-							u.user = user;
-							attributes.users.add(u);
-						}
-						u.chats++;
-						if (lastChat != null) {
-							lastChat = lastChat.replaceAll("\t", " ");
-							lastChat = lastChat.replaceAll("\r", " ");
-							lastChat = lastChat.replaceAll("\n", " ");
-							while (lastChat.indexOf("  ") > -1)
-								lastChat = lastChat.replaceAll("  ", "");
-							u.words += lastChat.split(" ").length;
-							u.letters += lastChat.replaceAll(" ", "").length();
-						}
+					Statistics u = attributes.users.stream().filter(e -> e.user.equals(user)).findFirst()
+							.orElse(null);
+					if (u == null) {
+						u = new Statistics();
+						u.user = user;
+						attributes.users.add(u);
 					}
-					s = line.split(" ");
-					s[0] = DateHandler.replaceDay(s[0].replace("[", "").replace(",", "").trim());
-					if (currentDate == null || !currentDate.equals(s[0])) {
-						currentDate = s[0];
+					date = DateHandler.replaceDay(line.substring(0, line.indexOf(" ")).replace("[", "").replace(",", "").trim());
+					if (currentDate == null || !currentDate.equals(date)) {
+						currentDate = date;
 						if (attributes.periods.size() == 0
 								|| !attributes.periods.get(attributes.periods.size() - 1).period.equals(currentDate)) {
 							final Statistics statistics = new Statistics();
@@ -155,20 +142,23 @@ public class ExtractService {
 						}
 					}
 					final Statistics period = attributes.periods.get(attributes.periods.size() - 1);
+					u.chats++;
 					period.chats++;
-					if (lastChat != null) {
-						lastChat = lastChat.replaceAll("\t", " ");
-						lastChat = lastChat.replaceAll("\r", " ");
-						lastChat = lastChat.replaceAll("\n", " ");
-						while (lastChat.indexOf("  ") > -1)
-							lastChat = lastChat.replaceAll("  ", " ");
-						period.words += lastChat.split(" ").length;
-						period.letters += lastChat.replaceAll(" ", "").length();
+					if (media.matcher(line).matches()) {
+						u.media++;
+						period.media++;
+					} else {
+						line = line.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
+						while (line.indexOf("  ") > -1)
+							line = line.replaceAll("  ", "");
+						final int words = line.split(" ").length;
+						final int letters = line.replaceAll(" ", "").length();
+						u.words += words;
+						u.letters += letters;
+						period.words += words;
+						period.letters += letters;
 					}
-					if (!media.matcher(line).matches())
-						lastChat = line.substring(line.indexOf(": ") + 2);
-				} else
-					lastChat += " " + line;
+				}
 			}
 			new ObjectMapper().writeValue(
 					ExtractService.getTempDir(id).resolve(PdfService.filename + "Attributes").toFile(), attributes);
