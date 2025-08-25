@@ -144,7 +144,7 @@ class api {
 			tr.addEventListener('click', () => {
 				if (tr.classList.contains('download')) {
 					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(tr.getAttribute('value')));
+					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true?period=' + encodeURIComponent(tr.getAttribute('value')));
 					link.setAttribute('target', '_blank');
 					link.click();
 					tr.classList.remove('download');
@@ -186,7 +186,7 @@ class api {
 	static download(period) {
 		var download = function () {
 			api.ajax({
-				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + (period ? '?period=' + encodeURIComponent(period) : ''),
+				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/false' + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
 					document.getElementsByTagName('progressbar')[0].style.display = null;
@@ -196,7 +196,7 @@ class api {
 						tr.classList.add('download');
 					} else {
 						var link = document.createElement('a');
-						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText);
+						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/true';
 						link.setAttribute('target', '_blank');
 						link.click();
 					}
@@ -276,3 +276,4 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
