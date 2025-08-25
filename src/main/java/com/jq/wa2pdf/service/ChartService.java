@@ -31,7 +31,7 @@ import com.jq.wa2pdf.util.DateHandler;
 class ChartService {
 	void createImage(final List<Statistics> data, final Path file, final boolean preview,
 			final Map<String, Color> colors) throws IOException, ParseException {
-		final List<String> x = this.createX(data.get(0).getPeriod());
+		final List<String> x = this.createXAxis(data.get(0).getPeriod());
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -53,7 +53,7 @@ class ChartService {
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private List<String> createX(final String period) throws ParseException {
+	private List<String> createXAxis(final String period) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat(DateHandler.dateFormat(period));
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(period));
@@ -88,7 +88,7 @@ class ChartService {
 				plotData.plots.add(plot);
 			}
 			final int index = xAxis.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
-			for (int i2 = 1; i2 < index - plot.lastIndex; i2++) {
+			for (int i2 = (int) Math.signum(plot.lastIndex); i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);
 				plot.chats.addPoint(x, heightPlot);
 				plot.words.addPoint(x, 2 * heightPlot + marginPlot);
