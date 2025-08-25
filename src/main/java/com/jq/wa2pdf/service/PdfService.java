@@ -395,7 +395,7 @@ public class PdfService {
 			table.setKeepTogether(true);
 			this.content.add(table);
 			this.addEmptyLine();
-			final Statistics u = getUserStatistics(user, date.split(" ")[0]);
+			final Statistics u = getUserStatistics(user, date.split(" ")[0].replace("[", "").replace(",", "").trim());
 			u.chats++;
 			if (media == null || media.length == 0 || !media[0]) {
 				Statistics wordCloud = this.wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()
