@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
 
 import org.springframework.stereotype.Service;
 
-import com.jq.wa2pdf.service.PdfService.Statistics;
+import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.util.DateHandler;
 
 @Service
