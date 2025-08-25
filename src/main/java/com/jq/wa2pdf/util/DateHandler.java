@@ -26,4 +26,8 @@ public class DateHandler {
 	public static String dateFormat(final String period) {
 		return period.contains("/") ? "dd/MM/yy" : period.contains(".") ? "dd.MM.yy" : "yy-MM-dd";
 	}
+
+	public static String removeYear(String pattern) {
+		return pattern.replace("/yy", "").replace(".yy", "").replace("yy-", "");
+	}
 }
