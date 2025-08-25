@@ -196,7 +196,7 @@ class api {
 						tr.classList.add('download');
 					} else {
 						var link = document.createElement('a');
-						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText) + '/true');
+						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true');
 						link.setAttribute('target', '_blank');
 						link.click();
 					}
@@ -276,5 +276,6 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
 
