@@ -118,18 +118,18 @@ public class ExtractService {
 			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
 			final Pattern media = Pattern.compile(this.getPatternMadia());
 			String date, currentDate = null, line, separator = null;
+			Statistics user, period;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
 					if (separator == null)
 						separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
-					final String user = line
+					final String u = line
 							.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator))).trim();
-					Statistics u = attributes.users.stream().filter(e -> e.user.equals(user)).findFirst()
-							.orElse(null);
-					if (u == null) {
-						u = new Statistics();
-						u.user = user;
-						attributes.users.add(u);
+					user = attributes.users.stream().filter(e -> e.user.equals(u)).findFirst().orElse(null);
+					if (user == null) {
+						user = new Statistics();
+						user.user = u;
+						attributes.users.add(user);
 					}
 					date = DateHandler.replaceDay(line.substring(0, line.indexOf(" ")).replace("[", "").replace(",", "").trim());
 					if (currentDate == null || !currentDate.equals(date)) {
@@ -141,23 +141,24 @@ public class ExtractService {
 							attributes.periods.add(statistics);
 						}
 					}
-					final Statistics period = attributes.periods.get(attributes.periods.size() - 1);
-					u.chats++;
-					period.chats++;
-					if (media.matcher(line).matches()) {
-						u.media++;
-						period.media++;
-					} else {
-						line = line.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
-						while (line.indexOf("  ") > -1)
-							line = line.replaceAll("  ", "");
-						final int words = line.split(" ").length;
-						final int letters = line.replaceAll(" ", "").length();
-						u.words += words;
-						u.letters += letters;
-						period.words += words;
-						period.letters += letters;
-					}
+					period = attributes.periods.get(attributes.periods.size() - 1);
+					line = line.substring(line.indexOf(':') + 1);
+				}
+				user.chats++;
+				period.chats++;
+				if (media.matcher(line).matches()) {
+					user.media++;
+					period.media++;
+				} else {
+					line = line.replaceAll("\t", " ");
+					while (line.indexOf("  ") > -1)
+						line = line.replaceAll("  ", "");
+					final int words = line.split(" ").length;
+					final int letters = line.replaceAll(" ", "").length();
+					user.words += words;
+					user.letters += letters;
+					period.words += words;
+					period.letters += letters;
 				}
 			}
 			new ObjectMapper().writeValue(
