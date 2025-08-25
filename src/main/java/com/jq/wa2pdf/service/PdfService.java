@@ -63,6 +63,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
+import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
 import com.vdurmont.emoji.EmojiParser;
