@@ -118,7 +118,7 @@ public class ExtractService {
 			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
 			final Pattern media = Pattern.compile(this.getPatternMadia());
 			String date, currentDate = null, line, separator = null;
-			Statistics user, period;
+			Statistics user = null, period = null;
 			while ((line = chat.readLine()) != null) {
 				if (line.trim().length() > 0 && start.matcher(line).matches()) {
 					if (separator == null)
@@ -144,21 +144,23 @@ public class ExtractService {
 					period = attributes.periods.get(attributes.periods.size() - 1);
 					line = line.substring(line.indexOf(':') + 1);
 				}
-				user.chats++;
-				period.chats++;
-				if (media.matcher(line).matches()) {
-					user.media++;
-					period.media++;
-				} else {
-					line = line.replaceAll("\t", " ");
-					while (line.indexOf("  ") > -1)
-						line = line.replaceAll("  ", "");
-					final int words = line.split(" ").length;
-					final int letters = line.replaceAll(" ", "").length();
-					user.words += words;
-					user.letters += letters;
-					period.words += words;
-					period.letters += letters;
+				if (user != null) {
+					user.chats++;
+					period.chats++;
+					if (media.matcher(line).matches()) {
+						user.media++;
+						period.media++;
+					} else {
+						line = line.replaceAll("\t", " ");
+						while (line.indexOf("  ") > -1)
+							line = line.replaceAll("  ", "");
+						final int words = line.split(" ").length;
+						final int letters = line.replaceAll(" ", "").length();
+						user.words += words;
+						user.letters += letters;
+						period.words += words;
+						period.letters += letters;
+					}
 				}
 			}
 			new ObjectMapper().writeValue(
