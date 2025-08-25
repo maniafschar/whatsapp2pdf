@@ -101,14 +101,10 @@ public class PdfService {
 
 	public Path get(final String id, final String period) throws IOException {
 		final Path pdfPath = ExtractService.getTempDir(id)
-				.resolve(this.getFilename(period) + ".pdf");
+				.resolve(filename + DateHandler.periodSuffix(period) + ".pdf");
 		if (Files.exists(pdfPath))
 			return pdfPath;
 		return null;
-	}
-
-	private String getFilename(final String period) {
-		return filename + DateHandler.periodSuffix(period);
 	}
 
 	public static class Statistics {
@@ -178,7 +174,7 @@ public class PdfService {
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
-			final String filename = PdfService.this.getFilename(this.preview ? null : this.period);
+			final String filename = PdfService.filename + (this.preview ? "" : DateHandler.periodSuffix(this.period));
 			Files.deleteIfExists(this.dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(this.dir.resolve(filename + ".pdf"));
 			this.writer = new PdfWriter(
