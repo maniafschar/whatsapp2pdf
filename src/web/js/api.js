@@ -45,10 +45,13 @@ class api {
 	}
 
 	static buy() {
+		document.querySelector('period').classList.remove('error');
 		var period = '';
 		var periods = document.querySelectorAll('period .selected');
-		if (periods.length < 1)
+		if (periods.length < 1) {
+			document.querySelector('period').classList.add('error');
 			return;
+		}
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		for (var i = 0; i < periods.length; i++)
@@ -276,6 +279,7 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
 
 
