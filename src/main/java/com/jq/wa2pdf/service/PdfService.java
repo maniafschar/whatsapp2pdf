@@ -569,7 +569,7 @@ public class PdfService {
 				} else {
 					final double max = 450;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
-					if (!mediaId.endsWith(".png")
+					if (!mediaId.matches(ExtractService.filename + "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
 							&& (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
 						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
 						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
