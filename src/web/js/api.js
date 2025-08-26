@@ -120,8 +120,13 @@ class api {
 			url: api.url + '/rest/api/feedback/list',
 			success: xhr => {
 				var s = '';
+				var formatTime = function(s) {
+					var d = new Date(s.replace('+00:00', ''));
+					d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
+					return d.toLocaleString();
+				};
 				for (var i = 0; i < xhr.length; i++)
-					s += '<rating><input-rating rating="' + (20 * xhr[i].rating) + '"></input-rating><top>' + new Date(xhr[i].modifiedAt.replace('+00:00', '')).toLocaleString() + '<br/>' + xhr[i].name + '</top><note>' + xhr[i].note.replace(/\n/g, '<br/>') + '</note></rating>';
+					s += '<rating><input-rating rating="' + xhr[i].rating + '"></input-rating><top>' + formatTime(xhr[i].modifiedAt) + '<br/>' + xhr[i].name + '</top><note>' + xhr[i].note.replace(/\n/g, '<br/>') + '</note></rating>';
 				document.querySelector('feedbacks').innerHTML = s;
 			}
 		});
@@ -279,6 +284,7 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
 
 
