@@ -253,7 +253,8 @@ public class PdfService {
 				if (table.getNumberOfRows() == 2 && table.getNumberOfColumns() == 2) {
 					final IElement element = table
 							.getCell(1, table.getColumnWidth(0).getValue() < 50 ? 1 : 0).getChildren().get(0);
-					if (element instanceof Paragraph && ((Paragraph) element).getChildren().get(0) instanceof Text) {
+					if (element instanceof Paragraph &&  ((Paragraph) element).getChildren().size() > 0
+							&& ((Paragraph) element).getChildren().get(0) instanceof Text) {
 						final Text text = (Text) ((Paragraph) element).getChildren().get(0);
 						if (text.getText().startsWith("media://")) {
 							final String mediaId = text.getText().substring(8);
