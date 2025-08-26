@@ -150,6 +150,7 @@ class api {
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
 			tr.addEventListener('click', () => {
+				document.querySelector('period').classList.remove('error');
 				if (tr.classList.contains('download')) {
 					var link = document.createElement('a');
 					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true?period=' + encodeURIComponent(tr.getAttribute('value')));
@@ -284,6 +285,7 @@ class api {
 		xhr.send(param.body);
 	}
 }
+
 
 
 
