@@ -147,7 +147,7 @@ public class ExtractService {
 				s.append("|" + file.replace(".", "\\."));
 		}
 		if (s.length() > 0)
-			return "^.?(" + s.delete(0, 1) + ").*";
+			return ".*(" + s.delete(0, 1) + ").*";
 		return "";
 	}
 

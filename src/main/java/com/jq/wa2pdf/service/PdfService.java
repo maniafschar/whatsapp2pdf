@@ -367,6 +367,10 @@ public class PdfService {
 				while (s.indexOf("  ") > -1)
 					s = s.replaceAll("  ", " ");
 				s = s.trim();
+				if (s.endsWith(">") && s.contains("<")
+						&& !s.substring(s.lastIndexOf("<"))
+								.matches(".*[0-9\\.\\\\/\\?\\!\"'+\\-_=&%#@\\,:;\\{}\\()\\[\\]].*"))
+					s = s.substring(0, s.lastIndexOf("<")).trim();
 				u.words += s.split(" ").length;
 				u.letters += s.replaceAll(" ", "").length();
 				Statistics wordCloud = this.wordClouds.stream().filter(e -> user.equals(e.getUser())).findFirst()

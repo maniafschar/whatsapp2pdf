@@ -54,6 +54,19 @@ public class PdfServiceTest {
 	}
 
 	@Test
+	public void regex4() {
+		// given
+		final String text = "<Questo messaggio è stato modificato>";
+		final Pattern p = Pattern.compile(".*[0-9\\.\\\\/\\?\\!\"'+\\-_=&%#@\\,:;\\{}\\()\\[\\]].*");
+
+		// when
+		final boolean match = p.matcher(text).matches();
+
+		// then
+		assertFalse(match);
+	}
+
+	@Test
 	public void regex_false() {
 		// given
 		final String text = "Die braucht Nachhilfe. In allen Bereichen …";
