@@ -80,7 +80,7 @@ public class WordCloudService {
 
 	void createImage(final List<Token> tokens, final int max, final int min, final Path file)
 			throws IOException {
-		final BufferedImage image = new BufferedImage(500, 500, BufferedImage.TYPE_4BYTE_ABGR);
+		final BufferedImage image = new BufferedImage(800, 800, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		final List<Position> positions = this.createPositions(tokens, min, max, image, 20.0f);
 		for (final Position position : positions) {
