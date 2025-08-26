@@ -120,7 +120,7 @@ class api {
 			url: api.url + '/rest/api/feedback/list',
 			success: xhr => {
 				var s = '';
-				var formatTime = function(s) {
+				var formatTime = function (s) {
 					var d = new Date(s.replace('+00:00', ''));
 					d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
 					return d.toLocaleString();
@@ -159,8 +159,6 @@ class api {
 					tr.classList.remove('download');
 					if (document.querySelectorAll('period .spinner,period .download').length == 0)
 						document.querySelector('attributes button[onclick*="delete"]').style.display = '';
-					if (document.querySelectorAll('period .selected,period .spinner,period .download').length == 0)
-						tr.classList.add('selected');
 					api.feedbackStatus = '';
 				} else if (tr.classList.contains('selected'))
 					tr.classList.remove('selected');

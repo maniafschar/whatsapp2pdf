@@ -91,7 +91,8 @@ public class ExtractService {
 	}
 
 	public String getFilename(final String id) throws IOException {
-		return IOUtils.toString(ExtractService.getTempDir(id).resolve(ExtractService.filename + "Filename").toUri().toURL(),
+		return IOUtils.toString(
+				ExtractService.getTempDir(id).resolve(ExtractService.filename + "Filename").toUri().toURL(),
 				StandardCharsets.UTF_8);
 	}
 
@@ -104,7 +105,8 @@ public class ExtractService {
 		if (tempDir.resolve(filename).toFile().exists())
 			return tempDir.resolve(filename);
 		for (final String file : tempDir.toFile().list()) {
-			if (file.toLowerCase().startsWith("whatsapp chat") && file.toLowerCase().endsWith(".txt"))
+			if (file.toLowerCase().contains("whatsapp") && file.toLowerCase().contains("chat")
+					&& file.toLowerCase().endsWith(".txt"))
 				return tempDir.resolve(file);
 		}
 		throw new IOException("Chat file not found!");
@@ -138,8 +140,15 @@ public class ExtractService {
 		FileUtils.deleteDirectory(ExtractService.getTempDir(id).toAbsolutePath().toFile());
 	}
 
-	String getPatternMadia() {
-		return ".?<[a-zA-Z]{4,10}: [0-9]{8}-[A-Z]{4,10}-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}\\.[a-z0-9]{3,4}>";
+	String getPatternMadia(final String id) {
+		final StringBuilder s = new StringBuilder();
+		for (final String file : getTempDir(id).toFile().list()) {
+			if (!file.startsWith(filename))
+				s.append("|" + file.replace(".", "\\."));
+		}
+		if (s.length() > 0)
+			return "^.?(" + s.delete(0, 1) + ").*";
+		return "";
 	}
 
 	String getPatternStart() {
@@ -151,7 +160,7 @@ public class ExtractService {
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
 			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
-			final Pattern media = Pattern.compile(this.getPatternMadia());
+			final Pattern media = Pattern.compile(this.getPatternMadia(id));
 			String date, currentDate = null, line, separator = null;
 			Statistics user = null, period = null;
 			while ((line = chat.readLine()) != null) {
@@ -166,7 +175,8 @@ public class ExtractService {
 						user.user = u;
 						attributes.users.add(user);
 					}
-					date = DateHandler.replaceDay(line.substring(0, line.indexOf(" ")).replace("[", "").replace(",", "").trim());
+					date = DateHandler
+							.replaceDay(line.substring(0, line.indexOf(" ")).replace("[", "").replace(",", "").trim());
 					if (currentDate == null || !currentDate.equals(date)) {
 						currentDate = date;
 						if (attributes.periods.size() == 0
@@ -179,7 +189,7 @@ public class ExtractService {
 					period = attributes.periods.get(attributes.periods.size() - 1);
 					line = line.substring(line.indexOf(':', line.indexOf(separator)) + 1);
 				}
-				if (user != null) {
+				if (user != null && period != null) {
 					user.chats++;
 					period.chats++;
 					if (media.matcher(line).matches()) {

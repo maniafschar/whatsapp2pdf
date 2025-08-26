@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -139,7 +140,8 @@ public class PdfService {
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
-			final String filename = ExtractService.filename + (this.preview ? "" : DateHandler.periodSuffix(this.period));
+			final String filename = ExtractService.filename
+					+ (this.preview ? "" : DateHandler.periodSuffix(this.period));
 			Files.deleteIfExists(this.dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(this.dir.resolve(filename + ".pdf"));
 			this.writer = new PdfWriter(
@@ -185,7 +187,7 @@ public class PdfService {
 		private void parseChats() throws IOException {
 			try (final BufferedReader chat = new BufferedReader(
 					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
-				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia());
+				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia(this.id));
 				final Pattern patternStart = Pattern
 						.compile(PdfService.this.extractService.getPatternStart().replace("{date}",
 								this.period.replaceAll("[0-9]", "\\\\d")));
@@ -213,14 +215,14 @@ public class PdfService {
 							date = line.substring(0, line.indexOf(separator)).trim();
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
-							if (patternMedia.matcher(line).matches()) {
+							final Matcher m = patternMedia.matcher(line);
+							if (m.matches()) {
 								lastChat = null;
-								this.addMessage(user, date,
-										line.substring(line.indexOf(": ") + 2, line.length() - 1).trim(), true);
+								this.addMessage(user, date, m.group(1), true);
 							} else
 								lastChat = line;
 						}
-					} else if (foundMonth)
+					} else if (foundMonth && lastChat != null)
 						lastChat += "\n" + line;
 				}
 				this.addMessage(user, date, lastChat);
@@ -253,7 +255,7 @@ public class PdfService {
 				if (table.getNumberOfRows() == 2 && table.getNumberOfColumns() == 2) {
 					final IElement element = table
 							.getCell(1, table.getColumnWidth(0).getValue() < 50 ? 1 : 0).getChildren().get(0);
-					if (element instanceof Paragraph &&  ((Paragraph) element).getChildren().size() > 0
+					if (element instanceof Paragraph && ((Paragraph) element).getChildren().size() > 0
 							&& ((Paragraph) element).getChildren().get(0) instanceof Text) {
 						final Text text = (Text) ((Paragraph) element).getChildren().get(0);
 						if (text.getText().startsWith("media://")) {
@@ -357,7 +359,8 @@ public class PdfService {
 			table.setKeepTogether(true);
 			this.content.add(table);
 			this.addEmptyLine();
-			final Statistics u = getUserStatistics(user, date.split(" ")[0].replace("[", "").replace(",", "").trim());
+			final Statistics u = this.getUserStatistics(user,
+					date.split(" ")[0].replace("[", "").replace(",", "").trim());
 			u.chats++;
 			if (media == null || media.length == 0 || !media[0]) {
 				String s = message.replaceAll("\t", " ").replaceAll("\r", " ").replaceAll("\n", " ");
@@ -567,9 +570,10 @@ public class PdfService {
 					cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
-					final double max = 450;
+					final double max = 550;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
-					if (!mediaId.matches(ExtractService.filename + "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
+					if (!mediaId.matches(ExtractService.filename
+							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
 							&& (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
 						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
 						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
