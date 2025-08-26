@@ -134,6 +134,15 @@ attributes user {
 	margin-bottom: 2em;
 }
 
+attributes period.error::before {
+    content: '↑ please chose an enty ↑';
+    position: absolute;
+    bottom: -1.5em;
+    color: red;
+    text-align: center;
+    width: 100%;
+}
+
 attributes div {
 	padding-bottom: 0.3em;
 	font-weight: bold;
@@ -464,4 +473,5 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
