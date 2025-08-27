@@ -45,7 +45,7 @@ class ChartService {
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
 		final int marginX = (image.getWidth() - marginLegend) / x.size();
 		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot, x);
-		this.drawChart(g, marginLegend, marginPlot, heightPlot,
+		this.drawCharts(g, marginLegend, marginPlot, heightPlot,
 				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, x, preview, colors));
 		g.dispose();
 		image.flush();
@@ -117,8 +117,8 @@ class ChartService {
 		return plotData;
 	}
 
-	private void drawChart(final Graphics2D g, final int marginLegend, final int marginPlot, final int heightPlot,
-			final PlotData plotData) {
+	private void drawCharts(final Graphics2D g, final int marginLegend, final int marginPlot,
+			final int heightPlot, final PlotData plotData) {
 		final Font fontHorizontal = g.getFont();
 		final Font fontVertical = g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5));
 		String s = String.format("%,d", plotData.chatsMax);
