@@ -72,7 +72,8 @@ class ChartService {
 			final int marginX, final int heightPlot, final List<String> xAxis, final boolean preview,
 			final Map<String, Color> colors) {
 		final PlotData plotData = new PlotData();
-		for (int i = 0; i < data.size() && (!preview || i < 8); i++) {
+		final int iMax = preview ? Math.min(8, data.size()) : data.size();
+		for (int i = 0; i < iMax; i++) {
 			final Statistics statistics = data.get(i);
 			if (plotData.chatsMax < statistics.chats)
 				plotData.chatsMax = statistics.chats;
@@ -81,7 +82,7 @@ class ChartService {
 			if (plotData.lettersMax < statistics.letters)
 				plotData.lettersMax = statistics.letters;
 		}
-		for (int i = 0; i < data.size() && (!preview || i < 8); i++) {
+		for (int i = 0; i < iMax; i++) {
 			final Statistics statistics = data.get(i);
 			Plot plot = plotData.plots.stream().filter(e -> e.user.equals(statistics.user)).findFirst().orElse(null);
 			if (plot == null) {
