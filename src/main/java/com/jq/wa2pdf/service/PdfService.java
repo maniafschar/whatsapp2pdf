@@ -81,6 +81,9 @@ public class PdfService {
 	private WordCloudService wordCloudService;
 
 	@Autowired
+	private AIService aiService;
+
+	@Autowired
 	private AdminService adminService;
 
 	@Async
@@ -125,6 +128,7 @@ public class PdfService {
 		private final String id;
 		private final boolean preview;
 		private final boolean groupChat;
+		private final StringBuilder chat = new StringBuilder();
 
 		private PDF(final String id, final String period, final String user, final boolean preview)
 				throws IOException {
@@ -178,6 +182,7 @@ public class PdfService {
 			this.addMetaData();
 			this.addChart();
 			this.addWordCloud();
+			this.addAISummery();
 			this.writeContent();
 			this.document.flush();
 			this.document.close();
@@ -204,6 +209,7 @@ public class PdfService {
 							break;
 						foundMonth = inMonth;
 						if (foundMonth) {
+							this.chat.append(line).append('\n');
 							if (lastChat != null)
 								this.addMessage(user, date, lastChat);
 							this.addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
@@ -536,6 +542,14 @@ public class PdfService {
 				empty.addCell(this.createCell(""));
 				this.document.add(empty);
 			}
+		}
+
+		private void addAISummery() {
+			final Table header = new Table(1);
+			header.setWidth(UnitValue.createPercentValue(100f));
+			header.addCell(this.createCell(PdfService.this.aiService.summerize(this.chat.toString())));
+			header.getCell(0, 0).setPaddingTop(36);
+			this.document.add(header);
 		}
 
 		private Cell createCell(final String text, final boolean... media) {

@@ -18,7 +18,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -89,7 +88,8 @@ class ChartService {
 				plot = new Plot(statistics.user, colors.get(statistics.user));
 				plotData.plots.add(plot);
 			}
-			final int index = xAxis.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
+			final int index = xAxis
+					.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
 			// add null values before, from beginning or between days
 			for (int i2 = (int) Math.signum(plot.lastIndex); i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);

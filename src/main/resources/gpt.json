@@ -1,0 +1,8 @@
+{
+	"model": "gpt-5",
+	"reasoning": {
+		"effort": "low"
+	},
+	"instructions": "Summarize this WhatsApp chat in about 300 words.",
+	"input": "{chat}"
+}
