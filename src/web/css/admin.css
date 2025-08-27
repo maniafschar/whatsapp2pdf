@@ -298,6 +298,7 @@ popup content {
 	text-align: left;
 	overflow: auto;
 	max-height: 80vh;
+	max-width: 50em;
 }
 
 popup label {
