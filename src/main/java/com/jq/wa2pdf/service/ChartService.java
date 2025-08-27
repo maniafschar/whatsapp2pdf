@@ -72,7 +72,8 @@ class ChartService {
 			final int marginX, final int heightPlot, final List<String> xAxis, final boolean preview,
 			final Map<String, Color> colors) {
 		final PlotData plotData = new PlotData();
-		for (final Statistics statistics : data) {
+		for (int i = 0; i < data.size() && (!preview || i < 8); i++) {
+			final Statistics statistics = data.get(i);
 			if (plotData.chatsMax < statistics.chats)
 				plotData.chatsMax = statistics.chats;
 			if (plotData.wordsMax < statistics.words)
@@ -88,12 +89,14 @@ class ChartService {
 				plotData.plots.add(plot);
 			}
 			final int index = xAxis.indexOf(xAxis.stream().filter(e -> statistics.period.contains(e)).findFirst().get());
+			// add null values before, from beginning or between days
 			for (int i2 = (int) Math.signum(plot.lastIndex); i2 < index - plot.lastIndex; i2++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i2);
 				plot.chats.addPoint(x, heightPlot);
 				plot.words.addPoint(x, 2 * heightPlot + marginPlot);
 				plot.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
 			}
+			// print entry
 			final int x = marginLegend + marginX * (1 + index);
 			plot.chats.addPoint(x, heightPlot - heightPlot * statistics.chats / plotData.chatsMax);
 			plot.words.addPoint(x, 2 * heightPlot + marginPlot - heightPlot * statistics.words / plotData.wordsMax);
@@ -101,6 +104,7 @@ class ChartService {
 					3 * heightPlot + 2 * marginPlot - heightPlot * statistics.letters / plotData.lettersMax);
 			plot.lastIndex = index;
 		}
+		// add null values after till end
 		plotData.plots.stream().forEach(e -> {
 			for (int i = 1; i < xAxis.size() - e.lastIndex; i++) {
 				final int x = marginLegend + marginX * (1 + e.lastIndex + i);
