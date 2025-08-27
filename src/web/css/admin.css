@@ -364,7 +364,7 @@ popup buttons {
 }
 
 popup pre {
-	padding: 0 1em 1em 1em;
+	padding-bottom: 1em;
 	box-sizing: border-box;
 	display: block;
 	position: relative;
