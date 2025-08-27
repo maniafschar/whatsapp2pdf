@@ -279,12 +279,14 @@ popup {
 
 popup close {
 	position: absolute;
-	padding: 1em 1em 2em 3em;
+	padding: 0.25em 0.5em 2em 3em;
 	top: 0;
 	right: 0;
 	cursor: pointer;
-	color: rgba(0, 0, 0, 0.3);
+	color: rgba(0, 0, 0, 0.2);
 	z-index: 2;
+	font-weight: bold;
+	font-size: 1.4em;
 }
 
 popup close::before {
