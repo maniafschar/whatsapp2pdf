@@ -81,7 +81,7 @@ public class PdfService {
 	private WordCloudService wordCloudService;
 
 	@Autowired
-	private AIService aiService;
+	private AiService aiService;
 
 	@Autowired
 	private AdminService adminService;
