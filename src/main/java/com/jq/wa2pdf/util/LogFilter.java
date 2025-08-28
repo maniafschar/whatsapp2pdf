@@ -68,7 +68,7 @@ public class LogFilter implements Filter {
 			}
 		} catch (Throwable ex) {
 			final StringBuilder s = new StringBuilder(req.getRequestURL() + '\n');
-			for (String name in req.getHeaderNames())
+			for (String name : req.getHeaderNames())
 				s.append(name + '=' + req.getHeaders(name) + '\n');
 			log.setBody((log.getBody() + '\n' + s.toString());
 		} finally {
