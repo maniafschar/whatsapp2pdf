@@ -43,11 +43,8 @@ public class LogFilter implements Filter {
 		final Log log = new Log();
 		log.setUri(req.getRequestURI());
 		log.setMethod(req.getMethod());
-		if (req.getHeader("referer") != null) {
+		if (req.getHeader("referer") != null)
 			log.setReferer(req.getHeader("referer"));
-			if (log.getReferer().length() > 255)
-				log.setReferer(log.getReferer().substring(0, 255));
-		}
 		log.setIp(this.sanatizeIp(req.getHeader("X-Forwarded-For")));
 		if ("".equals(log.getIp()))
 			log.setIp(request.getRemoteAddr());
@@ -59,8 +56,6 @@ public class LogFilter implements Filter {
 						StandardCharsets.UTF_8.name()));
 			else if (!query.startsWith("_="))
 				log.setQuery(URLDecoder.decode(query, StandardCharsets.UTF_8.name()));
-			if (log.getQuery() != null && log.getQuery().length() > 255)
-				log.setQuery(log.getQuery().substring(0, 252) + "...");
 		}
 		final long time = System.currentTimeMillis();
 		try {
@@ -71,6 +66,11 @@ public class LogFilter implements Filter {
 				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
 				log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
+		} catch (Throwable ex) {
+			final StringBuilder s = new StringBuilder(req.getRequestURL() + '\n');
+			for (String name in req.getHeaderNames())
+				s.append(name + '=' + req.getHeaders(name) + '\n');
+			log.setBody((log.getBody() + '\n' + s.toString());
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			if (log.getStatus() == 0)
@@ -78,10 +78,10 @@ public class LogFilter implements Filter {
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
-				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
+				log.setBody((log.getBody() + '\n' + new String(b, StandardCharsets.UTF_8).trim()));
 			b = res.getContentAsByteArray();
 			if (b != null && b.length > 0)
-				log.setBody((log.getBody() + "\n" + new String(b, StandardCharsets.UTF_8).trim()));
+				log.setBody((log.getBody() + '\n' + new String(b, StandardCharsets.UTF_8).trim()));
 			res.copyBodyToResponse();
 			try {
 				this.repository.save(log);
