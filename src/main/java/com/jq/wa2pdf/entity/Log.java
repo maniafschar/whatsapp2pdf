@@ -103,6 +103,6 @@ public class Log extends BaseEntity {
 	}
 
 	public void setReferer(final String referer) {
-		this.referer = referer;
+		this.referer = Utilities.trim(referer, 255);
 	}
 }
