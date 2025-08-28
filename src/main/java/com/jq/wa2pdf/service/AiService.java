@@ -15,7 +15,7 @@ import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.util.Utilities;
 
 @Service
-class AIService {
+class AiService {
 	@Autowired
 	private AdminService adminService;
 
