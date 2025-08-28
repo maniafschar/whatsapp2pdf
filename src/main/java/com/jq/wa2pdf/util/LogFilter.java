@@ -70,7 +70,7 @@ public class LogFilter implements Filter {
 			final StringBuilder s = new StringBuilder(req.getRequestURL() + '\n');
 			for (String name : req.getHeaderNames())
 				s.append(name + '=' + req.getHeaders(name) + '\n');
-			log.setBody((log.getBody() + '\n' + s.toString());
+			log.setBody((log.getBody() + '\n' + s.toString()).trim());
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			if (log.getStatus() == 0)
