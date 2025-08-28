@@ -289,10 +289,9 @@ popup {
 	right: 0;
 	margin: 0 auto;
 	z-index: 2;
-	border-radius: 1em;
+	border-radius: 1em 0 1em 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
-	overflow: hidden;
 }
 
 popup close {
@@ -484,6 +483,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
