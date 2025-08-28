@@ -67,9 +67,9 @@ public class LogFilter implements Filter {
 				log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
 		} catch (Throwable ex) {
-			final StringBuilder s = new StringBuilder(req.getRequestURL() + '\n');
-			for (String name : req.getHeaderNames())
-				s.append(name + '=' + req.getHeaders(name) + '\n');
+			final StringBuilder s = new StringBuilder(req.getRequestURL().toString() + '\n');
+			for (String name, Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();)
+				s.append((name = e.nextElement()) + '=' + req.getHeaders(name) + '\n');
 			log.setBody((log.getBody() + '\n' + s.toString()).trim());
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
