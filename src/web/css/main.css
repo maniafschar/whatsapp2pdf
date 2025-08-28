@@ -323,6 +323,7 @@ popup content {
 	display: block;
 	padding: 1em;
 	max-height: 86vh;
+	max-width: 50em;
 }
 
 popup content message {
@@ -483,6 +484,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
