@@ -266,7 +266,7 @@ popup {
 	position: fixed;
 	max-width: 90%;
 	background-color: blanchedalmond;
-	top: 5%;
+	top: 6%;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
@@ -296,9 +296,9 @@ popup::before {
 	padding: 0.25em 1em;
 	background-color: blanchedalmond;
 	border-radius: 0.5em 0.5em 0 0;
-	color: rgba(0, 0, 0, 0.2);
+	color: rgba(0, 0, 0, 0.1);
 	font-weight: bold;
-	font-size: 1.4em;
+	font-size: 1.2em;
 }
 
 popup content {
@@ -307,7 +307,7 @@ popup content {
 	padding: 1em 1em 0 1em;
 	text-align: left;
 	overflow: auto;
-	max-height: 80vh;
+	max-height: 76vh;
 	max-width: 50em;
 }
 
