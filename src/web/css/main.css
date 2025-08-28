@@ -308,7 +308,7 @@ popup close {
 popup::before {
 	content: 'x';
 	position: absolute;
-	top: -1.6em;
+	top: -1.5em;
 	right: 0;
 	padding: 0.25em 1em;
 	background-color: blanchedalmond;
@@ -483,6 +483,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
