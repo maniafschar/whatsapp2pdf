@@ -284,7 +284,7 @@ popup {
 	width: 30em;
 	max-width: 90%;
 	background-color: blanchedalmond;
-	top: 2em;
+	top: 3em;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
@@ -297,22 +297,33 @@ popup {
 
 popup close {
 	position: absolute;
-	padding: 1em 1em 2em 3em;
-	top: 0;
+	top: -2.5em;
 	right: 0;
-	cursor: pointer;
-	color: rgba(0, 0, 0, 0.3);
 	z-index: 2;
+	width: 5.5em;
+	height: 3.5em;
+	cursor: pointer;
+	display: block;
 }
 
-popup close::before {
+popup::before {
 	content: 'x';
+	position: absolute;
+	top: -1.6em;
+	right: 0;
+	padding: 0.25em 1em;
+	background-color: blanchedalmond;
+	border-radius: 0.5em 0.5em 0 0;
+	color: rgba(0, 0, 0, 0.1);
+	font-weight: bold;
+	font-size: 1.2em;
 }
 
 popup content {
 	position: relative;
 	display: block;
 	padding: 1em;
+	max-height: 86vh;
 }
 
 popup content message {
@@ -473,5 +484,6 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
