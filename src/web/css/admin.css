@@ -295,7 +295,7 @@ popup::before {
 	right: 0;
 	padding: 0.25em 1em;
 	background-color: blanchedalmond;
-	border-radius: 1em 1em 0 0;
+	border-radius: 0.5em 0.5em 0 0;
 	color: rgba(0, 0, 0, 0.2);
 	font-weight: bold;
 	font-size: 1.4em;
