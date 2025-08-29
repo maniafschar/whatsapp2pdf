@@ -134,13 +134,19 @@ attributes user {
 	margin-bottom: 2em;
 }
 
-attributes period.error::before {
+attributes period::before {
     content: '↑ please chose an enty ↑';
     position: absolute;
     bottom: -1.5em;
     color: red;
     text-align: center;
     width: 100%;
+	opacity: 0;
+	transition: all .4s ease-out;
+}
+
+attributes period.error::before {
+	opacity: 1;
 }
 
 attributes div {
@@ -487,6 +493,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
