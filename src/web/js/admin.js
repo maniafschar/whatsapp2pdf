@@ -71,8 +71,10 @@ class api {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
+				var e = document.getElementsByTagName('progressbar')[0].style;
+				e.display = null;
+				e.opacity = null;
 				var errorHandler = function () {
-					document.querySelector('progressbar').style.display = null;
 					if (param.error) {
 						xhr.param = param;
 						param.error(xhr);
@@ -80,7 +82,6 @@ class api {
 						ui.popupOpen('<pre>' + JSON.stringify(xhr) + '</pre>');
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
-					document.getElementsByTagName('progressbar')[0].style.display = null;
 					if (param.success) {
 						var response = xhr.responseText;
 						if (response && (response.indexOf('{') === 0 || response.indexOf('[') === 0)) {
