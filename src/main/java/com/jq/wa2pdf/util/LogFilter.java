@@ -17,6 +17,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.jq.wa2pdf.entity.Log;
 import com.jq.wa2pdf.entity.Log.LogStatus;
+import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.repository.Repository;
 import com.jq.wa2pdf.service.AdminService;
 
