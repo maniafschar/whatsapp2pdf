@@ -18,6 +18,7 @@ import org.springframework.web.util.ContentCachingResponseWrapper;
 import com.jq.wa2pdf.entity.Log;
 import com.jq.wa2pdf.entity.Log.LogStatus;
 import com.jq.wa2pdf.repository.Repository;
+import com.jq.wa2pdf.service.AdminService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -30,6 +31,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @Order(1)
 public class LogFilter implements Filter {
+	@Autowired
+	private AdminService adminService;
+
 	@Autowired
 	private Repository repository;
 
@@ -72,11 +76,12 @@ public class LogFilter implements Filter {
 			if (log.getStatus() == 0)
 				log.setStatus(res.getStatus());
 			if (log.getStatus() > 299) {
-				final StringBuilder s = new StringBuilder(req.getRequestURL().toString() + '\n');
+				final StringBuilder s = new StringBuilder();
 				String name;
 				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();)
-					s.append((name = e.nextElement()) + '=' + req.getHeaders(name) + '\n');
-				log.setBody((log.getBody() + '\n' + s.toString()).trim());
+					s.append((name = e.nextElement()) + '=' + req.getHeader(name) + '\n');
+				s.append(req.getRequestURL().toString());
+				this.adminService.createTicket(new Ticket(s.toString()));
 			}
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			byte[] b = req.getContentAsByteArray();
