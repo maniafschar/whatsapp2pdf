@@ -28,7 +28,9 @@ class api {
 	static preview(event, period) {
 		event.preventDefault();
 		event.stopPropagation();
+		api.showProgressBar();
 		api.ajax({
+			hideProgressBar: true,
 			url: api.url + '/rest/api/pdf/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
@@ -48,7 +50,9 @@ class api {
 		}
 		for (var i = 0; i < periods.length; i++)
 			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
+		api.showProgressBar();
 		api.ajax({
+			hideProgressBar: true,
 			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.postBuy,
@@ -174,7 +178,6 @@ class api {
 	}
 
 	static download(period) {
-		api.showProgressBar();
 		var download = function () {
 			api.ajax({
 				hideProgressBar: true,
@@ -280,4 +283,5 @@ class api {
 		setTimeout(function() { e.opacity = 1; }, 100);
 	}
 }
+
 
