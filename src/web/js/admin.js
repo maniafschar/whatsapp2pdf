@@ -103,7 +103,9 @@ class api {
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			param.body = JSON.stringify(param.body);
 		}
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
+		var e = document.getElementsByTagName('progressbar')[0].style;
+		e.display = 'block';
+		e.opacity = 1;
 		xhr.send(param.body);
 	}
 }
