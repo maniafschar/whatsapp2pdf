@@ -79,9 +79,13 @@ public class LogFilter implements Filter {
 			if (log.getStatus() > 299) {
 				final StringBuilder s = new StringBuilder();
 				String name;
-				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();)
-					s.append((name = e.nextElement()) + '=' + req.getHeader(name) + '\n');
-				s.append(req.getRequestURL().toString());
+				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
+					s.append((name = e.nextElement()) + '=')
+					for (Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();) {
+						s.append(e2.nextElement() + '|');
+					s.delete(s.length() - 1, s.length());
+					s.append('\n');
+				}
 				this.adminService.createTicket(new Ticket(s.toString()));
 			}
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
