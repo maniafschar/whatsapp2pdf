@@ -80,7 +80,7 @@ public class LogFilter implements Filter {
 				final StringBuilder s = new StringBuilder();
 				String name;
 				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
-					s.append((name = e.nextElement()) + '=')
+					s.append((name = e.nextElement()) + '=');
 					for (Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();)
 						s.append(e2.nextElement() + '|');
 					s.delete(s.length() - 1, s.length());
