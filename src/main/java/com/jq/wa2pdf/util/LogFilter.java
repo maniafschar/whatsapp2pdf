@@ -76,18 +76,6 @@ public class LogFilter implements Filter {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			if (log.getStatus() == 0)
 				log.setStatus(res.getStatus());
-			if (log.getStatus() > 299) {
-				final StringBuilder s = new StringBuilder();
-				String name;
-				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
-					s.append((name = e.nextElement()) + '=');
-					for (Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();)
-						s.append(e2.nextElement() + '|');
-					s.delete(s.length() - 1, s.length());
-					s.append('\n');
-				}
-				this.adminService.createTicket(new Ticket(s.toString()));
-			}
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
@@ -98,6 +86,19 @@ public class LogFilter implements Filter {
 			res.copyBodyToResponse();
 			try {
 				this.repository.save(log);
+				if (log.getStatus() > 299) {
+					final StringBuilder s = new StringBuilder();
+					String name;
+					for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
+						s.append((name = e.nextElement()) + '=');
+						for (Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();)
+							s.append(e2.nextElement() + '|');
+						s.delete(s.length() - 1, s.length());
+						s.append('\n');
+					}
+					s.append("Log ID: " + log.getId());
+					this.adminService.createTicket(new Ticket(s.toString()));
+				}
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
