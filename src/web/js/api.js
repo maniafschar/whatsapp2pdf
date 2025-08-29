@@ -203,20 +203,23 @@ class api {
 					else {
 						if (xhr.status < 500)
 							error = 'The server is unavailable. Please try again later.';
-						else if (error.indexOf('Invalid ID') > -1) {
-							document.getElementsByTagName('attributes')[0].style.display = null;
-							document.getElementsByTagName('upload')[0].style.display = '';
-							document.getElementById('chatFile').value = '';
-							error = 'Uploaded chat already deleted. Please upload new chat.';
-						} else {
-							if (period) {
-								var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]').classList;
-								tr.remove('spinner');
-								tr.add('selected');
+						else {
+							api.hideProgressBar();
+							if (error.indexOf('Invalid ID') > -1) {
+								document.getElementsByTagName('attributes')[0].style.display = null;
+								document.getElementsByTagName('upload')[0].style.display = '';
+								document.getElementById('chatFile').value = '';
+								error = 'Uploaded chat already deleted. Please upload new chat.';
+							} else {
+								if (period) {
+									var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]').classList;
+									tr.remove('spinner');
+									tr.add('selected');
+								}
+								if (error.indexOf(' ') < 5)
+									error = error.substring(error.indexOf(' ')).trim();
+								error = 'Creation failed: ' + error;
 							}
-							if (error.indexOf(' ') < 5)
-								error = error.substring(error.indexOf(' ')).trim();
-							error = 'Creation failed: ' + error;
 						}
 						document.getElementsByTagName('error')[0].innerHTML = error;
 					}
@@ -283,5 +286,6 @@ class api {
 		setTimeout(function() { e.opacity = 1; }, 100);
 	}
 }
+
 
 
