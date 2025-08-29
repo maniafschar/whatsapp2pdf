@@ -277,6 +277,7 @@ class api {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		var e = document.getElementsByTagName('progressbar')[0].style;
 		e.display = 'block';
-		e.opacity = 1;
+		setTimeout(function() { e.opacity = 1; }, 100);
 	}
 }
+
