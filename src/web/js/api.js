@@ -8,8 +8,6 @@ class api {
 		document.getElementsByTagName('attributes')[0].style.display = 'none';
 		document.getElementsByTagName('upload')[0].style.display = '';
 		if (event.target.files[0]) {
-			document.getElementsByTagName('error')[0].innerHTML = '';
-			document.getElementsByTagName('progressbar')[0].style.display = 'block';
 			var formData = new FormData();
 			formData.append('file', event.target.files[0]);
 			api.ajax({
@@ -18,7 +16,6 @@ class api {
 				body: formData,
 				success: api.postAnalyse,
 				error: xhr => {
-					document.getElementsByTagName('progressbar')[0].style.display = null;
 					document.getElementsByTagName('error')[0].innerHTML =
 						xhr.status == 403 ? 'The file was blocked by your proxy. Please try a correct WhatsApp exported chat file.' :
 							xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Is it a WhatsApp exported chat file?';
@@ -31,14 +28,11 @@ class api {
 	static preview(event, period) {
 		event.preventDefault();
 		event.stopPropagation();
-		document.getElementsByTagName('error')[0].innerHTML = '';
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/pdf/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
 			error: xhr => {
-				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Please try again later.';
 			}
 		});
@@ -52,29 +46,22 @@ class api {
 			document.querySelector('period').classList.add('error');
 			return;
 		}
-		document.getElementsByTagName('error')[0].innerHTML = '';
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		for (var i = 0; i < periods.length; i++)
 			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
 		api.ajax({
 			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.postBuy,
-			error: xhr => {
-				document.getElementsByTagName('progressbar')[0].style.display = null;
+			error: xhr =>
 				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Please try again later.';
-			}
 		});
 	}
 
 	static delete() {
-		document.getElementsByTagName('error')[0].innerHTML = '';
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText,
 			method: 'DELETE',
 			success: () => {
-				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.getElementsByTagName('attributes')[0].style.display = null;
 				document.getElementsByTagName('upload')[0].style.display = null;
 				api.feedbackStatus = 'You already deleted the uploaded data. Please give feedback before deleting the data.';
@@ -96,20 +83,16 @@ class api {
 			document.querySelector('popup content error').innerHTML = 'Please enter all fields.';
 			return;
 		}
-		document.querySelector('popup content error').innerHTML = '';
-		document.getElementsByTagName('progressbar')[0].style.display = 'block';
 		api.ajax({
 			url: api.url + '/rest/api/feedback/' + document.querySelector('id').innerText,
 			method: 'PUT',
 			body: body,
 			success: xhr => {
-				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content message').innerHTML = xhr;
 				document.querySelector('popup content data').style.display = '';
 				api.feedbackStatus = 'You already successfully added a feedback. You may edit it with the link in the email we sent you.';
 			},
 			error: xhr => {
-				document.getElementsByTagName('progressbar')[0].style.display = null;
 				document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
 			}
 		});
@@ -117,6 +100,7 @@ class api {
 
 	static feedback() {
 		api.ajax({
+			hideProgressBar: true,
 			url: api.url + '/rest/api/feedback/list',
 			success: xhr => {
 				var s = '';
@@ -134,11 +118,9 @@ class api {
 
 	static postAnalyse(data) {
 		if (!data) {
-			document.getElementsByTagName('progressbar')[0].style.display = null;
 			document.getElementsByTagName('error')[0].innerHTML = 'PDF creation failed. Is it a WhatsApp exported chat file?';
 			return;
 		}
-		document.getElementsByTagName('progressbar')[0].style.display = null;
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
 		document.getElementsByTagName('upload')[0].style.display = 'none';
 		document.querySelector('attributes button[onclick*="delete"]').style.display = '';
@@ -191,12 +173,14 @@ class api {
 	}
 
 	static download(period) {
+		api.showProgressBar();
 		var download = function () {
 			api.ajax({
+				hideProgressBar: true,
 				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/false' + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
-					document.getElementsByTagName('progressbar')[0].style.display = null;
+					api.hideProgressBar();
 					if (period) {
 						var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]');
 						tr.classList.remove('spinner');
@@ -213,7 +197,6 @@ class api {
 					if (error.indexOf('"status":566,') > -1)
 						setTimeout(function () { download(period); }, 1000);
 					else {
-						document.getElementsByTagName('progressbar')[0].style.display = null;
 						if (xhr.status < 500)
 							error = 'The server is unavailable. Please try again later.';
 						else if (error.indexOf('Invalid ID') > -1) {
@@ -243,21 +226,8 @@ class api {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
-				var errorHandler = function () {
-					if (api.status < 500) {
-						var xhrError = new XMLHttpRequest();
-						xhrError.open('POST', api.url + '/rest/api/ticket', true);
-						xhrError.setRequestHeader('Content-Type', 'application/json');
-						xhrError.send(JSON.stringify({ note: xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
-					}
-					if (param.error) {
-						xhr.param = param;
-						param.error(xhr);
-					} else {
-						document.getElementsByTagName('progressbar')[0].style.display = null;
-						document.getElementsByTagName('error')[0].innerHTML = 'An error occurred while processing your request. Please try again later.';
-					}
-				};
+				if (xhr.status < 300 || !param.hideProgressBar)
+					api.hideProgressBar();
 				if (xhr.status >= 200 && xhr.status < 300) {
 					if (param.success) {
 						var response = xhr.responseText;
@@ -269,8 +239,19 @@ class api {
 						}
 						param.success(response);
 					}
-				} else
-					errorHandler();
+				} else {
+					if (api.status < 500) {
+						var xhrError = new XMLHttpRequest();
+						xhrError.open('POST', api.url + '/rest/api/ticket', true);
+						xhrError.setRequestHeader('Content-Type', 'application/json');
+						xhrError.send(JSON.stringify({ note: xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
+					}
+					if (param.error) {
+						xhr.param = param;
+						param.error(xhr);
+					} else
+						document.getElementsByTagName('error')[0].innerHTML = 'An error occurred while processing your request. Please try again later.';
+				}
 			}
 		};
 		xhr.open(param.method ? param.method : 'GET', param.url, true);
@@ -280,12 +261,21 @@ class api {
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			param.body = JSON.stringify(param.body);
 		}
+		if (!param.hideProgressBar)
+			api.showProgressBar();
 		xhr.send(param.body);
 	}
+
+	static hideProgressBar() {
+		var e = document.getElementsByTagName('progressbar')[0];
+		e.addEventListener("transitionend", event => { e.style.display = null; }, { once: true });
+		e.style.opacity = 0;
+	}
+
+	static showProgressBar() {
+		document.getElementsByTagName('error')[0].innerHTML = '';
+		var e = document.getElementsByTagName('progressbar')[0].style;
+		e.display = 'block';
+		e.opacity = 1;
+	}
 }
-
-
-
-
-
-
