@@ -67,16 +67,17 @@ public class LogFilter implements Filter {
 				log.setBody("unauthorized acccess:\n" + req.getRequestURI() + "\n" + req.getHeader("user"));
 				log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
-		} catch (Throwable ex) {
-			final StringBuilder s = new StringBuilder(req.getRequestURL().toString() + '\n');
-			String name;
-			for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();)
-				s.append((name = e.nextElement()) + '=' + req.getHeaders(name) + '\n');
-			log.setBody((log.getBody() + '\n' + s.toString()).trim());
 		} finally {
 			log.setTime((int) (System.currentTimeMillis() - time));
 			if (log.getStatus() == 0)
 				log.setStatus(res.getStatus());
+			if (log.getStatus() > 299) {
+				final StringBuilder s = new StringBuilder(req.getRequestURL().toString() + '\n');
+				String name;
+				for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();)
+					s.append((name = e.nextElement()) + '=' + req.getHeaders(name) + '\n');
+				log.setBody((log.getBody() + '\n' + s.toString()).trim());
+			}
 			log.setCreatedAt(new Timestamp(Instant.now().toEpochMilli() - log.getTime()));
 			byte[] b = req.getContentAsByteArray();
 			if (b != null && b.length > 0)
