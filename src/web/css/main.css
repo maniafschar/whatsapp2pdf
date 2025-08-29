@@ -415,6 +415,8 @@ progressbar {
 	height: 100%;
 	background-color: rgba(0, 0, 0, 0.4);
 	display: none;
+	opacity: 0;
+	transition: all .4s ease-out;
 }
 
 progressbar loader {
@@ -485,6 +487,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
