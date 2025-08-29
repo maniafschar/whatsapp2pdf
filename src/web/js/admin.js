@@ -105,7 +105,7 @@ class api {
 		}
 		var e = document.getElementsByTagName('progressbar')[0].style;
 		e.display = 'block';
-		e.opacity = 1;
+		setTimeout(function() { e.opacity = 1; }, 100);
 		xhr.send(param.body);
 	}
 }
