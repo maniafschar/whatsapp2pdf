@@ -270,7 +270,7 @@ class api {
 	static hideProgressBar() {
 		var e = document.getElementsByTagName('progressbar')[0];
 		e.addEventListener("transitionend", event => { e.style.display = null; }, { once: true });
-		e.style.opacity = 0;
+		e.style.opacity = null;
 	}
 
 	static showProgressBar() {
@@ -280,4 +280,3 @@ class api {
 		e.opacity = 1;
 	}
 }
-
