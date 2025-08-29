@@ -30,7 +30,7 @@ class api {
 		event.stopPropagation();
 		api.showProgressBar();
 		api.ajax({
-			hideProgressBar: true,
+			noProgressBar: true,
 			url: api.url + '/rest/api/pdf/preview/' + document.querySelector('id').innerText + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.download,
@@ -52,7 +52,7 @@ class api {
 			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
 		api.showProgressBar();
 		api.ajax({
-			hideProgressBar: true,
+			noProgressBar: true,
 			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.postBuy,
@@ -105,7 +105,7 @@ class api {
 
 	static feedback() {
 		api.ajax({
-			hideProgressBar: true,
+			noProgressBar: true,
 			url: api.url + '/rest/api/feedback/list',
 			success: xhr => {
 				var s = '';
@@ -180,7 +180,7 @@ class api {
 	static download(period) {
 		var download = function () {
 			api.ajax({
-				hideProgressBar: true,
+				noProgressBar: true,
 				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/false' + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
@@ -233,7 +233,7 @@ class api {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
-				if (xhr.status < 300 || !param.hideProgressBar)
+				if (!param.noProgressBar)
 					api.hideProgressBar();
 				if (xhr.status >= 200 && xhr.status < 300) {
 					if (param.success) {
@@ -268,7 +268,7 @@ class api {
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			param.body = JSON.stringify(param.body);
 		}
-		if (!param.hideProgressBar)
+		if (!param.noProgressBar)
 			api.showProgressBar();
 		xhr.send(param.body);
 	}
@@ -286,6 +286,7 @@ class api {
 		setTimeout(function() { e.opacity = 1; }, 100);
 	}
 }
+
 
 
 
