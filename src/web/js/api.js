@@ -52,8 +52,9 @@ class api {
 			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
 			method: 'POST',
 			success: api.postBuy,
-			error: xhr =>
+			error: xhr => {
 				document.getElementsByTagName('error')[0].innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'PDF creation failed. Please try again later.';
+			}
 		});
 	}
 
@@ -279,3 +280,4 @@ class api {
 		e.opacity = 1;
 	}
 }
+
