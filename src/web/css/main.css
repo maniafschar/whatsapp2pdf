@@ -292,6 +292,7 @@ popup {
 	border-radius: 1em 0 1em 1em;
 	box-shadow: 0 0 1em rgba(0, 0, 0, 0.3);
 	transition: all ease-out .4s;
+	min-width: 5em;
 }
 
 popup close {
@@ -484,6 +485,7 @@ progressbar loader .three {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
 }
+
 
 
 
