@@ -72,8 +72,8 @@ class api {
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				var e = document.getElementsByTagName('progressbar')[0].style;
-				e.display = null;
 				e.opacity = null;
+				setTimeout(function() { e.display = null; }, 400);
 				var errorHandler = function () {
 					if (param.error) {
 						xhr.param = param;
