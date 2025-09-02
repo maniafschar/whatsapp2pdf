@@ -275,18 +275,17 @@ class api {
 
 	static hideProgressBar() {
 		var e = document.getElementsByTagName('progressbar')[0];
-		e.addEventListener("transitionend", event => { e.style.display = null; }, { once: true });
-		e.style.opacity = null;
+		if (e.style.opacity == 1) {
+			e.addEventListener("transitionend", event => { e.style.display = null; }, { once: true });
+			e.style.opacity = null;
+		} else
+			e.style.display = null;
 	}
 
 	static showProgressBar() {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		var e = document.getElementsByTagName('progressbar')[0].style;
 		e.display = 'block';
-		setTimeout(function() { e.opacity = 1; }, 100);
+		setTimeout(function() { if (xhr.readyState != 4) e.opacity = 1; }, 100);
 	}
 }
-
-
-
-
