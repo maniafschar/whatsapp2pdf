@@ -86,7 +86,7 @@ public class LogFilter implements Filter {
 			res.copyBodyToResponse();
 			try {
 				this.repository.save(log);
-				if (log.getStatus() > 299) {
+				if (log.getStatus() > 299 && log.getStatus() != 566) {
 					final StringBuilder s = new StringBuilder();
 					String name;
 					for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
