@@ -572,10 +572,12 @@ public class PdfService {
 			cell.setPaddingBottom(
 					padding != null && padding.length > 2 ? padding[2] : defaultPadding / (media ? 1 : 2));
 			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
-			if (media)
-				this.fillMedia(cell, text);
-			else
-				this.fillText(cell, text, alignment);
+			if (text != null) {
+				if (media)
+					this.fillMedia(cell, text);
+				else
+					this.fillText(cell, text, alignment);
+			}
 			return cell;
 		}
 
