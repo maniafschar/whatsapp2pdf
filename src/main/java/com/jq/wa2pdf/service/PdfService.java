@@ -128,7 +128,7 @@ public class PdfService {
 		private final String id;
 		private final boolean preview;
 		private final boolean groupChat;
-		private final StringBuilder chat = new StringBuilder();
+		private final StringBuilder text = new StringBuilder();
 
 		private PDF(final String id, final String period, final String user, final boolean preview)
 				throws IOException {
@@ -190,7 +190,7 @@ public class PdfService {
 		}
 
 		private void parseChats() throws IOException {
-			try (final BufferedReader chat = new BufferedReader(
+			try (final BufferedReader input = new BufferedReader(
 					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
 				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia(this.id));
 				final Pattern patternStart = Pattern
@@ -201,7 +201,7 @@ public class PdfService {
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
-				while ((line = chat.readLine()) != null) {
+				while ((line = input.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
 						final boolean inMonth = patternMonth.matcher(line).matches();
@@ -209,7 +209,7 @@ public class PdfService {
 							break;
 						foundMonth = inMonth;
 						if (foundMonth) {
-							this.chat.append(line).append('\n');
+							this.text.append(line).append('\n');
 							if (lastChat != null)
 								this.addMessage(user, date, lastChat);
 							this.addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
@@ -545,11 +545,17 @@ public class PdfService {
 		}
 
 		private void addAISummery() {
-			final Table header = new Table(1);
-			header.setWidth(UnitValue.createPercentValue(100f));
-			header.addCell(this.createCell(PdfService.this.aiService.summerize(this.chat.toString())));
-			header.getCell(0, 0).setPaddingTop(36);
-			this.document.add(header);
+			final String summary = PdfService.this.aiService.summerize(this.text.toString());
+			if (!summary.isBlank()) {
+				final Table header = new Table(1);
+				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
+				cell.setBackgroundColor(this.colorDate, 0.2f);
+				header.addCell(cell);
+				header.setWidth(UnitValue.createPercentValue(100f));
+				header.addCell(this.createCell(summary));
+				header.getCell(1, 0).setPaddingBottom(36);
+				this.document.add(header);
+			}
 		}
 
 		private Cell createCell(final String text, final boolean... media) {

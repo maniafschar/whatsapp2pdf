@@ -16,7 +16,6 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.jq.wa2pdf.entity.Log;
-import com.jq.wa2pdf.entity.Log.LogStatus;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.repository.Repository;
 import com.jq.wa2pdf.service.AdminService;
@@ -89,9 +88,9 @@ public class LogFilter implements Filter {
 				if (log.getStatus() > 299 && log.getStatus() != 566) {
 					final StringBuilder s = new StringBuilder();
 					String name;
-					for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
+					for (final Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
 						s.append((name = e.nextElement()) + '=');
-						for (Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();)
+						for (final Enumeration<String> e2 = req.getHeaders(name); e2.hasMoreElements();)
 							s.append(e2.nextElement() + '|');
 						s.delete(s.length() - 1, s.length());
 						s.append('\n');

@@ -269,7 +269,7 @@ class api {
 			param.body = JSON.stringify(param.body);
 		}
 		if (!param.noProgressBar)
-			api.showProgressBar();
+			api.showProgressBar(xhr);
 		xhr.send(param.body);
 	}
 
@@ -282,10 +282,10 @@ class api {
 			e.style.display = null;
 	}
 
-	static showProgressBar() {
+	static showProgressBar(xhr) {
 		document.getElementsByTagName('error')[0].innerHTML = '';
 		var e = document.getElementsByTagName('progressbar')[0].style;
 		e.display = 'block';
-		setTimeout(function() { if (xhr.readyState != 4) e.opacity = 1; }, 100);
+		setTimeout(function () { if (!xhr || xhr.readyState != 4) e.opacity = 1; }, 100);
 	}
 }
