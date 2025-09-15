@@ -545,7 +545,9 @@ public class PdfService {
 		}
 
 		private void addAISummery() {
-			final String summary = PdfService.this.aiService.summerize(this.text.toString());
+			final String summary = this.preview ?
+				"Here you will see a summary of the chat, which reveals interessting insights." :
+				PdfService.this.aiService.summerize(this.text.toString());
 			if (!summary.isBlank()) {
 				final Table header = new Table(1);
 				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
