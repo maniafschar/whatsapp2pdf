@@ -5,7 +5,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Enumeration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +15,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import com.jq.wa2pdf.entity.Log;
-import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.repository.Repository;
-import com.jq.wa2pdf.service.AdminService;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -31,9 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 @Order(1)
 public class LogFilter implements Filter {
-	@Autowired
-	private AdminService adminService;
-
 	@Autowired
 	private Repository repository;
 
