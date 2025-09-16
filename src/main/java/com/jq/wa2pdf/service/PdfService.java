@@ -626,9 +626,12 @@ public class PdfService {
 		private void fillText(final Cell cell, String text, final TextAlignment alignment) {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
+			boolean hasText = false;
 			for (final String emoji : emojis) {
-				if (text.substring(0, text.indexOf(emoji)).trim().length() > 0)
+				if (text.substring(0, text.indexOf(emoji)).trim().length() > 0) {
 					paragraph.add(this.createText(text.substring(0, text.indexOf(emoji)), fontMessage));
+					hasText = true;
+				}
 				String id = "";
 				for (int i = 0; i < emoji.length(); i++) {
 					if (emoji.codePointAt(i) != 56614)
@@ -661,9 +664,10 @@ public class PdfService {
 				}
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
-			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039)
-				paragraph.add(this.createText(text, fontMessage));
-			else if (paragraph.getChildren().size() == 1 && paragraph.getChildren().get(0) instanceof Image) {
+			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
+				if (!fillWithPreview(text))
+					paragraph.add(this.createText(text, fontMessage));
+			} else if (!hasText && paragraph.getChildren().get(0) instanceof Image) {
 				final Image image = (Image) paragraph.getChildren().get(0);
 				image.setHeight(36);
 				image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
@@ -671,6 +675,11 @@ public class PdfService {
 			}
 			paragraph.setTextAlignment(alignment);
 			cell.add(paragraph);
+		}
+
+		private void fillWithPreview(final String text) {
+			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
+			}
 		}
 
 		private Text createText(final String text, final PdfFont font) {
