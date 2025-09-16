@@ -697,7 +697,7 @@ public class PdfService {
 							final Matcher matcher = content.matcher(line);
 							if (matcher.find()) {
 								final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
-								IOUtils.write(IOUtils.toByteArray(new URL(matcher.group(1)).openStreaam()), new FileOutputStream(f));
+								IOUtils.write(IOUtils.toByteArray(new URL(matcher.group(1)).openStream()), new FileOutputStream(f));
 								fillMedia(cell, f.getName());
 								cell.add(new Paragraph(text));
 								return true;
