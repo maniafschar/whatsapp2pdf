@@ -704,6 +704,8 @@ public class PdfService {
 							}
 						}
 					}
+				} catch (IOException ex) {
+					return false;
 				}
 			}
 			return false;
