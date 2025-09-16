@@ -695,7 +695,7 @@ public class PdfService {
 							final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
 							IOUtils.write(IOUtils.toByteArray(new URL().openStreaam()), new FileOutputStream(f));
 							fillMedia(cell, f.getName());
-							cell.add(text);
+							cell.add(new Paragraph(text));
 							return true;
 						}
 					}
