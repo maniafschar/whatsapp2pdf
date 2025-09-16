@@ -4,6 +4,7 @@ import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -680,7 +681,7 @@ public class PdfService {
 			cell.add(paragraph);
 		}
 
-		private void fillWithPreview(final Cell cell, final String text) {
+		private boolean fillWithPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URL(text).openStream()))) {
