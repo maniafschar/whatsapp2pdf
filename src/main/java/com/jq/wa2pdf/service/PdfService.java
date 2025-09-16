@@ -6,8 +6,10 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -679,7 +681,22 @@ public class PdfService {
 
 		private void fillWithPreview(final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
+				try (final BufferedReader input = new BufferedReader(
+						new InputStreamReader(new URL(text).openStream()))) {
+					String line;
+					while ((line = input.readLine()) != null) {
+						int i = line.indexOf("property=\"og:image\"");
+						if (i > -1) {
+							line = line.substring(line.lastIndexOf('<', i));
+							if (line.contains(">"))
+								line += input.readLine();
+							line = line.substring(0, line.indexOf('>'));
+							return true;
+						}
+					}
+				}
 			}
+			return false;
 		}
 
 		private Text createText(final String text, final PdfFont font) {
