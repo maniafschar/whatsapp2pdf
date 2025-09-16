@@ -686,18 +686,22 @@ public class PdfService {
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URL(text).openStream()))) {
 					String line;
+					final Pattern content = Pattern.compile("content=\"([^\"].*)\"");
 					while ((line = input.readLine()) != null) {
 						int i = line.indexOf("property=\"og:image\"");
 						if (i > -1) {
 							line = line.substring(line.lastIndexOf('<', i));
 							if (line.contains(">"))
-								line += input.readLine();
+								line += " " + input.readLine();
 							line = line.substring(0, line.indexOf('>'));
-							final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
-							IOUtils.write(IOUtils.toByteArray(new URL().openStreaam()), new FileOutputStream(f));
-							fillMedia(cell, f.getName());
-							cell.add(new Paragraph(text));
-							return true;
+							final Matcher matcher = content.matcher(line);
+							if (matcher.find()) {
+								final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
+								IOUtils.write(IOUtils.toByteArray(new URL(matcher.group(1)).openStreaam()), new FileOutputStream(f));
+								fillMedia(cell, f.getName());
+								cell.add(new Paragraph(text));
+								return true;
+							}
 						}
 					}
 				}
