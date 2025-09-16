@@ -667,7 +667,7 @@ public class PdfService {
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				if (!fillWithPreview(text))
+				if (!fillWithPreview(cell, text))
 					paragraph.add(this.createText(text, fontMessage));
 			} else if (!hasText && paragraph.getChildren().get(0) instanceof Image) {
 				final Image image = (Image) paragraph.getChildren().get(0);
@@ -679,7 +679,7 @@ public class PdfService {
 			cell.add(paragraph);
 		}
 
-		private void fillWithPreview(final String text) {
+		private void fillWithPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URL(text).openStream()))) {
@@ -691,6 +691,10 @@ public class PdfService {
 							if (line.contains(">"))
 								line += input.readLine();
 							line = line.substring(0, line.indexOf('>'));
+							final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
+							IOUtils.write(IOUtils.toByteArray(new URL().openStreaam()), new FileOutputStream(f));
+							fillMedia(cell, f.getName());
+							cell.add(text);
 							return true;
 						}
 					}
