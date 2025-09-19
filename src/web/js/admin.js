@@ -21,7 +21,7 @@ class api {
 				ui.data[0].list = xhr.logs;
 				ui.renderTable(ui.data[0]);
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
-				var msg = function(i) { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[i].selector + ' tr').length - 1) + ' entries'; };
+				var msg = function (i) { document.querySelector('msg').innerHTML = (document.querySelectorAll(ui.data[i].selector + ' tr').length - 1) + ' entries'; };
 				document.querySelector('tabHeader').addEventListener('changed', event => { msg(event.detail.index) });
 				document.querySelector('log').addEventListener('changed', event => { msg(0) });
 				document.querySelector('ticket').addEventListener('changed', event => { msg(1) });
@@ -73,7 +73,7 @@ class api {
 			if (xhr.readyState == 4) {
 				var e = document.getElementsByTagName('progressbar')[0].style;
 				e.opacity = null;
-				setTimeout(function() { e.display = null; }, 400);
+				setTimeout(function () { e.display = null; }, 400);
 				var errorHandler = function () {
 					if (param.error) {
 						xhr.param = param;
@@ -106,103 +106,103 @@ class api {
 		}
 		var e = document.getElementsByTagName('progressbar')[0].style;
 		e.display = 'block';
-		setTimeout(function() { if (xhr.readyState != 4) e.opacity = 1; }, 100);
+		setTimeout(function () { if (xhr.readyState != 4) e.opacity = 1; }, 100);
 		xhr.send(param.body);
 	}
 }
 
 class ui {
 	static data =
-	[
-		{
-			list: [],
-			filter: null,
-			sort: null,
-			selector: 'log',
-			columns: [
-				{
-					label: 'id',
-					sort: true,
-					excludeNarrow: true
+		[
+			{
+				list: [],
+				filter: null,
+				sort: null,
+				selector: 'log',
+				columns: [
+					{
+						label: 'id',
+						sort: true,
+						excludeNarrow: true
+					},
+					{
+						label: 'createdAt'
+					},
+					{
+						label: 'status',
+						filter: true
+					},
+					{
+						label: 'ip',
+						filter: true
+					},
+					{
+						label: 'time',
+						sort: true
+					},
+					{
+						label: 'uri',
+						filter: true
+					},
+					{
+						label: 'referer',
+						excludeNarrow: true
+					}
+				],
+				convert() {
+					var d = [];
+					for (var i = 0; i < this.list.length; i++) {
+						var row = [];
+						row.push(this.list[i].id);
+						row.push(ui.formatTime(this.list[i].createdAt));
+						row.push(this.list[i].logStatus);
+						row.push(this.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + this.list[i].ip + '" target="sc_ip">' + this.list[i].ip + '</a>' : '');
+						row.push(this.list[i].time);
+						row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.trim(ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : '')));
+						row.push(this.list[i].referer);
+						d.push(row);
+					}
+					return d;
 				},
-				{
-					label: 'createdAt'
-				},
-				{
-					label: 'status',
-					filter: true
-				},
-				{
-					label: 'ip',
-					filter: true
-				},
-				{
-					label: 'time',
-					sort: true
-				},
-				{
-					label: 'uri',
-					filter: true
-				},
-				{
-					label: 'referer',
-					excludeNarrow: true
+				widths(narrowView) {
+					return narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35];
 				}
-			],
-			convert() {
-				var d = [];
-				for (var i = 0; i < this.list.length; i++) {
-					var row = [];
-					row.push(this.list[i].id);
-					row.push(ui.formatTime(this.list[i].createdAt));
-					row.push(this.list[i].logStatus);
-					row.push(this.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + this.list[i].ip + '" target="sc_ip">' + this.list[i].ip + '</a>' : '');
-					row.push(this.list[i].time);
-					row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.trim(ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : '')));
-					row.push(this.list[i].referer);
-					d.push(row);
-				}
-				return d;
 			},
-			widths(narrowView) {
-				return narrowView ? [0, 20, 10, 15, 10, 45] : [5, 10, 5, 10, 10, 25, 35];
-			}
-		},
-		{
-			list: [],
-			filter: null,
-			sort: null,
-			selector: 'ticket',
-			columns: [
-				{
-					label: 'id',
-					sort: true,
-					excludeNarrow: true
+			{
+				list: [],
+				filter: null,
+				sort: null,
+				selector: 'ticket',
+				columns: [
+					{
+						label: 'id',
+						sort: true,
+						excludeNarrow: true
+					},
+					{
+						label: 'createdAt'
+					},
+					{
+						label: 'note',
+						sort: true
+					}
+				],
+				convert() {
+					var d = [];
+					for (var i = 0; i < this.list.length; i++) {
+						var row = [];
+						row.push(this.list[i].id);
+						row.push(ui.formatTime(this.list[i].createdAt));
+						row.push(ui.trim(ui.sanitizeText(this.list[i].note)));
+						d.push(row);
+					}
+					return d;
 				},
-				{
-					label: 'createdAt'
-				},
-				{
-					label: 'note',
-					sort: true
+				widths(narrowView) {
+					return narrowView ? [0, 20, 80] : [5, 10, 85];
 				}
-			],
-			convert() {
-				var d = [];
-				for (var i = 0; i < this.list.length; i++) {
-					var row = [];
-					row.push(this.list[i].id);
-					row.push(ui.formatTime(this.list[i].createdAt));
-					row.push(ui.trim(ui.sanitizeText(this.list[i].note)));
-					d.push(row);
-				}
-				return d;
-			},
-			widths(narrowView) {
-				return narrowView ? [0, 20, 80] : [5, 10, 85];
 			}
-		}
-	];
+		];
 	static multiline = false;
 
 	static openDetails(event) {
@@ -248,7 +248,7 @@ class ui {
 	static popupClose() {
 		document.getElementsByTagName('popup')[0].style.transform = '';
 		document.querySelector('popup content').removeAttribute('i');
-		setTimeout(function() { document.querySelector('popup content').innerHTML = ''; }, 500);
+		setTimeout(function () { document.querySelector('popup content').innerHTML = ''; }, 500);
 	}
 
 	static filter(event, field) {
@@ -313,17 +313,17 @@ class ui {
 	static isNarrowView() {
 		return window.outerWidth < 700;
 	}
-	
+
 	static renderTable(data) {
 		var d = data.convert();
 		var narrowView = ui.isNarrowView();
 		var s = '<thead><tr>';
 		for (var i = 0; i < data.columns.length; i++) {
 			if (!narrowView || !data.columns[i].excludeNarrow)
-				s += '<th' + 
-						(data.columns[i].sort ? ' onclick="ui.sortColumn(event)" class="clickable"' : '') +
-						(data.columns[i].filter ? ' onclick="ui.openFilter(event)" class="clickable"' : '') +
-						' [[w' + (i + 1) + ']]>' + data.columns[i].label + '</th>';
+				s += '<th' +
+					(data.columns[i].sort ? ' onclick="ui.sortColumn(event)" class="clickable"' : '') +
+					(data.columns[i].filter ? ' onclick="ui.openFilter(event)" class="clickable"' : '') +
+					' [[w' + (i + 1) + ']]>' + data.columns[i].label + '</th>';
 		}
 		s += '</tr></thead>';
 		if (data.sort) {
@@ -331,7 +331,7 @@ class ui {
 			var factor = data.sort.indexOf('-asc') > 0 ? 1 : -1;
 			d = d.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
 		}
-		var isFiltered = function(data, row) {
+		var isFiltered = function (data, row) {
 			if (data.filter) {
 				var field = row[parseInt(data.filter.substring(0, data.filter.indexOf('-'))) + (narrowView ? 1 : 0)];
 				var filterValue = data.filter.substring(data.filter.indexOf('-') + 1);

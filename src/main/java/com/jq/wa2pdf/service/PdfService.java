@@ -7,10 +7,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -70,6 +70,7 @@ import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
+import com.jq.wa2pdf.util.Utilities;
 import com.vdurmont.emoji.EmojiParser;
 
 @Component
@@ -115,6 +116,7 @@ public class PdfService {
 
 	private class PDF {
 		private static PdfFont fontMessage;
+		private static final int defaultPadding = 10;
 		private final Path dir;
 		private PdfWriter writer;
 		private Document document;
@@ -360,10 +362,6 @@ public class PdfService {
 				table.addCell(cellMessage);
 				table.addCell(empty);
 			}
-			if (media != null && media.length > 0 && media[0]) {
-				cellMessage.setPadding(0);
-				cellMessage.setBackgroundColor(null);
-			}
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			this.content.add(table);
@@ -407,7 +405,7 @@ public class PdfService {
 			final Table header = new Table(1);
 			header.setWidth(UnitValue.createPercentValue(100f));
 			header.setHeight(UnitValue.createPointValue(80));
-			header.addCell(this.createCell("https://wa2pdf.com"));
+			header.addCell(new Paragraph(this.createText("https://wa2pdf.com", fontMessage)));
 			header.getCell(0, 0).setPadding(0);
 			header.getCell(0, 0).setFontColor(this.colorDate);
 			header.getCell(0, 0).setPaddingTop(36);
@@ -548,9 +546,9 @@ public class PdfService {
 		}
 
 		private void addAISummery() {
-			final String summary = this.preview ?
-					"The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights." :
-					PdfService.this.aiService.summerize(this.text.toString());
+			final String summary = this.preview
+					? "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights."
+					: PdfService.this.aiService.summerize(this.text.toString());
 			if (!summary.isBlank()) {
 				final Table header = new Table(1);
 				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
@@ -574,15 +572,17 @@ public class PdfService {
 		private Cell createCell(final String text, final TextAlignment alignment, final boolean media,
 				final float... padding) {
 			final Cell cell = new Cell();
-			final int defaultPadding = 10;
 			cell.setBorder(Border.NO_BORDER);
 			cell.setFontSize(11f);
 			cell.setMargin(0);
-			cell.setPaddingTop(padding != null && padding.length > 0 ? padding[0] : defaultPadding / (media ? 1 : 2));
-			cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
-			cell.setPaddingBottom(
-					padding != null && padding.length > 2 ? padding[2] : defaultPadding / (media ? 1 : 2));
-			cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
+			if (!media) {
+				cell.setPaddingTop(
+						padding != null && padding.length > 0 ? padding[0] : defaultPadding / 2);
+				cell.setPaddingLeft(padding != null && padding.length > 1 ? padding[1] : defaultPadding);
+				cell.setPaddingBottom(
+						padding != null && padding.length > 2 ? padding[2] : defaultPadding / 2);
+				cell.setPaddingRight(padding != null && padding.length > 3 ? padding[3] : defaultPadding);
+			}
 			if (text != null) {
 				if (media)
 					this.fillMedia(cell, text);
@@ -601,7 +601,7 @@ public class PdfService {
 					cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
-					final double max = 550;
+					final double max = 440;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
 					if (!mediaId.matches(ExtractService.filename
 							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
@@ -668,10 +668,11 @@ public class PdfService {
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				if (fillWithPreview(cell, text))
+				if (this.fillWithPreview(cell, text))
 					return;
 				paragraph.add(this.createText(text, fontMessage));
-			} else if (!hasText && paragraph.getChildren().get(0) instanceof Image) {
+			} else if (!hasText && !paragraph.getChildren().isEmpty()
+					&& paragraph.getChildren().get(0) instanceof Image) {
 				final Image image = (Image) paragraph.getChildren().get(0);
 				image.setHeight(36);
 				image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
@@ -684,11 +685,11 @@ public class PdfService {
 		private boolean fillWithPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				try (final BufferedReader input = new BufferedReader(
-						new InputStreamReader(new URL(text).openStream()))) {
+						new InputStreamReader(new URI(text).toURL().openStream()))) {
 					String line;
 					final Pattern content = Pattern.compile("content=\"([^\"].*)\"");
 					while ((line = input.readLine()) != null) {
-						int i = line.indexOf("property=\"og:image\"");
+						final int i = line.indexOf("property=\"og:image\"");
 						if (i > -1) {
 							line = line.substring(line.lastIndexOf('<', i));
 							if (line.contains(">"))
@@ -696,15 +697,21 @@ public class PdfService {
 							line = line.substring(0, line.indexOf('>'));
 							final Matcher matcher = content.matcher(line);
 							if (matcher.find()) {
-								final File f = this.dir.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".png").toAbsolutePath().toFile();
-								IOUtils.write(IOUtils.toByteArray(new URL(matcher.group(1)).openStream()), new FileOutputStream(f));
-								fillMedia(cell, f.getName());
+								final File f = this.dir
+										.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".jpg")
+										.toAbsolutePath().toFile();
+								IOUtils.write(IOUtils.toByteArray(new URI(matcher.group(1)).toURL().openStream()),
+										new FileOutputStream(f));
+								cell.setPaddingTop(defaultPadding);
+								this.fillMedia(cell, f.getName());
 								cell.add(new Paragraph(text));
 								return true;
 							}
 						}
 					}
-				} catch (IOException ex) { }
+				} catch (final Exception ex) {
+					PdfService.this.adminService.createTicket(new Ticket(Utilities.stackTraceToString(ex)));
+				}
 			}
 			return false;
 		}

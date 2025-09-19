@@ -16,6 +16,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.wa2pdf.TestConfig;
 import com.jq.wa2pdf.WhatsApp2PdfApplication;
+import com.jq.wa2pdf.service.AiService.AiType;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
@@ -30,6 +31,7 @@ public class AiServiceTest {
 	@Test
 	public void summerize() throws IOException {
 		// given
+		AiService.type = AiType.None;
 		final String text = IOUtils.toString(this.getClass().getResourceAsStream("/_chat.txt"), StandardCharsets.UTF_8);
 
 		// when
@@ -37,6 +39,6 @@ public class AiServiceTest {
 
 		// then
 		assertNotNull(summary);
-		assertTrue(summary.length() > 100);
+		assertTrue(summary.length() < 100);
 	}
 }

@@ -28,7 +28,11 @@ import com.jq.wa2pdf.util.Utilities;
 
 @Service
 class AiService {
-	private static final boolean gemini = true;
+	static AiType type = AiType.Gemini;
+
+	enum AiType {
+		GPT, Gemini, None
+	}
 
 	@Autowired
 	private AdminService adminService;
@@ -42,12 +46,13 @@ class AiService {
 	public String summerize(final String text) {
 		if (text.length() < 900)
 			return "";
-		return gemini ? this.summerizeGemini(text) : this.summerizeGPT(text);
+		return type == AiType.Gemini ? this.summerizeGemini(text) : type == AiType.GPT ? this.summerizeGPT(text) : "";
 	}
 
 	private String summerizeGemini(final String text) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
-				.parts(ImmutableList.of(Part.fromText("Summarize this WhatsApp chat in about 300 words in the language they speak:\n" + text)))
+				.parts(ImmutableList.of(Part.fromText(
+						"Summarize this WhatsApp chat in about 300 words in the language they speak:\n" + text)))
 				.build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
 				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
