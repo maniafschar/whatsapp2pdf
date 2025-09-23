@@ -338,7 +338,7 @@ public class PdfService {
 		private void addMessage(final String user, final String date, final String message, final boolean... media) {
 			final Cell cellMessage = this.createCell(message, media);
 
-			final Cell cellTime = this.createCell(date.split(" ")[1] + (this.groupChat ? " · " + user : ""));
+			final Cell cellTime = this.createCell((date == null ? "" : date.split(" ")[1]) + (this.groupChat ? " · " + user : ""));
 			cellTime.setFontSize(8.5f);
 			cellTime.setFontColor(this.colorDate);
 			cellTime.setPaddingBottom(0);
