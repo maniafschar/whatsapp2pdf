@@ -206,6 +206,7 @@ public class PdfService {
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
+				int i = 0;
 				while ((line = input.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
@@ -214,10 +215,10 @@ public class PdfService {
 							break;
 						foundMonth = inMonth;
 						if (foundMonth) {
+							i++;
 							this.text.append(line).append('\n');
 							if (lastChat != null)
 								this.addMessage(user, date, lastChat);
-							this.addDate(line.split(" ")[0].replace("[", "").replace(",", "").trim());
 							if (separator == null)
 								separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
 							user = line
@@ -235,6 +236,8 @@ public class PdfService {
 						}
 					} else if (foundMonth && lastChat != null)
 						lastChat += "\n" + line;
+					if (this.preview && i > 40)
+						break;
 				}
 				this.addMessage(user, date, lastChat);
 				this.addDate(null);
@@ -292,8 +295,6 @@ public class PdfService {
 									this.sanitizeDestination(
 											((Text) ((Paragraph) table.getCell(0, 0).getChildren().get(0))
 													.getChildren().get(0)).getText())));
-				if (this.preview && this.document.getPdfDocument().getNumberOfPages() > 4)
-					break;
 			}
 			if (this.preview)
 				this.addPreviewInfo();
@@ -336,9 +337,13 @@ public class PdfService {
 		}
 
 		private void addMessage(final String user, final String date, final String message, final boolean... media) {
+			if (message == null || message.isBlank())
+				return;
+			this.addDate(date.split(" ")[0].replace("[", "").replace(",", "").trim());
 			final Cell cellMessage = this.createCell(message, media);
 
-			final Cell cellTime = this.createCell((date == null ? "" : date.split(" ")[1]) + (this.groupChat ? " · " + user : ""));
+			final Cell cellTime = this
+					.createCell((date == null ? "" : date.split(" ")[1]) + (this.groupChat ? " · " + user : ""));
 			cellTime.setFontSize(8.5f);
 			cellTime.setFontColor(this.colorDate);
 			cellTime.setPaddingBottom(0);
@@ -409,6 +414,7 @@ public class PdfService {
 			header.getCell(0, 0).setPadding(0);
 			header.getCell(0, 0).setFontColor(this.colorDate);
 			header.getCell(0, 0).setPaddingTop(36);
+			header.getCell(0, 0).setBorder(Border.NO_BORDER);
 			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
 			this.document.add(header);
 
@@ -427,7 +433,7 @@ public class PdfService {
 			table.addCell(this.createCell("Words", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(this.createCell("Letters", TextAlignment.RIGHT, 0, 0, 0, 0));
 			final List<Statistics> totalSumUp = new ArrayList<>();
-			for (int i = 0; i < this.total.size() && (!this.preview || i < 8); i++) {
+			for (int i = 0; i < this.total.size(); i++) {
 				final Statistics statistics = this.total.get(i);
 				Statistics statisticsTotal = totalSumUp.stream().filter(e2 -> e2.user.equals(statistics.user))
 						.findFirst().orElse(null);
@@ -468,7 +474,7 @@ public class PdfService {
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			final String idChart = ExtractService.filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.preview, this.colors);
+			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors);
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);
@@ -495,10 +501,7 @@ public class PdfService {
 			int max = 0, min = Integer.MAX_VALUE;
 			table.setMarginTop(20f);
 			for (final Statistics wordCloud : this.wordClouds) {
-				final List<Token> token = PdfService.this.wordCloudService.extract(wordCloud.text.substring(0,
-						this.preview && wordCloud.text.indexOf(" ") > 0 && wordCloud.text.length() > 700
-								? wordCloud.text.lastIndexOf(" ", (int) (0.1 * wordCloud.text.length()))
-								: wordCloud.text.length()));
+				final List<Token> token = PdfService.this.wordCloudService.extract(wordCloud.text.toString());
 				while (token.size() > 50)
 					token.remove(50);
 				if (token.size() > 0) {
