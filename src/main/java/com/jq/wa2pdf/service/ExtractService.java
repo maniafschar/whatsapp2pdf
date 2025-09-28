@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -151,43 +152,48 @@ public class ExtractService {
 		return "";
 	}
 
-	String getPatternStart() {
-		return "^.?((\\[{date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)])|({date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm) -)) ([^:].*?):.*";
+	String getPatternStart(final String date) {
+		return "^[^0-9a-zA-Z]?((\\[{date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)])|({date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm) -)) ([^:].*?):.*"
+				.replace("{date}", date);
 	}
 
 	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
 		this.unzip(file, id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
-			final Pattern start = Pattern.compile(this.getPatternStart().replace("{date}", "[0-9/-\\\\.]*"));
+			final Pattern start = Pattern.compile(this.getPatternStart("[0-9\\/\\-\\.]*"));
 			final Pattern media = Pattern.compile(this.getPatternMadia(id));
 			String date, currentDate = null, line, separator = null;
 			Statistics user = null, period = null;
 			while ((line = chat.readLine()) != null) {
-				if (line.trim().length() > 0 && start.matcher(line).matches()) {
-					if (separator == null)
-						separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
-					final String u = line
-							.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator))).trim();
-					user = attributes.users.stream().filter(e -> e.user.equals(u)).findFirst().orElse(null);
-					if (user == null) {
-						user = new Statistics();
-						user.user = u;
-						attributes.users.add(user);
-					}
-					date = DateHandler
-							.replaceDay(line.substring(0, line.indexOf(" ")).replace("[", "").replace(",", "").trim());
-					if (currentDate == null || !currentDate.equals(date)) {
-						currentDate = date;
-						if (attributes.periods.size() == 0
-								|| !attributes.periods.get(attributes.periods.size() - 1).period.equals(currentDate)) {
-							final Statistics statistics = new Statistics();
-							statistics.period = currentDate;
-							attributes.periods.add(statistics);
+				if (!line.isBlank()) {
+					final Matcher matcher = start.matcher(line);
+					if (matcher.matches()) {
+						if (separator == null)
+							separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
+						final String u = line
+								.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
+								.trim();
+						user = attributes.users.stream().filter(e -> e.user.equals(u)).findFirst().orElse(null);
+						if (user == null) {
+							user = new Statistics();
+							user.user = u;
+							attributes.users.add(user);
 						}
+						date = DateHandler.replaceDay(matcher.group(1).trim());
+						if (currentDate == null || !currentDate.equals(date)) {
+							currentDate = date;
+							if (attributes.periods.size() == 0
+									|| !attributes.periods.get(attributes.periods.size() - 1).period
+											.equals(currentDate)) {
+								final Statistics statistics = new Statistics();
+								statistics.period = currentDate;
+								attributes.periods.add(statistics);
+							}
+						}
+						period = attributes.periods.get(attributes.periods.size() - 1);
+						line = line.substring(line.indexOf(':', line.indexOf(separator)) + 1);
 					}
-					period = attributes.periods.get(attributes.periods.size() - 1);
-					line = line.substring(line.indexOf(':', line.indexOf(separator)) + 1);
 				}
 				if (user != null && period != null) {
 					user.chats++;

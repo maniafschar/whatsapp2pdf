@@ -120,6 +120,7 @@ public class PdfService {
 		private final Path dir;
 		private PdfWriter writer;
 		private Document document;
+		private String dateFormat;
 		private final List<String> outline = new ArrayList<>();
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
@@ -199,10 +200,10 @@ public class PdfService {
 					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
 				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia(this.id));
 				final Pattern patternStart = Pattern
-						.compile(PdfService.this.extractService.getPatternStart().replace("{date}",
-								this.period.replaceAll("[0-9]", "\\\\d")));
+						.compile(PdfService.this.extractService
+								.getPatternStart(this.period.replaceAll("[0-9]", "\\\\d")));
 				final Pattern patternMonth = Pattern
-						.compile(PdfService.this.extractService.getPatternStart().replace("{date}", this.period));
+						.compile(PdfService.this.extractService.getPatternStart(this.period));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
@@ -225,6 +226,8 @@ public class PdfService {
 									.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
 									.trim();
 							date = line.substring(0, line.indexOf(separator)).trim();
+							if (this.dateFormat == null)
+								this.dateFormat = DateHandler.dateFormat(date);
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
 							final Matcher m = patternMedia.matcher(line);
@@ -470,11 +473,13 @@ public class PdfService {
 		}
 
 		private void addChart() throws IOException, ParseException {
+			if (this.total.size() == 0)
+				return;
 			final Table table = new Table(1);
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			final String idChart = ExtractService.filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors);
+			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors, this.dateFormat);
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);
@@ -484,6 +489,8 @@ public class PdfService {
 		}
 
 		private void addWordCloud() throws IOException {
+			if (this.wordClouds.size() == 0)
+				return;
 			final Statistics wordCloudStatistics = this.wordClouds.stream().filter(e -> e.user.equals(this.user))
 					.findFirst().orElse(null);
 			if (wordCloudStatistics != null) {

@@ -1,7 +1,11 @@
 package com.jq.wa2pdf.util;
 
 public class DateHandler {
-	public static String replaceDay(final String date) {
+	public static String replaceDay(String date) {
+		final boolean ampm = date.toLowerCase().contains("m");
+		date = date.substring(0, date.indexOf(' ')).replace(",", "");
+		if (date.contains("/") && ampm)
+			return date.split("/")[0] + "/\\d\\d/" + date.split("/")[2];
 		if (date.contains("/"))
 			return "\\d\\d/" + date.split("/")[1] + "/" + date.split("/")[2];
 		if (date.contains("."))
@@ -23,11 +27,12 @@ public class DateHandler {
 		return "_" + period;
 	}
 
-	public static String dateFormat(final String period) {
-		return period.contains("/") ? "dd/MM/yy" : period.contains(".") ? "dd.MM.yy" : "yy-MM-dd";
+	public static String dateFormat(final String date) {
+		return date.contains("/") && date.toLowerCase().contains("m") ? "M/d/yy"
+				: date.contains("/") ? "d/M/yy" : date.contains(".") ? "d.M.yy" : "yy-M-d";
 	}
 
-	public static String removeYear(String pattern) {
+	public static String removeYear(final String pattern) {
 		return pattern.replace("/yy", "").replace(".yy", "").replace("yy-", "");
 	}
 }

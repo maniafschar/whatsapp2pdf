@@ -28,9 +28,9 @@ import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 class ChartService {
-	void createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors)
-			throws IOException, ParseException {
-		final List<String> x = this.createXAxis(data.get(0).getPeriod());
+	void createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors,
+			final String dateFormat) throws IOException, ParseException {
+		final List<String> x = this.createXAxis(data.get(0).getPeriod(), dateFormat);
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -52,8 +52,8 @@ class ChartService {
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private List<String> createXAxis(final String period) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat(DateHandler.dateFormat(period));
+	private List<String> createXAxis(final String period, final String dateFormat) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(period));
 		gc.set(Calendar.DATE, 1);
