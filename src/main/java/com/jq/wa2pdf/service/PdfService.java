@@ -357,17 +357,22 @@ public class PdfService {
 			final Cell empty = this.createCell("");
 			empty.setPadding(0);
 
+			final boolean hasText = cellMessage.getChildren().get(0) instanceof Paragraph
+					&& ((Paragraph) cellMessage.getChildren().get(0)).getChildren().stream()
+							.anyMatch(e -> e instanceof Text);
 			final Table table;
 			if (user.equals(this.user)) {
 				table = new Table(UnitValue.createPercentArray(new float[] { 15f, 85f }));
-				cellMessage.setBackgroundColor(this.colorChatUser, 0.3f);
+				if (hasText)
+					cellMessage.setBackgroundColor(this.colorChatUser, 0.3f);
 				table.addCell(empty);
 				table.addCell(cellTime);
 				table.addCell(empty);
 				table.addCell(cellMessage);
 			} else {
 				table = new Table(UnitValue.createPercentArray(new float[] { 85f, 15f }));
-				cellMessage.setBackgroundColor(this.colorChatOther, 0.3f);
+				if (hasText)
+					cellMessage.setBackgroundColor(this.colorChatOther, 0.3f);
 				table.addCell(cellTime);
 				table.addCell(empty);
 				table.addCell(cellMessage);
@@ -686,10 +691,12 @@ public class PdfService {
 				paragraph.add(this.createText(text, fontMessage));
 			} else if (!hasText && !paragraph.getChildren().isEmpty()
 					&& paragraph.getChildren().get(0) instanceof Image) {
-				final Image image = (Image) paragraph.getChildren().get(0);
-				image.setHeight(36);
-				image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
-				image.setMarginBottom(0);
+				for (final IElement e : paragraph.getChildren()) {
+					final Image image = (Image) e;
+					image.setHeight(36);
+					image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
+					image.setMarginBottom(0);
+				}
 			}
 			paragraph.setTextAlignment(alignment);
 			cell.add(paragraph);
