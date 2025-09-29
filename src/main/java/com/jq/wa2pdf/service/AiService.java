@@ -28,7 +28,7 @@ import com.jq.wa2pdf.util.Utilities;
 
 @Service
 class AiService {
-	static AiType type = AiType.Gemini;
+	public static AiType type = AiType.Gemini;
 
 	enum AiType {
 		GPT, Gemini, None
