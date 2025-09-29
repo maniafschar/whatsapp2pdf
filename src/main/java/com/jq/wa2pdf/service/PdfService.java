@@ -678,8 +678,7 @@ public class PdfService {
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				if (this.fillWithPreview(cell, text))
-					return;
+				this.fillLinkPreview(cell, text);
 				paragraph.add(this.createText(text, fontMessage));
 			} else if (!hasText && !paragraph.getChildren().isEmpty()
 					&& paragraph.getChildren().get(0) instanceof Image) {
@@ -692,7 +691,7 @@ public class PdfService {
 			cell.add(paragraph);
 		}
 
-		private boolean fillWithPreview(final Cell cell, final String text) {
+		private void fillLinkPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URI(text).toURL().openStream()))) {
@@ -714,8 +713,6 @@ public class PdfService {
 										new FileOutputStream(f));
 								cell.setPaddingTop(defaultPadding);
 								this.fillMedia(cell, f.getName());
-								cell.add(new Paragraph(text));
-								return true;
 							}
 						}
 					}
@@ -723,7 +720,6 @@ public class PdfService {
 					PdfService.this.adminService.createTicket(new Ticket(Utilities.stackTraceToString(ex)));
 				}
 			}
-			return false;
 		}
 
 		private Text createText(final String text, final PdfFont font) {
