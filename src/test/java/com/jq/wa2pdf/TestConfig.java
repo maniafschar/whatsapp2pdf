@@ -1,5 +1,7 @@
 package com.jq.wa2pdf;
 
+import com.jq.wa2pdf.service.AiService;
+
 import javax.sql.DataSource;
 
 import org.springframework.boot.test.context.TestConfiguration;
@@ -12,6 +14,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @TestConfiguration
 @EnableTransactionManagement
 public class TestConfig {
+	public TestConfig() {
+		AiService.type = AiService.AiType.None;
+	}
+
 	@Bean
 	public DataSource getDataSource() throws Exception {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
