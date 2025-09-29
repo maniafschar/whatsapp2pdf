@@ -32,7 +32,7 @@ public class DateHandler {
 				: date.contains("/") ? "d/M/yy" : date.contains(".") ? "d.M.yy" : "yy-M-d";
 	}
 
-	public static String removeYear(final String pattern) {
-		return pattern.replace("/yy", "").replace(".yy", "").replace("yy-", "");
+	public static String removeYear(final String tag, final String pattern) {
+		return "yy-M-d".equals(pattern) ? tag.substring(3) : tag.substring(0, tag.length() - 3);
 	}
 }

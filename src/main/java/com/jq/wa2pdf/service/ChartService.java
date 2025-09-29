@@ -43,7 +43,8 @@ class ChartService {
 		final int marginPlot = 10;
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
 		final int marginX = (image.getWidth() - marginLegend) / x.size();
-		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot, x);
+		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot, x,
+				dateFormat);
 		this.drawCharts(g, marginLegend, marginPlot, heightPlot,
 				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, x, colors));
 		g.dispose();
@@ -53,13 +54,12 @@ class ChartService {
 	}
 
 	private List<String> createXAxis(final String period, final String dateFormat) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		final SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(period));
 		gc.set(Calendar.DATE, 1);
 		final int month = gc.get(Calendar.MONTH);
 		final List<String> result = new ArrayList<>();
-		formatter = new SimpleDateFormat(DateHandler.removeYear(formatter.toPattern()));
 		while (month == gc.get(Calendar.MONTH)) {
 			result.add(formatter.format(gc.getTime()));
 			gc.add(Calendar.DATE, 1);
@@ -85,7 +85,7 @@ class ChartService {
 				plotData.plots.add(plot);
 			}
 			final int index = xAxis
-					.indexOf(xAxis.stream().filter(e -> dataUser.period.contains(e)).findFirst().get());
+					.indexOf(xAxis.stream().filter(e -> dataUser.period.equals(e)).findFirst().get());
 			// add null values before, from beginning or between days
 			for (int i = (int) Math.signum(plot.lastIndex); i < index - plot.lastIndex; i++) {
 				final int x = marginLegend + marginX * (1 + plot.lastIndex + i);
@@ -142,15 +142,20 @@ class ChartService {
 
 	private void drawLegend(final Graphics2D g, final List<Statistics> data, final int width, final int height,
 			final int marginLegend, final int marginPlot, final int marginX, final int heightPlot,
-			final List<String> periods) {
+			final List<String> xAxis, final String dateFormat) {
 		int x = marginLegend;
 		final Font fontHorizontal = g.getFont();
 		final Font fontVertical = g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5));
 		g.setFont(fontVertical);
 		g.setColor(new Color(0, 0, 0, 120));
 
-		for (final String period : periods)
-			g.drawString(period, x += marginX, height);
+		for (final String period : xAxis) {
+			final String s = DateHandler.removeYear(period, dateFormat);
+			g.setFont(fontHorizontal);
+			final int stringWidth = g.getFontMetrics().stringWidth(s);
+			g.setFont(fontVertical);
+			g.drawString(s, x += marginX, height - marginLegend + stringWidth + marginPlot / 2);
+		}
 
 		g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(0)));
 		final String[] types = { "chats", "words", "letters" };

@@ -339,10 +339,13 @@ public class PdfService {
 			}
 		}
 
-		private void addMessage(final String user, final String date, final String message, final boolean... media) {
+		private void addMessage(final String user, String date, final String message, final boolean... media) {
 			if (message == null || message.isBlank())
 				return;
-			this.addDate(date.split(" ")[0].replace("[", "").replace(",", "").trim());
+			date = date.replace("[", "").replace(",", "").trim();
+			for (int i = 1; i < 10; i++)
+				date = date.replace("0" + i, "" + i);
+			this.addDate(date.split(" ")[0]);
 			final Cell cellMessage = this.createCell(message, media);
 
 			final Cell cellTime = this
@@ -479,7 +482,8 @@ public class PdfService {
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			final String idChart = ExtractService.filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors, this.dateFormat);
+			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors,
+					this.dateFormat);
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);

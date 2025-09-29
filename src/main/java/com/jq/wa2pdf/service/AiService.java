@@ -27,10 +27,10 @@ import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.util.Utilities;
 
 @Service
-class AiService {
+public class AiService {
 	public static AiType type = AiType.Gemini;
 
-	enum AiType {
+	public enum AiType {
 		GPT, Gemini, None
 	}
 
