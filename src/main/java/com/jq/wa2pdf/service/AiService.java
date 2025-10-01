@@ -52,7 +52,7 @@ public class AiService {
 	private String summerizeGemini(final String text) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(
-						"Summarize this WhatsApp chat in about 300 words in the language they speak:\n" + text)))
+						"Summarize this WhatsApp chat in about 300 words in the language they speak and at the end of the summary add for each user 3 adjectives mainly discribing his/her mood during conversation:\n" + text)))
 				.build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
 				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
