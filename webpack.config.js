@@ -3,11 +3,11 @@ const express = require('express');
 
 module.exports = (env) => {
 	return [{
-		entry: './src/web/js/admin.js',
+		entry: './src/web/admin/js/main.js',
 		mode: 'production',
 		output: {
 			globalObject: 'this',
-			filename: 'js/admin.js',
+			filename: 'admin/js/main.js',
 			path: path.resolve(__dirname, 'dist'),
 		},
 		optimization: {
