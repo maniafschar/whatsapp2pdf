@@ -2,7 +2,7 @@
 	font-family: 'Comfortaa';
 	font-style: regular;
 	font-weight: 400;
-	src: url(../font/Comfortaa-Regular.ttf) format('truetype');
+	src: url(/font/Comfortaa-Regular.ttf) format('truetype');
 }
 
 * {
