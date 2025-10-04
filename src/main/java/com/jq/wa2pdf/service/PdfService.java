@@ -66,6 +66,7 @@ import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
+import com.jq.wa2pdf.service.AiService.AiSummary;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
@@ -125,6 +126,7 @@ public class PdfService {
 		private final List<Statistics> total = new ArrayList<>();
 		private final List<Statistics> wordClouds = new ArrayList<>();
 		private final List<Table> content = new ArrayList<>();
+		private AiSummary aiSummary = null;
 		private final Map<String, java.awt.Color> colors = new HashMap<>();
 		private final Color colorDate = PatternColor.createColorWithColorSpace(new float[] { 0.53f, 0.53f, 0.53f });
 		private final Color colorChatUser = PatternColor.createColorWithColorSpace(new float[] { 0.7f, 0.9f, 1f });
@@ -187,8 +189,8 @@ public class PdfService {
 			this.parseChats();
 			this.addMetaData();
 			this.addChart();
-			this.addWordCloud();
 			this.addAISummery();
+			this.addWordCloud();
 			this.writeContent();
 			this.document.flush();
 			this.document.close();
@@ -542,7 +544,17 @@ public class PdfService {
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f));
 				cellTable.addCell(cell);
-				cell = this.createCell(names.remove(0), TextAlignment.CENTER);
+				String name = names.remove(0);
+				if (this.aiSummary != null) {
+					final String n = name;
+					if (this.aiSummary.adjectives.containsKey(n))
+						name += "\n" + this.aiSummary.adjectives.get(n).stream()
+								.collect(Collectors.joining("\u00a0\u00a0\u00a0"));
+					if (this.aiSummary.emojis.containsKey(n))
+						name += "\n" + this.aiSummary.emojis.get(n).stream()
+								.collect(Collectors.joining("\u00a0\u00a0\u00a0"));
+				}
+				cell = this.createCell(name, TextAlignment.CENTER);
 				cell.setPaddingTop(0);
 				cellTable.addCell(cell);
 				cell = new Cell();
@@ -565,18 +577,29 @@ public class PdfService {
 		}
 
 		private void addAISummery() {
-			final String summary = this.preview
-					? "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights."
-					: PdfService.this.aiService.summerize(this.text.toString());
-			if (!summary.isBlank()) {
-				final Table header = new Table(1);
+			final String text;
+			if (this.preview)
+				text = "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights.";
+			else {
+				final Set<String> users = new HashSet<>();
+				this.total.stream().forEach(e -> users.add(e.user));
+				final AiSummary summary = PdfService.this.aiService.summerize(this.text.toString(), users);
+				if (summary == null)
+					text = null;
+				else {
+					text = summary.text;
+					this.aiSummary = summary;
+				}
+			}
+			if (text != null && !text.isBlank()) {
+				final Table summary = new Table(1);
 				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
 				cell.setBackgroundColor(this.colorDate, 0.2f);
-				header.addCell(cell);
-				header.setWidth(UnitValue.createPercentValue(100f));
-				header.addCell(this.createCell(summary));
-				header.getCell(1, 0).setPaddingBottom(36);
-				this.document.add(header);
+				summary.addCell(cell);
+				summary.setWidth(UnitValue.createPercentValue(100f));
+				summary.addCell(this.createCell(text));
+				summary.setMarginTop(15);
+				this.document.add(summary);
 			}
 		}
 
@@ -704,6 +727,7 @@ public class PdfService {
 
 		private void fillLinkPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
+				String uri = null;
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URI(text).toURL().openStream()))) {
 					String line;
@@ -717,18 +741,21 @@ public class PdfService {
 							line = line.substring(0, line.indexOf('>'));
 							final Matcher matcher = content.matcher(line);
 							if (matcher.find()) {
+								uri = matcher.group(1);
 								final File f = this.dir
 										.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".jpg")
 										.toAbsolutePath().toFile();
-								IOUtils.write(IOUtils.toByteArray(new URI(matcher.group(1)).toURL().openStream()),
+								IOUtils.write(IOUtils.toByteArray(new URI(uri).toURL().openStream()),
 										new FileOutputStream(f));
 								cell.setPaddingTop(defaultPadding);
 								this.fillMedia(cell, f.getName());
+								break;
 							}
 						}
 					}
 				} catch (final Exception ex) {
-					PdfService.this.adminService.createTicket(new Ticket(Utilities.stackTraceToString(ex)));
+					PdfService.this.adminService.createTicket(new Ticket(
+							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTraceToString(ex)));
 				}
 			}
 		}

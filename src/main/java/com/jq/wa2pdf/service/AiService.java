@@ -2,8 +2,13 @@ package com.jq.wa2pdf.service;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +30,11 @@ import com.google.genai.types.ThinkingConfig;
 import com.google.genai.types.Tool;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.util.Utilities;
+import com.vdurmont.emoji.EmojiParser;
 
 @Service
 public class AiService {
 	public static AiType type = AiType.Gemini;
-
-	public enum AiType {
-		GPT, Gemini, None
-	}
 
 	@Autowired
 	private AdminService adminService;
@@ -43,16 +45,32 @@ public class AiService {
 	@Value("${app.google.gemini.apiKey}")
 	private String geminiKey;
 
-	public String summerize(final String text) {
-		if (text.length() < 900)
-			return "";
-		return type == AiType.Gemini ? this.summerizeGemini(text) : type == AiType.GPT ? this.summerizeGPT(text) : "";
+	private final String adjectiveDelimiter = "########";
+
+	public enum AiType {
+		GPT, Gemini, None
 	}
 
-	private String summerizeGemini(final String text) {
+	class AiSummary {
+		String text;
+		final Map<String, List<String>> adjectives = new HashMap<>();
+		final Map<String, List<String>> emojis = new HashMap<>();
+	}
+
+	public AiSummary summerize(final String text, final Set<String> users) {
+		if (text.length() < 900)
+			return null;
+		return type == AiType.Gemini ? this.summerizeGemini(text, users)
+				: type == AiType.GPT ? this.summerizeGPT(text, users) : null;
+	}
+
+	private AiSummary summerizeGemini(final String text, final Set<String> users) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(
-						"Summarize this WhatsApp chat in about 300 words in the language they speak and at the end of the summary add for each user 3 adjectives mainly discribing his/her mood during conversation:\n" + text)))
+						"Summarize this WhatsApp chat in about 300 words in the language they speak and at the end of the summary, separated by \""
+								+ this.adjectiveDelimiter
+								+ "\", add for each user in one line 3 comma separated adjectives and 3 emojis mainly discribing their mood during conversation:\n"
+								+ text)))
 				.build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
 				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
@@ -68,11 +86,67 @@ public class AiService {
 				for (final Part part : parts)
 					s.append(part.text().orElse(""));
 			}
-			return s.toString();
+			return this.parseAdjectives(s.toString(), users);
 		}
 	}
 
-	private String summerizeGPT(final String text) {
+	AiSummary parseAdjectives(final String summary, final Set<String> users) {
+		final AiSummary response = new AiSummary();
+		response.text = summary;
+		this.adminService.createTicket(new Ticket("AI: " + summary));
+		String delimiter = this.adjectiveDelimiter;
+		if (!response.text.contains(delimiter) && response.text.contains("\n\n"))
+			delimiter = "\n\n";
+		if (response.text.contains(delimiter)) {
+			final StringBuilder adjectives = new StringBuilder("\n" + response.text
+					.substring(response.text.lastIndexOf(delimiter) + delimiter.length())
+					.toLowerCase().replace("*", "").replace("\n ", "\n"));
+			for (final String user : users) {
+				int pos = adjectives.indexOf("\n" + user.trim().toLowerCase() + ":");
+				if (pos < 0 && user.contains(" "))
+					pos = adjectives.indexOf("\n" + user.trim().split(" ")[0].toLowerCase() + ":");
+				if (pos > -1) {
+					String s = "";
+					int posEnd = pos;
+					if (!response.adjectives.containsKey(user)) {
+						response.adjectives.put(user, new ArrayList<>());
+						response.emojis.put(user, new ArrayList<>());
+					}
+					for (final String line : adjectives.substring(pos).split("\n")) {
+						posEnd += line.length();
+						final List<String> emojis = EmojiParser.extractEmojis(line);
+						s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
+						if (emojis.size() > 0) {
+							s = s.substring(0, s.indexOf(emojis.get(0))).trim();
+							response.adjectives.get(user).addAll(
+									Arrays.asList(s.replace("\ufe0f", "").trim().split(",")).stream()
+											.map(e -> e.trim()).collect(Collectors.toList()));
+							response.emojis.get(user)
+									.addAll(emojis.stream().map(e -> {
+										final int start = line.indexOf(e);
+										final int position = line.indexOf("\ufe0f", start);
+										if (position > -1 && position - e.length() - start < 2) {
+											for (int i = start + e.length(); i <= position; i++)
+												e += line.charAt(i);
+										}
+										return e;
+									}).collect(Collectors.toList()));
+							if (response.adjectives.get(user).size() > 2)
+								break;
+							s = "";
+						}
+					}
+					adjectives.delete(pos, posEnd);
+				} else
+					this.adminService.createTicket(new Ticket("AI: " + user + " not found in\n" + adjectives));
+			}
+			if (response.adjectives.size() > 0)
+				response.text = response.text.substring(0, response.text.lastIndexOf(delimiter)).trim();
+		}
+		return response;
+	}
+
+	private AiSummary summerizeGPT(final String text, final Set<String> users) {
 		try (final InputStream in = this.getClass().getResourceAsStream("/gpt.json")) {
 			final String s = WebClient
 					.create("https://api.openai.com/v1/completions")
@@ -82,11 +156,13 @@ public class AiService {
 					.bodyValue(IOUtils.toString(in, StandardCharsets.UTF_8)
 							.replace("{chat}", text.replace("\"", "\\\"").replace("\n", "\\n")))
 					.retrieve().toEntity(String.class).block().getBody();
-			return new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
+			final AiSummary response = new AiSummary();
+			response.text = new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
+			return response;
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 			this.adminService.createTicket(new Ticket(Utilities.stackTraceToString(ex)));
-			return "";
+			return null;
 		}
 	}
 }
