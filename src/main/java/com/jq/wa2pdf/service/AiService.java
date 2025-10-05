@@ -100,7 +100,7 @@ public class AiService {
 		if (response.text.contains(delimiter)) {
 			final StringBuilder adjectives = new StringBuilder("\n" + response.text
 					.substring(response.text.lastIndexOf(delimiter) + delimiter.length())
-					.toLowerCase().replace("*", "").replace("\n ", "\n"));
+					.toLowerCase().replace("**", "").replace("\n*", "\n").replace("\n ", "\n"));
 			for (final String user : users) {
 				int pos = adjectives.indexOf("\n" + user.trim().toLowerCase() + ":");
 				if (pos < 0 && user.contains(" "))
@@ -113,7 +113,7 @@ public class AiService {
 						response.emojis.put(user, new ArrayList<>());
 					}
 					for (final String line : adjectives.substring(pos).split("\n")) {
-						posEnd += line.length();
+						posEnd += line.length() + 1;
 						final List<String> emojis = EmojiParser.extractEmojis(line);
 						s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
 						if (emojis.size() > 0) {
@@ -121,16 +121,19 @@ public class AiService {
 							response.adjectives.get(user).addAll(
 									Arrays.asList(s.replace("\ufe0f", "").trim().split(",")).stream()
 											.map(e -> e.trim()).collect(Collectors.toList()));
-							response.emojis.get(user)
-									.addAll(emojis.stream().map(e -> {
-										final int start = line.indexOf(e);
-										final int position = line.indexOf("\ufe0f", start);
-										if (position > -1 && position - e.length() - start < 2) {
-											for (int i = start + e.length(); i <= position; i++)
-												e += line.charAt(i);
-										}
-										return e;
-									}).collect(Collectors.toList()));
+							for (int i = 0; i < emojis.size(); i++) {
+								String e = emojis.get(i);
+								final int start = line.indexOf(e);
+								final int position = Math.min(line.indexOf("\ufe0f", start),
+										i < emojis.size() - 1 ? line.indexOf(emojis.get(i + 1)) - 1
+												: Integer.MAX_VALUE);
+								if (position > -1) {
+									for (int i2 = start + e.length(); i2 <= position
+											&& line.codePointAt(i2) > 128; i2++)
+										e += line.charAt(i2);
+								}
+								response.emojis.get(user).add(e);
+							}
 							if (response.adjectives.get(user).size() > 2)
 								break;
 							s = "";
