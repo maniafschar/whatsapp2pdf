@@ -102,13 +102,20 @@ public class AiService {
 					.toLowerCase();
 			for (final String user : users) {
 				String u = user.trim().toLowerCase();
-				int pos = s.indexOf("\n" + u + ":");
+				int pos = s.indexOf(u);
 				if (pos < 0 && u.contains(" ")) {
 					u = u.split(" ")[0];
-					pos = s.indexOf("\n" + u + ":");
+					pos = s.indexOf(u);
 				}
-				if (pos > -1)
-					s = s.replace("\n" + u + ":", "\n" + user.hashCode() + ":");
+				if (pos > -1) {
+					String[] data = s.split("\n");
+					s = "";
+					for (int i = 0; i < data.length; i++) {
+						if ((pos = data[i].indexOf(':')) > 0)
+							data[i] = data[i].substring(0, pos).replace(u, "" + user.hashCode()) + data[i].substring(pos);
+						s += data[i] + "\n";
+					}
+				}
 			}
 			final StringBuilder adjectives = new StringBuilder(s.replace("*", "").replace("\n ", "\n"));
 			for (final String user : users) {
