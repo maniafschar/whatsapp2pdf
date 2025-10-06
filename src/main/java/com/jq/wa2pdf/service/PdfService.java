@@ -549,10 +549,10 @@ public class PdfService {
 					final String n = name;
 					if (this.aiSummary.adjectives.containsKey(n))
 						name += "\n" + this.aiSummary.adjectives.get(n).stream()
-								.collect(Collectors.joining("\u00a0\u00a0\u00a0"));
+								.collect(Collectors.joining("\u00a0 \u00a0"));
 					if (this.aiSummary.emojis.containsKey(n))
 						name += "\n" + this.aiSummary.emojis.get(n).stream()
-								.collect(Collectors.joining("\u00a0\u00a0\u00a0"));
+								.collect(Collectors.joining("\u00a0 \u00a0"));
 				}
 				cell = this.createCell(name, TextAlignment.CENTER);
 				cell.setPaddingTop(0);

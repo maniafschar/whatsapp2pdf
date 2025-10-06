@@ -93,75 +93,76 @@ public class AiService {
 	AiSummary parseAdjectives(final String summary, final Set<String> users) {
 		final AiSummary response = new AiSummary();
 		response.text = summary;
-		String delimiter = this.adjectiveDelimiter, error = "";
-		if (!response.text.contains(delimiter) && response.text.contains("\n\n"))
-			delimiter = "\n\n";
-		if (response.text.contains(delimiter)) {
-			String s = "\n" + response.text
-					.substring(response.text.lastIndexOf(delimiter) + delimiter.length())
-					.toLowerCase();
-			for (final String user : users) {
-				String u = user.trim().toLowerCase();
-				int pos = s.indexOf(u);
-				if (pos < 0 && u.contains(" ")) {
-					u = u.split(" ")[0];
-					pos = s.indexOf(u);
-				}
-				if (pos > -1) {
-					String[] data = s.split("\n");
-					s = "";
-					for (int i = 0; i < data.length; i++) {
-						if ((pos = data[i].indexOf(':')) > 0)
-							data[i] = data[i].substring(0, pos).replace(u, "" + user.hashCode()) + data[i].substring(pos);
-						s += data[i] + "\n";
-					}
+		String error = "";
+		String s = "\n" + response.text.toLowerCase() + '\n';
+		for (final String user : users) {
+			String u = user.trim().toLowerCase();
+			int pos = s.indexOf(u);
+			if (pos < 0 && u.contains(" ")) {
+				u = u.split(" ")[0];
+				pos = s.indexOf(u);
+			}
+			if (pos > -1) {
+				final String[] data = s.split("\n");
+				s = "";
+				for (int i = 0; i < data.length; i++) {
+					if ((pos = data[i].indexOf(':')) > 0)
+						data[i] = data[i].substring(0, pos).replace(u, "" + user.hashCode())
+								+ data[i].substring(pos);
+					s += data[i] + "\n";
 				}
 			}
-			final StringBuilder adjectives = new StringBuilder(s.replace("*", "").replace("\n ", "\n"));
-			for (final String user : users) {
-				final int pos = adjectives.indexOf("\n" + user.hashCode() + ":");
-				if (pos > -1) {
-					s = "";
-					int posEnd = pos;
-					if (!response.adjectives.containsKey(user)) {
-						response.adjectives.put(user, new ArrayList<>());
-						response.emojis.put(user, new ArrayList<>());
-					}
-					for (final String line : adjectives.substring(pos).split("\n")) {
-						posEnd += line.length() + 1;
-						final List<String> emojis = EmojiParser.extractEmojis(line);
-						s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
-						if (emojis.size() > 0) {
-							s = s.substring(0, s.indexOf(emojis.get(0))).trim();
-							response.adjectives.get(user).addAll(
-									Arrays.asList(s.replace("\ufe0f", "").trim().split(",")).stream()
-											.map(e -> e.trim()).collect(Collectors.toList()));
-							for (int i = 0; i < emojis.size(); i++) {
-								String e = emojis.get(i);
-								final int start = line.indexOf(e);
-								final int position = Math.min(line.indexOf("\ufe0f", start),
-										i < emojis.size() - 1 ? line.indexOf(emojis.get(i + 1)) - 1
-												: Integer.MAX_VALUE);
-								if (position > -1) {
-									for (int i2 = start + e.length(); i2 <= position
-											&& line.codePointAt(i2) > 128; i2++)
-										e += line.charAt(i2);
-								}
-								response.emojis.get(user).add(e);
+		}
+		final StringBuilder adjectives = new StringBuilder(s.replace("*", "").replace("\n ", "\n"));
+		int first = Integer.MAX_VALUE;
+		for (final String user : users) {
+			final int pos = adjectives.indexOf("\n" + user.hashCode() + ":");
+			if (pos > -1) {
+				if (first > pos)
+					first = pos;
+				s = "";
+				int posEnd = pos;
+				if (!response.adjectives.containsKey(user)) {
+					response.adjectives.put(user, new ArrayList<>());
+					response.emojis.put(user, new ArrayList<>());
+				}
+				for (final String line : adjectives.substring(pos).split("\n")) {
+					posEnd += line.length() + 1;
+					final List<String> emojis = EmojiParser.extractEmojis(line);
+					s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
+					if (emojis.size() > 0) {
+						s = s.substring(0, s.indexOf(emojis.get(0))).trim();
+						response.adjectives.get(user).addAll(
+								Arrays.asList(s.replace("\ufe0f", "").trim().split(",")).stream()
+										.map(e -> e.trim()).collect(Collectors.toList()));
+						for (int i = 0; i < emojis.size(); i++) {
+							String e = emojis.get(i);
+							final int start = line.indexOf(e);
+							final int position = Math.min(line.indexOf("\ufe0f", start),
+									i < emojis.size() - 1 ? line.indexOf(emojis.get(i + 1)) - 1
+											: Integer.MAX_VALUE);
+							if (position > -1) {
+								for (int i2 = start + e.length(); i2 <= position
+										&& line.codePointAt(i2) > 128; i2++)
+									e += line.charAt(i2);
 							}
-							if (response.adjectives.get(user).size() > 2)
-								break;
-							s = "";
+							response.emojis.get(user).add(e);
 						}
+						if (response.adjectives.get(user).size() > 2)
+							break;
+						s = "";
 					}
-					adjectives.delete(pos, posEnd);
-				} else
-					error += user + " not found\n";
-			}
-			if (response.adjectives.size() > 0)
-				response.text = response.text.substring(0, response.text.lastIndexOf(delimiter)).trim();
-		} else
-			error = "no delimiter\n";
+				}
+				adjectives.delete(pos, posEnd - 1);
+			} else
+				error += user + " not found\n";
+		}
+		if (response.adjectives.size() > 0) {
+			response.text = response.text.substring(0, first).trim();
+			if (response.text.endsWith(this.adjectiveDelimiter))
+				response.text = response.text.substring(0, response.text.length() - this.adjectiveDelimiter.length())
+						.trim();
+		}
 		this.adminService.createTicket(new Ticket("AI\n" + error + summary));
 		return response;
 	}

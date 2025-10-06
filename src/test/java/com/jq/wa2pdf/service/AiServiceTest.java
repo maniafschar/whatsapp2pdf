@@ -176,4 +176,22 @@ public class AiServiceTest {
 		assertEquals("[😥, 😌, 💞]", summary.emojis.get(this.julia).toString());
 		assertEquals("abc\n\ndef.", summary.text);
 	}
+
+	@Test
+	public void parseAdjectives_7() {
+		// when
+		final String text = "abc\ndef.\n"
+				+ "Julia: emotional, impulsiv, liebesbedürftig 😘💔😊\n"
+				+ "RoMeo: sehnsüchtig, nachdenklich, hoffnungsvoll 🥺❤️😊";
+
+		// when
+		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+
+		// then
+		assertEquals("[sehnsüchtig, nachdenklich, hoffnungsvoll]", summary.adjectives.get(this.romeo).toString());
+		assertEquals("[🥺, ❤️, 😊]", summary.emojis.get(this.romeo).toString());
+		assertEquals("[emotional, impulsiv, liebesbedürftig]", summary.adjectives.get(this.julia).toString());
+		assertEquals("[😘, 💔, 😊]", summary.emojis.get(this.julia).toString());
+		assertEquals("abc\ndef.", summary.text);
+	}
 }
