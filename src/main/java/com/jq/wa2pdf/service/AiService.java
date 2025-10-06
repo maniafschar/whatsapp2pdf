@@ -93,18 +93,26 @@ public class AiService {
 	AiSummary parseAdjectives(final String summary, final Set<String> users) {
 		final AiSummary response = new AiSummary();
 		response.text = summary;
-		this.adminService.createTicket(new Ticket("AI: " + summary));
-		String delimiter = this.adjectiveDelimiter;
+		String delimiter = this.adjectiveDelimiter, error = "";
 		if (!response.text.contains(delimiter) && response.text.contains("\n\n"))
 			delimiter = "\n\n";
 		if (response.text.contains(delimiter)) {
-			final StringBuilder adjectives = new StringBuilder("\n" + response.text
+			String s = "\n" + response.text
 					.substring(response.text.lastIndexOf(delimiter) + delimiter.length())
-					.toLowerCase().replace("**", "").replace("\n*", "\n").replace("\n ", "\n"));
+					.toLowerCase();
 			for (final String user : users) {
-				int pos = adjectives.indexOf("\n" + user.trim().toLowerCase() + ":");
-				if (pos < 0 && user.contains(" "))
-					pos = adjectives.indexOf("\n" + user.trim().split(" ")[0].toLowerCase() + ":");
+				String u = user.trim().toLowerCase();
+				int pos = s.indexOf("\n" + u + ":");
+				if (pos < 0 && u.contains(" ")) {
+					u = u.split(" ")[0];
+					pos = s.indexOf("\n" + u + ":");
+				}
+				if (pos > -1)
+					s = s.replace("\n" + u + ":", "\n" + user.hashCode() + ":");
+			}
+			final StringBuilder adjectives = new StringBuilder(s.replace("*", "").replace("\n ", "\n"));
+			for (final String user : users) {
+				final int pos = adjectives.indexOf("\n" + user.hashCode() + ":");
 				if (pos > -1) {
 					String s = "";
 					int posEnd = pos;
@@ -141,11 +149,13 @@ public class AiService {
 					}
 					adjectives.delete(pos, posEnd);
 				} else
-					this.adminService.createTicket(new Ticket("AI: " + user + " not found in\n" + adjectives));
+					error += user + " not found\n";
 			}
 			if (response.adjectives.size() > 0)
 				response.text = response.text.substring(0, response.text.lastIndexOf(delimiter)).trim();
-		}
+		} else
+			error = "no delimiter\n";
+		this.adminService.createTicket(new Ticket("AI\n" + error + summary));
 		return response;
 	}
 
