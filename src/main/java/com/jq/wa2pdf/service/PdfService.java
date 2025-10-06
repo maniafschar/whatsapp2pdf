@@ -710,15 +710,18 @@ public class PdfService {
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				this.fillLinkPreview(cell, text);
+				if (emojis.size() == 0)
+					this.fillLinkPreview(cell, text);
 				paragraph.add(this.createText(text, fontMessage));
 			} else if (!hasText && !paragraph.getChildren().isEmpty()
 					&& paragraph.getChildren().get(0) instanceof Image) {
 				for (final IElement e : paragraph.getChildren()) {
-					final Image image = (Image) e;
-					image.setHeight(36);
-					image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
-					image.setMarginBottom(0);
+					if (e instanceof Image) {
+						final Image image = (Image) e;
+						image.setHeight(36);
+						image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
+						image.setMarginBottom(0);
+					}
 				}
 			}
 			paragraph.setTextAlignment(alignment);
