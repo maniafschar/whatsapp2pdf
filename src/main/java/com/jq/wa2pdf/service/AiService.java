@@ -114,7 +114,7 @@ public class AiService {
 			for (final String user : users) {
 				final int pos = adjectives.indexOf("\n" + user.hashCode() + ":");
 				if (pos > -1) {
-					String s = "";
+					s = "";
 					int posEnd = pos;
 					if (!response.adjectives.containsKey(user)) {
 						response.adjectives.put(user, new ArrayList<>());
