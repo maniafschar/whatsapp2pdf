@@ -35,6 +35,11 @@ import com.vdurmont.emoji.EmojiParser;
 @Service
 public class AiService {
 	public static AiType type = AiType.Gemini;
+	private static final String prompt =
+			"Summarize this WhatsApp chat in about 300 words in the language they speak "
+			+ "and at the end of the summary add for each user in one line 3 comma "
+			+ "separated adjectives and 3 emojis mainly discribing their mood "
+			+ "during conversation:";
 
 	@Autowired
 	private AdminService adminService;
@@ -64,11 +69,7 @@ public class AiService {
 
 	private AiSummary summerizeGemini(final String text, final Set<String> users) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
-				.parts(ImmutableList.of(Part.fromText(
-						"Summarize this WhatsApp chat in about 300 words in the language they speak "
-								+ "and at the end of the summary add for each user in one line 3 comma "
-								+ "separated adjectives and 3 emojis mainly discribing their mood "
-								+ "during conversation:\n" + text)))
+				.parts(ImmutableList.of(Part.fromText(prompt + "\n" + text)))
 				.build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
 				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
