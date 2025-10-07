@@ -45,8 +45,6 @@ public class AiService {
 	@Value("${app.google.gemini.apiKey}")
 	private String geminiKey;
 
-	private final String adjectiveDelimiter = "########";
-
 	public enum AiType {
 		GPT, Gemini, None
 	}
@@ -67,10 +65,10 @@ public class AiService {
 	private AiSummary summerizeGemini(final String text, final Set<String> users) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(
-						"Summarize this WhatsApp chat in about 300 words in the language they speak and at the end of the summary, separated by \""
-								+ this.adjectiveDelimiter
-								+ "\", add for each user in one line 3 comma separated adjectives and 3 emojis mainly discribing their mood during conversation:\n"
-								+ text)))
+						"Summarize this WhatsApp chat in about 300 words in the language they speak "
+								+ "and at the end of the summary add for each user in one line 3 comma "
+								+ "separated adjectives and 3 emojis mainly discribing their mood "
+								+ "during conversation:\n" + text)))
 				.build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
 				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
@@ -157,12 +155,8 @@ public class AiService {
 			} else
 				error += user + " not found\n";
 		}
-		if (response.adjectives.size() > 0) {
+		if (response.adjectives.size() > 0)
 			response.text = response.text.substring(0, first).trim();
-			if (response.text.endsWith(this.adjectiveDelimiter))
-				response.text = response.text.substring(0, response.text.length() - this.adjectiveDelimiter.length())
-						.trim();
-		}
 		this.adminService.createTicket(new Ticket("AI\n" + error + summary));
 		return response;
 	}
