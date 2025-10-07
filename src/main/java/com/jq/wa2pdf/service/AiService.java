@@ -35,11 +35,10 @@ import com.vdurmont.emoji.EmojiParser;
 @Service
 public class AiService {
 	public static AiType type = AiType.Gemini;
-	private static final String prompt =
-			"Summarize this WhatsApp chat in about 300 words in the language they speak "
-			+ "and at the end of the summary add for each user in one line 3 comma "
-			+ "separated adjectives and 3 emojis mainly discribing their mood "
-			+ "during conversation:";
+	private static final String prompt = "Summarize this WhatsApp chat in about 300 words "
+			+ "in the language they speak and at the end of the summary add for each user "
+			+ "in one line 3 comma separated adjectives and 3 emojis mainly discribing "
+			+ "their mood during conversation:";
 
 	@Autowired
 	private AdminService adminService;

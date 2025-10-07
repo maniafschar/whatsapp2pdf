@@ -70,7 +70,7 @@ public class AiServiceTest {
 		assertEquals("[😉, 😁, 👌]", summary.emojis.get(this.romeo).toString());
 		assertEquals("[persistent, longing, provocative]", summary.adjectives.get(this.julia).toString());
 		assertEquals("[🎉, 🏋️, 🥵]", summary.emojis.get(this.julia).toString());
-		assertEquals("yxz", summary.text);
+		assertEquals("yxz\n########", summary.text);
 	}
 
 	@Test
@@ -95,7 +95,7 @@ public class AiServiceTest {
 		assertEquals("[😉, 😁, 👌]", summary.emojis.get(this.romeo).toString());
 		assertEquals("[gefühlvoll, loyal, stark]", summary.adjectives.get(this.julia).toString());
 		assertEquals("[🎉, 🏋\ufe0f, 🥵]", summary.emojis.get(this.julia).toString());
-		assertEquals("abc\n\ndef.", summary.text);
+		assertEquals("abc\n\ndef.\n########", summary.text);
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class AiServiceTest {
 		assertEquals("[❤️, 😘, 🔥]", summary.emojis.get(this.romeo).toString());
 		assertEquals("[zärtlich, emotional, unsicher]", summary.adjectives.get(name).toString());
 		assertEquals("[😘, 🥺, 💖]", summary.emojis.get(name).toString());
-		assertEquals("abc\n\ndef.", summary.text);
+		assertEquals("abc\n\ndef.\n########", summary.text);
 	}
 
 	@Test
@@ -138,7 +138,7 @@ public class AiServiceTest {
 		assertEquals("[😘, 🥺, 💖]", summary.emojis.get(this.romeo).toString());
 		assertEquals("[emotional, leidenschaftlich, nachdenklich]", summary.adjectives.get(this.julia).toString());
 		assertEquals("[❤️, 😘, 🔥]", summary.emojis.get(this.julia).toString());
-		assertEquals("abc\n\ndef.", summary.text);
+		assertEquals("abc\n\ndef.\n########", summary.text);
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class AiServiceTest {
 		assertEquals("[🥰, 😔, ❤️]", summary.emojis.get(this.romeo).toString());
 		assertEquals("[emotional, ambivalent, stark]", summary.adjectives.get(this.julia).toString());
 		assertEquals("[😥, 😌, 💞]", summary.emojis.get(this.julia).toString());
-		assertEquals("abc\n\ndef.", summary.text);
+		assertEquals("abc\n\ndef.\n########", summary.text);
 	}
 
 	@Test
