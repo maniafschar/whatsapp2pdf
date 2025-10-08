@@ -94,24 +94,24 @@ public class AiService {
 		final AiSummary response = new AiSummary();
 		response.text = summary;
 		String error = "";
-		String s = response.text.toLowerCase();
+		StringBuilder adjectives = new StringBuilder(response.text.toLowerCase().replace('*', ' '));
 		for (final String user : users) {
 			String u = user.trim().toLowerCase();
-			Matcher matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(s);
+			Matcher matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(adjectives.toString());
 			if (!matcher.find() && u.contains(" ")) {
 				u = u.split(" ")[0];
-				matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(s);
+				matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(adjectives.toString());
 			}
 			if (matcher.find()) {
 				final int pos = matcher.start(1);
-				s = s.substring(0, pos) + user.hashCode() + s.substring(pos + u.length());
+				adjectives.delete(pos, pos + u.length());
+				adjectives.insert(pos, "" + user.hashCode());
 			}
 		}
-		final StringBuilder adjectives = new StringBuilder(s.replace('*', ' '));
 		int first = Integer.MAX_VALUE;
 		Pattern adjectiveLine = ;
 		for (final String user : users) {
-			final Matcher matcher = Pattern.compile("^([ ]*" + user.hashCode() + "[ ]*:).*$", Pattern.MULTILINE).matcher(adjectives);
+			final Matcher matcher = Pattern.compile("^([^:]*" + user.hashCode() + "[^:]*:).*$", Pattern.MULTILINE).matcher(adjectives);
 			if (matcher.find()) {
 				final int pos = matcher.start(1);
 				if (first > pos)
