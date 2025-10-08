@@ -94,32 +94,26 @@ public class AiService {
 		final AiSummary response = new AiSummary();
 		response.text = summary;
 		String error = "";
-		String s = response.text.toLowerCase() + '\n';
+		String s = response.text.toLowerCase();
 		for (final String user : users) {
 			String u = user.trim().toLowerCase();
-			int pos = s.indexOf(u);
-			if (pos < 0 && u.contains(" ")) {
+			Matcher matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(s);
+			if (!matcher.find() && u.contains(" ")) {
 				u = u.split(" ")[0];
-				pos = s.indexOf(u);
+				matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(s);
 			}
-			if (pos > -1) {
-				final String[] data = s.split("\n");
-				s = "";
-				for (int i = 0; i < data.length; i++) {
-					if ((pos = data[i].indexOf(':')) > 0)
-						data[i] = data[i].substring(0, pos).replace(u, "" + user.hashCode())
-								+ data[i].substring(pos);
-					s += data[i] + "\n";
-				}
+			if (matcher.find()) {
+				final int pos = matcher.start(1);
+				s = s.substring(0, pos) + user.hashCode() + s.substring(pos + u.length());
 			}
 		}
-		final StringBuilder adjectives = new StringBuilder(s.replace("*", " "));
+		final StringBuilder adjectives = new StringBuilder(s.replace('*', ' '));
 		int first = Integer.MAX_VALUE;
 		Pattern adjectiveLine = ;
 		for (final String user : users) {
-			final Matcher matcher = Pattern.compile("^([ ]*" + user.hashCode() + "[ ]*:).*$").matcher(adjectives);
+			final Matcher matcher = Pattern.compile("^([ ]*" + user.hashCode() + "[ ]*:).*$", Pattern.MULTILINE).matcher(adjectives);
 			if (matcher.find()) {
-				int pos = matcher.start(1);
+				final int pos = matcher.start(1);
 				if (first > pos)
 					first = pos;
 				s = "";
