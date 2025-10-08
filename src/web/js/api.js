@@ -190,7 +190,6 @@ class api {
 						tr.classList.remove('spinner');
 						tr.classList.add('download');
 						document.querySelector('period').classList.add('downloadHint');
-					}
 					} else {
 						var link = document.createElement('a');
 						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true');

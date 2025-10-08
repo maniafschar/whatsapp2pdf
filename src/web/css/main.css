@@ -151,7 +151,7 @@ attributes period.error::before {
 
 attributes period.downloadHint::before {
 	content: '↑ please download your PDF ↑';
-	color: black;
+	color: green;
 	opacity: 1;
 }
 
