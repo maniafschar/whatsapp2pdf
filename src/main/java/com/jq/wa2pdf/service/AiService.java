@@ -120,11 +120,11 @@ public class AiService {
 	}
 
 	private void parseAdjectivesOfUser(final AiSummary response, final String user, final String adjectives) {
-		String s = "";
 		if (!response.adjectives.containsKey(user)) {
 			response.adjectives.put(user, new ArrayList<>());
 			response.emojis.put(user, new ArrayList<>());
 		}
+		String s = "";
 		for (final String line : adjectives.split("\n")) {
 			final List<String> emojis = EmojiParser.extractEmojis(line);
 			s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
