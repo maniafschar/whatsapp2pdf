@@ -92,7 +92,7 @@ public class AiService {
 		final AiSummary response = new AiSummary();
 		response.text = summary;
 		String error = "";
-		String s = "\n" + response.text.toLowerCase() + '\n';
+		String s = response.text.toLowerCase() + '\n';
 		for (final String user : users) {
 			String u = user.trim().toLowerCase();
 			int pos = s.indexOf(u);
@@ -111,11 +111,13 @@ public class AiService {
 				}
 			}
 		}
-		final StringBuilder adjectives = new StringBuilder(s.replace("*", "").replace("\n ", "\n"));
+		final StringBuilder adjectives = new StringBuilder(s.replace("*", " "));
 		int first = Integer.MAX_VALUE;
+		Pattern adjectiveLine = ;
 		for (final String user : users) {
-			final int pos = adjectives.indexOf("\n" + user.hashCode() + ":");
-			if (pos > -1) {
+			final Matcher matcher = Pattern.compile("^([ ]*" + user.hashCode() + "[ ]*:).*$").matcher(adjectives);
+			if (matcher.find()) {
+				int pos = matcher.start(1);
 				if (first > pos)
 					first = pos;
 				s = "";
