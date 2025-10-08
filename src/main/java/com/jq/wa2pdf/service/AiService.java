@@ -98,18 +98,20 @@ public class AiService {
 		int first = Integer.MAX_VALUE;
 		for (final String user : users) {
 			String u = user.trim().toLowerCase();
-			Matcher matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(adjectives.toString());
+			Matcher matcher = Pattern.compile("^([^:^\n]*" + u + ")[^:^\n]*:.*$", Pattern.MULTILINE)
+					.matcher(adjectives.toString());
 			boolean found = matcher.find();
 			if (!found && u.contains(" ")) {
 				u = u.split(" ")[0];
-				matcher = Pattern.compile("^[^:]*(" + u + ")[^:]*:.*$", Pattern.MULTILINE).matcher(adjectives.toString());
+				matcher = Pattern.compile("^([^:^\n]*" + u + ")[^:^\n]*:.*$", Pattern.MULTILINE)
+						.matcher(adjectives.toString());
 				found = matcher.find();
 			}
 			if (found) {
 				final int pos = matcher.start(1);
 				if (first > pos)
 					first = pos;
-				parseAdjectivesOfUser(response, user, adjectives.substring(pos));
+				this.parseAdjectivesOfUser(response, user, adjectives.substring(pos));
 			} else
 				error += user + " not found\n";
 		}
@@ -127,7 +129,7 @@ public class AiService {
 		String s = "";
 		for (final String line : adjectives.split("\n")) {
 			final List<String> emojis = EmojiParser.extractEmojis(line);
-			s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).trim();
+			s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).replace('*', ' ').trim();
 			if (emojis.size() > 0) {
 				s = s.substring(0, s.indexOf(emojis.get(0))).trim();
 				response.adjectives.get(user).addAll(
