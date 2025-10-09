@@ -53,7 +53,9 @@ class api {
 		api.showProgressBar();
 		api.ajax({
 			noProgressBar: true,
-			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period + 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value')),
+			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period
+					+ 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value'))
+					+ '&summary=' + document.querySelector('summary').classList.contains('selected'),
 			method: 'POST',
 			success: api.postBuy,
 			error: xhr => {
@@ -292,3 +294,4 @@ class api {
 	}
 
 }
+
