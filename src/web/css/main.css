@@ -160,6 +160,17 @@ attributes div {
 	font-weight: bold;
 }
 
+attributes summary::before {
+	content: '☐';
+	margin-right: 1em;
+}
+
+attributes summary.selected::before {
+	content: '☑';
+	color: green;
+	margin-right: 1em;
+}
+
 table {
 	display: inline-block;
 	border-spacing: 0;
@@ -498,4 +509,5 @@ progressbar loader .three {
 	100% {
 		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
 	}
+
 }
