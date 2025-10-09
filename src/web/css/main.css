@@ -160,15 +160,21 @@ attributes div {
 	font-weight: bold;
 }
 
+attributes summary {
+	position: relative;
+	display: block;
+}
+
 attributes summary::before {
 	content: '☐';
+	position: relative;
+	display: inline-block;
 	margin-right: 1em;
 }
 
 attributes summary.selected::before {
 	content: '☑';
 	color: green;
-	margin-right: 1em;
 }
 
 table {
@@ -511,3 +517,4 @@ progressbar loader .three {
 	}
 
 }
+
