@@ -79,27 +79,29 @@ class ChartService {
 				plotData.lettersMax = dataUser.letters;
 		}
 		for (final Statistics dataUser : data) {
-			Plot plot = plotData.plots.stream().filter(e -> e.user.equals(dataUser.user)).findFirst().orElse(null);
-			if (plot == null) {
-				plot = new Plot(dataUser.user, colors.get(dataUser.user));
-				plotData.plots.add(plot);
+			final String date = xAxis.stream().filter(e -> dataUser.period.equals(e)).findFirst().orElse(null);
+			if (date != null) {
+				Plot plot = plotData.plots.stream().filter(e -> e.user.equals(dataUser.user)).findFirst().orElse(null);
+				if (plot == null) {
+					plot = new Plot(dataUser.user, colors.get(dataUser.user));
+					plotData.plots.add(plot);
+				}
+				final int index = xAxis.indexOf(date);
+				// add null values before, from beginning or between days
+				for (int i = (int) Math.signum(plot.lastIndex); i < index - plot.lastIndex; i++) {
+					final int x = marginLegend + marginX * (1 + plot.lastIndex + i);
+					plot.chats.addPoint(x, heightPlot);
+					plot.words.addPoint(x, 2 * heightPlot + marginPlot);
+					plot.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
+				}
+				// print entry
+				final int x = marginLegend + marginX * (1 + index);
+				plot.chats.addPoint(x, heightPlot - heightPlot * dataUser.chats / plotData.chatsMax);
+				plot.words.addPoint(x, 2 * heightPlot + marginPlot - heightPlot * dataUser.words / plotData.wordsMax);
+				plot.letters.addPoint(x,
+						3 * heightPlot + 2 * marginPlot - heightPlot * dataUser.letters / plotData.lettersMax);
+				plot.lastIndex = index;
 			}
-			final int index = xAxis
-					.indexOf(xAxis.stream().filter(e -> dataUser.period.equals(e)).findFirst().get());
-			// add null values before, from beginning or between days
-			for (int i = (int) Math.signum(plot.lastIndex); i < index - plot.lastIndex; i++) {
-				final int x = marginLegend + marginX * (1 + plot.lastIndex + i);
-				plot.chats.addPoint(x, heightPlot);
-				plot.words.addPoint(x, 2 * heightPlot + marginPlot);
-				plot.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
-			}
-			// print entry
-			final int x = marginLegend + marginX * (1 + index);
-			plot.chats.addPoint(x, heightPlot - heightPlot * dataUser.chats / plotData.chatsMax);
-			plot.words.addPoint(x, 2 * heightPlot + marginPlot - heightPlot * dataUser.words / plotData.wordsMax);
-			plot.letters.addPoint(x,
-					3 * heightPlot + 2 * marginPlot - heightPlot * dataUser.letters / plotData.lettersMax);
-			plot.lastIndex = index;
 		}
 		// add null values after till end
 		plotData.plots.stream().forEach(e -> {
