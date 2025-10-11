@@ -34,6 +34,7 @@ import com.jq.wa2pdf.service.ExtractService;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.FeedbackService;
 import com.jq.wa2pdf.service.PdfService;
+import com.jq.wa2pdf.service.PdfService.Type;
 import com.jq.wa2pdf.util.DateHandler;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -65,25 +66,28 @@ public class ApplicationApi {
 	@PostMapping("pdf/preview/{id}")
 	public void preview(@PathVariable final String id, @RequestParam final String period,
 			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
-		this.pdfService.create(id, period, user, true);
+		this.pdfService.create(id, period, user, Type.Preview);
 	}
 
 	@PostMapping("pdf/buy/{id}")
 	public void buy(@PathVariable final String id, @RequestParam final String[] periods,
-			@RequestParam final String user) throws IOException, FontFormatException, ParseException {
+			@RequestParam final String user, @RequestParam final boolean summary)
+			throws IOException, FontFormatException, ParseException {
 		for (final String period : periods)
-			this.pdfService.create(id, period, user, false);
+			this.pdfService.create(id, period, user, summary ? Type.Summary : null);
 	}
 
 	@GetMapping("pdf/{id}/{sendFile}")
 	public void pdf(@PathVariable final String id, @PathVariable final boolean sendFile,
-			@RequestParam(required = false) final String period, final HttpServletResponse response) throws IOException {
+			@RequestParam(required = false) final String period, final HttpServletResponse response)
+			throws IOException {
 		final Path file = this.pdfService.get(id, period);
 		if (file == null) {
 			if (!Files.exists(ExtractService.getTempDir(id)))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Invalid ID");
 			final Path path = ExtractService.getTempDir(id)
-					.resolve(ExtractService.filename + "Error" + (period == null ? "" : DateHandler.periodSuffix(period)));
+					.resolve(ExtractService.filename + "Error"
+							+ (period == null ? "" : DateHandler.periodSuffix(period)));
 			if (Files.exists(path))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));

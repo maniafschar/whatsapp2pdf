@@ -91,14 +91,19 @@ public class PdfService {
 	@Autowired
 	private AdminService adminService;
 
+	public enum Type {
+		Preview, Summary
+	}
+
 	@Async
-	public void create(final String id, final String period, final String user, final boolean preview)
+	public void create(final String id, final String period, final String user, final Type type)
 			throws IOException, FontFormatException, ParseException {
 		final Path error = ExtractService.getTempDir(id)
-				.resolve(ExtractService.filename + "Error" + (preview ? "" : DateHandler.periodSuffix(period)));
+				.resolve(ExtractService.filename + "Error"
+						+ (type == Type.Preview ? "" : DateHandler.periodSuffix(period)));
 		try {
 			Files.deleteIfExists(error);
-			new PDF(id, period, user, preview).create();
+			new PDF(id, period, user, type).create();
 		} catch (final Throwable ex) {
 			try (final FileOutputStream filename = new FileOutputStream(error.toFile())) {
 				filename.write(ex.getMessage().getBytes(StandardCharsets.UTF_8));
@@ -134,17 +139,17 @@ public class PdfService {
 		private final String period;
 		private final String user;
 		private final String id;
-		private final boolean preview;
+		private final Type type;
 		private final boolean groupChat;
 		private final StringBuilder text = new StringBuilder();
 
-		private PDF(final String id, final String period, final String user, final boolean preview)
+		private PDF(final String id, final String period, final String user, final Type type)
 				throws IOException {
 			this.dir = ExtractService.getTempDir(id).toAbsolutePath();
 			this.period = period;
 			this.user = user;
 			this.id = id;
-			this.preview = preview;
+			this.type = type;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 			this.groupChat = new ObjectMapper().readValue(
 					ExtractService.getTempDir(id).resolve(ExtractService.filename + "Attributes").toFile(),
@@ -153,7 +158,7 @@ public class PdfService {
 
 		private void create() throws IOException, FontFormatException, ParseException {
 			final String filename = ExtractService.filename
-					+ (this.preview ? "" : DateHandler.periodSuffix(this.period));
+					+ (this.type == Type.Preview ? "" : DateHandler.periodSuffix(this.period));
 			Files.deleteIfExists(this.dir.resolve(filename + ".tmp"));
 			Files.deleteIfExists(this.dir.resolve(filename + ".pdf"));
 			this.writer = new PdfWriter(
@@ -245,7 +250,7 @@ public class PdfService {
 						}
 					} else if (foundMonth && lastChat != null)
 						lastChat += "\n" + line;
-					if (this.preview && i > 40)
+					if (this.type == Type.Preview && i > 40)
 						break;
 				}
 				this.addMessage(user, date, lastChat);
@@ -305,7 +310,7 @@ public class PdfService {
 											((Text) ((Paragraph) table.getCell(0, 0).getChildren().get(0))
 													.getChildren().get(0)).getText())));
 			}
-			if (this.preview)
+			if (this.type == Type.Preview)
 				this.addPreviewInfo();
 		}
 
@@ -580,9 +585,9 @@ public class PdfService {
 
 		private void addAISummery() {
 			final String text;
-			if (this.preview)
+			if (this.type == Type.Preview)
 				text = "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights.";
-			else {
+			else if (this.type == Type.Summary) {
 				final Set<String> users = new HashSet<>();
 				this.total.stream().forEach(e -> users.add(e.user));
 				final AiSummary summary = PdfService.this.aiService.summerize(this.text.toString(), users);
@@ -592,7 +597,8 @@ public class PdfService {
 					text = summary.text;
 					this.aiSummary = summary;
 				}
-			}
+			} else
+				text = null;
 			if (text != null && !text.isBlank()) {
 				final Table summary = new Table(1);
 				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);

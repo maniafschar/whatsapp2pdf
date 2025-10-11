@@ -136,7 +136,7 @@ class api {
 		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
 			s += '<tr value="' + data.periods[i].period + '"><td>' + data.periods[i].period.replace('-\\d', '').replace('\\d/', '').replace('\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td><td><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
-		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table><summary class="selected">add an AI generated summary of the chat</summary>';
+		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table><summary>add AI generated summary (data will be sent to Google Gemini!)</summary>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
 			tr.addEventListener('click', () => {
 				document.querySelector('period').classList.remove('error');
@@ -157,6 +157,13 @@ class api {
 					tr.classList.add('selected');
 			});
 		});
+		document.getElementsByTagName('summary')[0].onclick = function () {
+			var e = document.getElementsByTagName('summary')[0];
+			if (e.classList.contains('selected'))
+				e.classList.remove('selected');
+			else
+				e.classList.add('selected');
+		};
 		s = '<table><tr><th>User</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
 		for (var i = 0; i < data.users.length; i++)
 			s += '<tr value="' + data.users[i].user + '"' + (s.indexOf('" class="selected">') < 0 ? ' class="selected"' : '') + '><td>' + data.users[i].user + '</td><td>' + data.users[i].chats.toLocaleString() + '</td><td>' + data.users[i].words.toLocaleString() + '</td><td>' + data.users[i].letters.toLocaleString() + '</td></tr>';
