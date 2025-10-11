@@ -654,7 +654,11 @@ public class PdfService {
 					}
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					image.setAutoScale(!mediaId.startsWith(ExtractService.filename));
+					if (!mediaId.startsWith(ExtractService.filename)) {
+						image.setAutoScale(true);
+						if (h > 400)
+							image.setMinHeight(400);
+					}
 					cell.add(image);
 				}
 			} catch (final IOException ex) {

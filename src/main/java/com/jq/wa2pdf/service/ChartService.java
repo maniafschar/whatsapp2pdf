@@ -96,11 +96,13 @@ class ChartService {
 				}
 				final int index = xAxis.indexOf(date);
 				// add null values before, from beginning or between days
-				for (int i = (int) Math.signum(plot.lastIndex); i < index - plot.lastIndex; i++) {
-					final int x = marginLegend + marginX * (1 + plot.lastIndex + i);
-					plot.chats.addPoint(x, heightPlot);
-					plot.words.addPoint(x, 2 * heightPlot + marginPlot);
-					plot.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
+				if (index > 0) {
+					for (int i = plot.lastIndex + 1; i < index; i++) {
+						final int x = marginLegend + marginX * (1 + i);
+						plot.chats.addPoint(x, heightPlot);
+						plot.words.addPoint(x, 2 * heightPlot + marginPlot);
+						plot.letters.addPoint(x, 3 * heightPlot + 2 * marginPlot);
+					}
 				}
 				// print entry
 				final int x = marginLegend + marginX * (1 + index);
@@ -152,19 +154,21 @@ class ChartService {
 
 	private void drawLegend(final Graphics2D g, final List<Statistics> data, final int width, final int height,
 			final int marginLegend, final int marginPlot, final int marginX, final int heightPlot,
-			final List<String> xAxis, final String dateFormat) {
+			final List<String> xAxis, final String dateFormat) throws ParseException {
 		int x = marginLegend;
 		final Font fontHorizontal = g.getFont();
 		final Font fontVertical = g.getFont().deriveFont(AffineTransform.getRotateInstance(Math.PI * 1.5));
 		g.setFont(fontVertical);
 		g.setColor(new Color(0, 0, 0, 120));
+		final SimpleDateFormat parseDate = new SimpleDateFormat(dateFormat);
+		final SimpleDateFormat formatDate = new SimpleDateFormat(DateHandler.dateFormatWithoutYear(dateFormat));
 
 		for (final String period : xAxis) {
-			final String s = DateHandler.removeYear(period, dateFormat);
+			final String s = formatDate.format(parseDate.parse(period));
 			g.setFont(fontHorizontal);
 			final int stringWidth = g.getFontMetrics().stringWidth(s);
 			g.setFont(fontVertical);
-			g.drawString(s, x += marginX, height - marginLegend + stringWidth + marginPlot / 2);
+			g.drawString(s, x += marginX, height - marginLegend + stringWidth + 2);
 		}
 
 		g.setFont(g.getFont().deriveFont(AffineTransform.getRotateInstance(0)));
@@ -188,7 +192,7 @@ class ChartService {
 		private final Polygon words = new Polygon();
 		private final Polygon letters = new Polygon();
 		private final Color color;
-		private int lastIndex = 0;
+		private int lastIndex = -1;
 
 		private Plot(final String user, final Color color) {
 			this.user = user;

@@ -172,10 +172,10 @@ attributes summary span {
 
 attributes summary::before {
 	content: '☐';
-	position: relative;
-	display: inline-block;
-	margin-right: 0.25em;
+	position: absolute;
 	font-size: 1.5em;
+	margin-left: -1em;
+	top: -0.25em;
 }
 
 attributes summary.selected::before {
