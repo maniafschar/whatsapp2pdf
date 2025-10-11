@@ -181,14 +181,14 @@ public class ExtractService {
 							user.user = u;
 							attributes.users.add(user);
 						}
-						date = DateHandler.replaceDay(matcher.group(1).trim());
+						date = DateHandler.replaceDay(matcher.group(1));
 						if (currentDate == null || !currentDate.equals(date)) {
 							currentDate = date;
 							if (attributes.periods.size() == 0
 									|| !attributes.periods.get(attributes.periods.size() - 1).period
 											.equals(currentDate)) {
 								final Statistics statistics = new Statistics();
-								statistics.period = currentDate;
+								statistics.period = currentDate.replace("[", "").trim();
 								attributes.periods.add(statistics);
 							}
 						}

@@ -1,5 +1,8 @@
 package com.jq.wa2pdf.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 public class DateHandler {
 	public static String replaceDay(String date) {
 		final boolean ampm = date.toLowerCase().contains("m");
@@ -28,8 +31,18 @@ public class DateHandler {
 	}
 
 	public static String dateFormat(final String date) {
-		return date.contains("/") && date.toLowerCase().contains("m") ? "M/d/yyyy"
-				: date.contains("/") ? "d/M/yyyy" : date.contains(".") ? "d.M.yyyy" : "yyyy-M-d";
+		if (date.contains("/") && date.toLowerCase().contains("m")) {
+			final String f = "M/d/yyyy";
+			final SimpleDateFormat df = new SimpleDateFormat(f);
+			try {
+				if (df.format(df.parse(date)).equals(date)
+						|| new SimpleDateFormat(f.replace("M", "MM").replace("d", "dd")).format(df.parse(date))
+								.equals(date))
+					return f;
+			} catch (final ParseException e) {
+			}
+		}
+		return date.contains("/") ? "d/M/yyyy" : date.contains(".") ? "d.M.yyyy" : "yyyy-M-d";
 	}
 
 	public static String dateFormatWithoutYear(final String format) {

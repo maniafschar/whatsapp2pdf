@@ -289,7 +289,6 @@ class api {
 	static hideProgressBar() {
 		var e = document.getElementsByTagName('progressbar')[0];
 		if (e.style.opacity == 1) {
-			e.addEventListener("transitionend", event => { e.style.display = null; }, { once: true });
 			setTimeout(function () { e.style.display = null; }, 500);
 			e.style.opacity = null;
 		} else

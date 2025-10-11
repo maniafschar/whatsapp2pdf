@@ -225,8 +225,6 @@ public class PdfService {
 									.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
 									.trim();
 							date = line.substring(0, line.indexOf(separator)).trim();
-							if (this.dateFormat == null)
-								this.dateFormat = DateHandler.dateFormat(date);
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
 							final Matcher m = patternMedia.matcher(line);
@@ -241,6 +239,7 @@ public class PdfService {
 					if (this.type == Type.Preview && i > 40)
 						break;
 				}
+				this.dateFormat = DateHandler.dateFormat(date);
 				this.addMessage(user, date, lastChat);
 				this.addDate(null);
 			}
