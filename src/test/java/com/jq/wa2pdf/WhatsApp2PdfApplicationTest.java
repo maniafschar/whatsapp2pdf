@@ -44,7 +44,7 @@ public class WhatsApp2PdfApplicationTest {
 		this.driver.get(url);
 		final Feedback feedback = new Feedback();
 		feedback.setNote("abc");
-		feedback.setRating((short) 4);
+		feedback.setRating((short) 88);
 		feedback.setName("mani");
 		feedback.setEmail("mani.afschar@jq-consulting.de");
 		feedback.setPin("123456");

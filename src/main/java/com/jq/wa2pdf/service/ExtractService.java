@@ -153,15 +153,16 @@ public class ExtractService {
 	}
 
 	String getPatternStart(final String date) {
-		return "^[^0-9a-zA-Z]?((\\[{date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)])|({date}, \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm) -)) ([^:].*?):.*"
-				.replace("{date}", date);
+		return "^[^\u200E]?((\\[{date}])|({date} -)) ([^:].*?):.*"
+				.replace("{date}", (date == null ? "\\d{1,2}[\\.|/]\\d{1,2}[\\.|/]\\d{2,4}" : date)
+						+ ", \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)");
 	}
 
 	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
 		this.unzip(file, id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Attributes attributes = new Attributes(id);
-			final Pattern start = Pattern.compile(this.getPatternStart("[0-9\\/\\-\\.]*"));
+			final Pattern start = Pattern.compile(this.getPatternStart(null));
 			final Pattern media = Pattern.compile(this.getPatternMadia(id));
 			String date, currentDate = null, line, separator = null;
 			Statistics user = null, period = null;

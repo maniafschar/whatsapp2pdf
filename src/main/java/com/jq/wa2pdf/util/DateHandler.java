@@ -28,8 +28,8 @@ public class DateHandler {
 	}
 
 	public static String dateFormat(final String date) {
-		return date.contains("/") && date.toLowerCase().contains("m") ? "M/d/yy"
-				: date.contains("/") ? "d/M/yy" : date.contains(".") ? "d.M.yy" : "yy-M-d";
+		return date.contains("/") && date.toLowerCase().contains("m") ? "M/d/yyyy"
+				: date.contains("/") ? "d/M/yyyy" : date.contains(".") ? "d.M.yyyy" : "yyyy-M-d";
 	}
 
 	public static String removeYear(final String tag, final String pattern) {

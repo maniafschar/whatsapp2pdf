@@ -163,6 +163,11 @@ attributes div {
 attributes summary {
 	position: relative;
 	display: block;
+	cursor: pointer;
+}
+
+attributes summary span {
+	font-size: 0.8em;
 }
 
 attributes summary::before {

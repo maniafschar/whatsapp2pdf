@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -67,7 +66,6 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.AiService.AiSummary;
-import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
@@ -140,7 +138,6 @@ public class PdfService {
 		private final String user;
 		private final String id;
 		private final Type type;
-		private final boolean groupChat;
 		private final StringBuilder text = new StringBuilder();
 
 		private PDF(final String id, final String period, final String user, final Type type)
@@ -151,9 +148,6 @@ public class PdfService {
 			this.id = id;
 			this.type = type;
 			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
-			this.groupChat = new ObjectMapper().readValue(
-					ExtractService.getTempDir(id).resolve(ExtractService.filename + "Attributes").toFile(),
-					Attributes.class).getUsers().size() > 2;
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
@@ -206,15 +200,9 @@ public class PdfService {
 			try (final BufferedReader input = new BufferedReader(
 					new FileReader(PdfService.this.extractService.getFilenameChat(this.id).toFile()))) {
 				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia(this.id));
-				final Pattern patternStart = Pattern
-						.compile(PdfService.this.extractService
-								.getPatternStart(this.period
-										.replace("\\d", "X")
-										.replaceAll("[0-9]", "\\\\d")
-										.replace("X", "\\d{1,2}")));
-				final Pattern patternMonth = Pattern
-						.compile(
-								PdfService.this.extractService.getPatternStart(this.period.replace("\\d", "\\d{1,2}")));
+				final Pattern patternStart = Pattern.compile(PdfService.this.extractService.getPatternStart(null));
+				final Pattern patternMonth = Pattern.compile(
+						PdfService.this.extractService.getPatternStart(this.period.replace("\\d", "\\d{1,2}")));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
@@ -357,8 +345,7 @@ public class PdfService {
 			this.addDate(date.split(" ")[0]);
 			final Cell cellMessage = this.createCell(message, media);
 
-			final Cell cellTime = this
-					.createCell((date == null ? "" : date.split(" ")[1]) + (this.groupChat ? " · " + user : ""));
+			final Cell cellTime = this.createCell(date == null ? "" : date + " · " + user);
 			cellTime.setFontSize(8.5f);
 			cellTime.setFontColor(this.colorDate);
 			cellTime.setPaddingBottom(0);
@@ -650,7 +637,7 @@ public class PdfService {
 					final Paragraph paragraph = new Paragraph("media://" + mediaId);
 					cell.add(paragraph);
 				} else {
-					final double max = 440;
+					final double max = 800;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
 					if (!mediaId.matches(ExtractService.filename
 							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
@@ -667,7 +654,7 @@ public class PdfService {
 					}
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					image.setAutoScale(false);
+					image.setAutoScale(!mediaId.startsWith(ExtractService.filename));
 					cell.add(image);
 				}
 			} catch (final IOException ex) {
@@ -717,8 +704,8 @@ public class PdfService {
 				text = text.substring(text.indexOf(emoji) + emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				if (emojis.size() == 0)
-					this.fillLinkPreview(cell, text);
+				if (emojis.size() == 0 && this.fillLinkPreview(cell, text))
+					cell.setPadding(0);
 				paragraph.add(this.createText(text, fontMessage));
 			} else if (!hasText && !paragraph.getChildren().isEmpty()
 					&& paragraph.getChildren().get(0) instanceof Image) {
@@ -735,7 +722,7 @@ public class PdfService {
 			cell.add(paragraph);
 		}
 
-		private void fillLinkPreview(final Cell cell, final String text) {
+		private boolean fillLinkPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				String uri = null;
 				try (final BufferedReader input = new BufferedReader(
@@ -757,9 +744,8 @@ public class PdfService {
 										.toAbsolutePath().toFile();
 								IOUtils.write(IOUtils.toByteArray(new URI(uri).toURL().openStream()),
 										new FileOutputStream(f));
-								cell.setPaddingTop(defaultPadding);
 								this.fillMedia(cell, f.getName());
-								break;
+								return true;
 							}
 						}
 					}
@@ -768,6 +754,7 @@ public class PdfService {
 							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTraceToString(ex)));
 				}
 			}
+			return false;
 		}
 
 		private Text createText(final String text, final PdfFont font) {

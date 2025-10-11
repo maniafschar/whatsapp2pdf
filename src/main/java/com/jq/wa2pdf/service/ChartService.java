@@ -30,7 +30,8 @@ import com.jq.wa2pdf.util.DateHandler;
 class ChartService {
 	void createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors,
 			final String dateFormat) throws IOException, ParseException {
-		final List<String> xAxis = this.createXAxis(data.get(0).getPeriod(), dateFormat);
+		final SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+		final List<String> xAxis = this.createXAxis(data.get(0).getPeriod(), formatter);
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -44,18 +45,16 @@ class ChartService {
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
 		final int marginX = (image.getWidth() - marginLegend) / xAxis.size();
 		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
-				xAxis,
-				dateFormat);
+				xAxis, dateFormat);
 		this.drawCharts(g, marginLegend, marginPlot, heightPlot,
-				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors));
+				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors, formatter));
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
 	}
 
-	private List<String> createXAxis(final String period, final String dateFormat) throws ParseException {
-		final SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+	private List<String> createXAxis(final String period, final SimpleDateFormat formatter) throws ParseException {
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(formatter.parse(period));
 		gc.set(Calendar.DATE, 1);
@@ -69,7 +68,8 @@ class ChartService {
 	}
 
 	private PlotData preparePlotData(final List<Statistics> data, final int marginLegend, final int marginPlot,
-			final int marginX, final int heightPlot, final List<String> xAxis, final Map<String, Color> colors) {
+			final int marginX, final int heightPlot, final List<String> xAxis, final Map<String, Color> colors,
+			final SimpleDateFormat formatter) {
 		final PlotData plotData = new PlotData();
 		for (final Statistics dataUser : data) {
 			if (plotData.chatsMax < dataUser.chats)
@@ -80,9 +80,16 @@ class ChartService {
 				plotData.lettersMax = dataUser.letters;
 		}
 		for (final Statistics dataUser : data) {
-			final String date = xAxis.stream().filter(e -> dataUser.period.equals(e)).findFirst().orElse(null);
+			final String date = xAxis.stream().filter(e -> {
+				try {
+					return formatter.parse(dataUser.period).equals(formatter.parse(e));
+				} catch (final ParseException ex) {
+					return false;
+				}
+			}).findFirst().orElse(null);
 			if (date != null) {
-				Plot plot = plotData.plots.stream().filter(e -> e.user.equals(dataUser.user)).findFirst().orElse(null);
+				Plot plot = plotData.plots.stream().filter(e -> e.user.equals(dataUser.user)).findFirst()
+						.orElse(null);
 				if (plot == null) {
 					plot = new Plot(dataUser.user, colors.get(dataUser.user));
 					plotData.plots.add(plot);
