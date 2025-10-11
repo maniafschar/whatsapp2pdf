@@ -30,7 +30,7 @@ import com.jq.wa2pdf.util.DateHandler;
 class ChartService {
 	void createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors,
 			final String dateFormat) throws IOException, ParseException {
-		final List<String> x = this.createXAxis(data.get(0).getPeriod(), dateFormat);
+		final List<String> xAxis = this.createXAxis(data.get(0).getPeriod(), dateFormat);
 		final BufferedImage image = new BufferedImage(800, 350, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION, RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
@@ -42,11 +42,12 @@ class ChartService {
 		final int marginLegend = 40;
 		final int marginPlot = 10;
 		final int heightPlot = (image.getHeight() - marginLegend - 2 * marginPlot) / 3;
-		final int marginX = (image.getWidth() - marginLegend) / x.size();
-		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot, x,
+		final int marginX = (image.getWidth() - marginLegend) / xAxis.size();
+		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
+				xAxis,
 				dateFormat);
 		this.drawCharts(g, marginLegend, marginPlot, heightPlot,
-				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, x, colors));
+				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors));
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();

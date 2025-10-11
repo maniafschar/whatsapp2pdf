@@ -5,13 +5,13 @@ public class DateHandler {
 		final boolean ampm = date.toLowerCase().contains("m");
 		date = date.substring(0, date.indexOf(' ')).replace(",", "");
 		if (date.contains("/") && ampm)
-			return date.split("/")[0] + "/\\d\\d/" + date.split("/")[2];
+			return date.split("/")[0] + "/\\d/" + date.split("/")[2];
 		if (date.contains("/"))
-			return "\\d\\d/" + date.split("/")[1] + "/" + date.split("/")[2];
+			return "\\d/" + date.split("/")[1] + "/" + date.split("/")[2];
 		if (date.contains("."))
-			return "\\d\\d" + date.substring(date.indexOf('.'));
+			return "\\d" + date.substring(date.indexOf('.'));
 		if (date.contains("-"))
-			return date.substring(0, date.lastIndexOf('-') + 1) + "\\d\\d";
+			return date.substring(0, date.lastIndexOf('-') + 1) + "\\d";
 		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
 
@@ -19,9 +19,9 @@ public class DateHandler {
 		if (period == null)
 			return "";
 		if (period.contains("/"))
-			period = period.replace("\\d\\d/", "").replace("/", "_");
+			period = period.replace("\\d/", "").replace("/", "_");
 		else if (period.contains("."))
-			period = period.replace("\\d\\d.", "").replace(".", "_");
+			period = period.replace("\\d.", "").replace(".", "_");
 		else if (period.contains("-"))
 			period = period.substring(0, period.lastIndexOf('-')).replace("-", "_");
 		return "_" + period;

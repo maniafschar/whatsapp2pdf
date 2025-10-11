@@ -169,7 +169,8 @@ attributes summary::before {
 	content: '☐';
 	position: relative;
 	display: inline-block;
-	margin-right: 1em;
+	margin-right: 0.25em;
+	font-size: 1.5em;
 }
 
 attributes summary.selected::before {
@@ -517,4 +518,3 @@ progressbar loader .three {
 	}
 
 }
-

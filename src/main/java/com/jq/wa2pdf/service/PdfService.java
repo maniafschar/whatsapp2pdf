@@ -203,9 +203,13 @@ public class PdfService {
 				final Pattern patternMedia = Pattern.compile(PdfService.this.extractService.getPatternMadia(this.id));
 				final Pattern patternStart = Pattern
 						.compile(PdfService.this.extractService
-								.getPatternStart(this.period.replaceAll("[0-9]", "\\\\d")));
+								.getPatternStart(this.period
+										.replace("\\d", "X")
+										.replaceAll("[0-9]", "\\\\d")
+										.replace("X", "\\d{1,2}")));
 				final Pattern patternMonth = Pattern
-						.compile(PdfService.this.extractService.getPatternStart(this.period));
+						.compile(
+								PdfService.this.extractService.getPatternStart(this.period.replace("\\d", "\\d{1,2}")));
 				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
@@ -289,7 +293,7 @@ public class PdfService {
 							// table.setAction(PdfAction.createRendition("abc.mp4", pdfFileSpec,
 							// "video/mp4",
 							// PdfAnnotation.makeAnnotation(null)));
-							text.setText("click");
+							// text.setText("click");
 						}
 					}
 				}
@@ -345,8 +349,6 @@ public class PdfService {
 			if (message == null || message.isBlank())
 				return;
 			date = date.replace("[", "").replace(",", "").trim();
-			for (int i = 1; i < 10; i++)
-				date = date.replace("0" + i, "" + i);
 			this.addDate(date.split(" ")[0]);
 			final Cell cellMessage = this.createCell(message, media);
 
@@ -640,7 +642,6 @@ public class PdfService {
 						.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				if (originalImage == null) {
 					final Paragraph paragraph = new Paragraph("media://" + mediaId);
-					cell.setMinHeight(200f);
 					cell.add(paragraph);
 				} else {
 					final double max = 440;

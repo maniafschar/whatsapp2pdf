@@ -40,7 +40,7 @@ public class WhatsApp2PdfApplicationTest {
 	@BeforeEach
 	public void beforeEach() throws Exception {
 		new ProcessBuilder("./web.sh", "start").start();
-		this.driver = createWebDriver(600, 900);
+		this.driver = createWebDriver(400, 900);
 		this.driver.get(url);
 		final Feedback feedback = new Feedback();
 		feedback.setNote("abc");

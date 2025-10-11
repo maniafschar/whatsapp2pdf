@@ -43,7 +43,7 @@ class api {
 	static buy() {
 		document.querySelector('period').classList.remove('error');
 		var period = '';
-		var periods = document.querySelectorAll('period .selected');
+		var periods = document.querySelectorAll('period tr.selected');
 		if (periods.length < 1) {
 			document.querySelector('period').classList.add('error');
 			return;
@@ -54,8 +54,8 @@ class api {
 		api.ajax({
 			noProgressBar: true,
 			url: api.url + '/rest/api/pdf/buy/' + document.querySelector('id').innerText + '?' + period
-					+ 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value'))
-					+ '&summary=' + document.querySelector('summary').classList.contains('selected'),
+				+ 'user=' + encodeURIComponent(document.querySelector('user .selected').getAttribute('value'))
+				+ '&summary=' + document.querySelector('summary').classList.contains('selected'),
 			method: 'POST',
 			success: api.postBuy,
 			error: xhr => {
@@ -135,7 +135,7 @@ class api {
 		ui.showTab(1);
 		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
-			s += '<tr value="' + data.periods[i].period + '"><td>' + data.periods[i].period.replace('-\\d\\d', '').replace('\\d\\d/', '').replace('\\d\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td><td><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
+			s += '<tr value="' + data.periods[i].period + '"><td>' + data.periods[i].period.replace('-\\d', '').replace('\\d/', '').replace('\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td><td><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table><summary class="selected">add an AI generated summary of the chat</summary>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
 			tr.addEventListener('click', () => {
@@ -149,6 +149,8 @@ class api {
 					if (document.querySelectorAll('period .spinner,period .download').length == 0)
 						document.querySelector('attributes button[onclick*="delete"]').style.display = '';
 					api.feedbackStatus = '';
+					if (!document.querySelector('period tr.download'))
+						document.querySelector('period').classList.remove('downloadHint');
 				} else if (tr.classList.contains('selected'))
 					tr.classList.remove('selected');
 				else if (!tr.classList.contains('spinner'))
@@ -170,12 +172,12 @@ class api {
 	static postBuy() {
 		api.feedbackStatus = 'Download one of your printed documents, then you can give feedback.';
 		document.querySelector('attributes button[onclick*="delete"]').style.display = 'none';
-		var periods = document.querySelectorAll('period .selected');
+		var periods = document.querySelectorAll('period tr.selected');
 		for (var i = 0; i < periods.length; i++) {
-			api.download(periods[i].getAttribute('value'));
 			var tr = document.querySelector('period tr[value="' + periods[i].getAttribute('value').replaceAll('\\', '\\\\') + '"]');
 			tr.classList.remove('selected');
 			tr.classList.add('spinner');
+			api.download(periods[i].getAttribute('value'));
 		}
 	}
 
@@ -229,7 +231,8 @@ class api {
 				}
 			});
 		}
-		setTimeout(download, 1000);
+		if (document.querySelector('period .spinner'))
+			setTimeout(download, 1000);
 	}
 
 	static ajax(param) {

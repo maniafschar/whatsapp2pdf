@@ -82,7 +82,7 @@ public class WordCloudService {
 			throws IOException {
 		final BufferedImage image = new BufferedImage(800, 800, BufferedImage.TYPE_4BYTE_ABGR);
 		final Graphics2D g = image.createGraphics();
-		final List<Position> positions = this.createPositions(tokens, min, max, image, 20.0f);
+		final List<Position> positions = this.createPositions(tokens, min, max, image, 28.0f);
 		for (final Position position : positions) {
 			g.setFont(position.font);
 			g.setColor(this.createColor(position.percent));
