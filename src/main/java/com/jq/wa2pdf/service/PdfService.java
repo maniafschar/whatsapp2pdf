@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -66,6 +67,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.AiService.AiSummary;
+import com.jq.wa2pdf.service.ExtractService.Attributes;
 import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
@@ -151,6 +153,9 @@ public class PdfService {
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
+			this.dateFormat = new ObjectMapper().readValue(
+					ExtractService.getTempDir(this.id).resolve(ExtractService.filename + "Attributes").toFile(),
+					Attributes.class).getDateFormat();
 			final String filename = ExtractService.filename
 					+ (this.type == Type.Preview ? "" : DateHandler.periodSuffix(this.period));
 			Files.deleteIfExists(this.dir.resolve(filename + ".tmp"));
@@ -239,7 +244,6 @@ public class PdfService {
 					if (this.type == Type.Preview && i > 40)
 						break;
 				}
-				this.dateFormat = DateHandler.dateFormat(date);
 				this.addMessage(user, date, lastChat);
 				this.addDate(null);
 			}

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,7 +19,6 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.wa2pdf.util.DateHandler;
@@ -64,6 +64,7 @@ public class ExtractService {
 	public static class Attributes {
 		private final List<Statistics> users = new ArrayList<>();
 		private final List<Statistics> periods = new ArrayList<>();
+		private String dateFormat;
 		private final String id;
 
 		public Attributes() {
@@ -84,6 +85,14 @@ public class ExtractService {
 
 		public String getId() {
 			return this.id;
+		}
+
+		public String getDateFormat() {
+			return this.dateFormat;
+		}
+
+		public void setDateFormat(final String dateFormat) {
+			this.dateFormat = dateFormat;
 		}
 	}
 
@@ -113,11 +122,10 @@ public class ExtractService {
 		throw new IOException("Chat file not found!");
 	}
 
-	@SuppressWarnings("null")
-	private void unzip(final MultipartFile file, final String id) throws IOException {
+	private void unzip(final InputStream in, final String name, final String id) throws IOException {
 		final Path targetDir = getTempDir(id).toAbsolutePath();
 		Files.createDirectories(targetDir);
-		try (final ZipInputStream zipIn = new ZipInputStream(file.getInputStream());
+		try (final ZipInputStream zipIn = new ZipInputStream(in);
 				final FileOutputStream filename = new FileOutputStream(
 						targetDir.resolve(ExtractService.filename + "Filename").toFile())) {
 			for (ZipEntry ze; (ze = zipIn.getNextEntry()) != null;) {
@@ -132,8 +140,7 @@ public class ExtractService {
 					Files.copy(zipIn, resolvedPath);
 				}
 			}
-			filename.write((file.getOriginalFilename() == null ? "WhatsAppChat.zip" : file.getOriginalFilename())
-					.getBytes(StandardCharsets.UTF_8));
+			filename.write((name == null ? "WhatsAppChat.zip" : name).getBytes(StandardCharsets.UTF_8));
 		}
 	}
 
@@ -153,16 +160,30 @@ public class ExtractService {
 	}
 
 	String getPatternStart(final String date) {
-		return "^[^\u200E]?((\\[{date}])|({date} -)) ([^:].*?):.*"
+		return "^\u200E?((\\[{date}])|({date} -)) ([^:].*?):.*"
 				.replace("{date}", (date == null ? "\\d{1,2}[\\.|/]\\d{1,2}[\\.|/]\\d{2,4}" : date)
 						+ ", \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)");
 	}
 
-	public Attributes analyse(final MultipartFile file, final String id) throws IOException {
-		this.unzip(file, id);
+	public Attributes analyse(final InputStream in, final String filename, final String id) throws IOException {
+		this.unzip(in, filename, id);
+		final Pattern start = Pattern.compile(this.getPatternStart(null));
+		final Attributes attributes = new Attributes(id);
 		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
-			final Attributes attributes = new Attributes(id);
-			final Pattern start = Pattern.compile(this.getPatternStart(null));
+			String line;
+			while ((line = chat.readLine()) != null) {
+				if (!line.isBlank()) {
+					final Matcher matcher = start.matcher(line);
+					if (matcher.matches()) {
+						attributes.dateFormat = DateHandler
+								.dateFormat(matcher.group(1).split(",")[0].replace("[", "").trim());
+						if (!attributes.dateFormat.startsWith("M/d/"))
+							break;
+					}
+				}
+			}
+		}
+		try (final BufferedReader chat = new BufferedReader(new FileReader(this.getFilenameChat(id).toFile()))) {
 			final Pattern media = Pattern.compile(this.getPatternMadia(id));
 			String date, currentDate = null, line, separator = null;
 			Statistics user = null, period = null;
@@ -181,7 +202,7 @@ public class ExtractService {
 							user.user = u;
 							attributes.users.add(user);
 						}
-						date = DateHandler.replaceDay(matcher.group(1));
+						date = DateHandler.replaceDay(matcher.group(1), attributes.getDateFormat());
 						if (currentDate == null || !currentDate.equals(date)) {
 							currentDate = date;
 							if (attributes.periods.size() == 0

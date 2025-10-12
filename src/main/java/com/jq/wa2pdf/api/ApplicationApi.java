@@ -57,7 +57,8 @@ public class ApplicationApi {
 	@PostMapping("pdf/analyse")
 	public Attributes analyse(@RequestParam("file") final MultipartFile file) {
 		try {
-			return this.extractService.analyse(file, "" + System.currentTimeMillis() + Math.random());
+			return this.extractService.analyse(file.getInputStream(), file.getOriginalFilename(),
+					"" + System.currentTimeMillis() + Math.random());
 		} catch (final IOException e) {
 			return null;
 		}

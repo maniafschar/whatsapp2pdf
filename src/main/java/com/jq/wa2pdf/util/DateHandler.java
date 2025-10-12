@@ -1,19 +1,15 @@
 package com.jq.wa2pdf.util;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 public class DateHandler {
-	public static String replaceDay(String date) {
-		final boolean ampm = date.toLowerCase().contains("m");
+	public static String replaceDay(String date, final String dateFormat) {
 		date = date.substring(0, date.indexOf(' ')).replace(",", "");
-		if (date.contains("/") && ampm)
+		if (dateFormat.startsWith("M/d/"))
 			return date.split("/")[0] + "/\\d/" + date.split("/")[2];
-		if (date.contains("/"))
+		if (dateFormat.contains("/"))
 			return "\\d/" + date.split("/")[1] + "/" + date.split("/")[2];
-		if (date.contains("."))
+		if (dateFormat.contains("."))
 			return "\\d" + date.substring(date.indexOf('.'));
-		if (date.contains("-"))
+		if (dateFormat.contains("-"))
 			return date.substring(0, date.lastIndexOf('-') + 1) + "\\d";
 		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
@@ -31,25 +27,25 @@ public class DateHandler {
 	}
 
 	public static String dateFormat(final String date) {
-		if (date.contains("/") && date.toLowerCase().contains("m")) {
-			final String f = "M/d/yyyy";
-			final SimpleDateFormat df = new SimpleDateFormat(f);
-			try {
-				if (df.format(df.parse(date)).equals(date)
-						|| new SimpleDateFormat(f.replace("M", "MM").replace("d", "dd")).format(df.parse(date))
-								.equals(date))
-					return f;
-			} catch (final ParseException e) {
-			}
+		if (date.contains("/")) {
+			final String[] test = date.split("/");
+			if (Integer.parseInt(test[0]) < 13)
+				return "M/d/" + (test[2].length() > 2 ? "yyyy" : "yy");
 		}
-		return date.contains("/") ? "d/M/yyyy" : date.contains(".") ? "d.M.yyyy" : "yyyy-M-d";
+		if (date.contains("/"))
+			return "d/M/" + (date.split("/")[2].length() > 2 ? "yyyy" : "yy");
+		if (date.contains("."))
+			return "d.M." + (date.split("\\.")[2].length() > 2 ? "yyyy" : "yy");
+		if (date.contains("-"))
+			return (date.split("-")[0].length() > 2 ? "yyyy" : "yy") + "-M-d";
+		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
 
 	public static String dateFormatWithoutYear(final String format) {
 		if (format.contains("/"))
-			return format.replace("/yyyy", "");
+			return format.replace("/yyyy", "").replace("/yy", "");
 		if (format.contains("."))
-			return format.replace(".yyyy", "");
-		return format.replace("yyyy-", "");
+			return format.replace(".yyyy", "").replace(".yy", "");
+		return format.replace("yyyy-", "").replace("yy-", "");
 	}
 }
