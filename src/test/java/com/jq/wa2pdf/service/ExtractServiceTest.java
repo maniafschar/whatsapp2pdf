@@ -158,40 +158,42 @@ public class ExtractServiceTest {
 	@Test
 	public void analyse_6() throws Exception {
 		// given
-		// [23/08/2025, 12:15:10 AM] abc:
+		// 14/04/2024, 9:10 am - Messages
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 3 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 6 WhatsApp with +81 234543 3463.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
 		assertNotNull(attributes);
 		assertEquals("d/M/yyyy", attributes.getDateFormat());
-		assertEquals(1, attributes.getPeriods().size());
-		assertEquals("\\d/08/2025", attributes.getPeriods().get(0).period);
+		assertEquals(2, attributes.getPeriods().size());
+		assertEquals("\\d/04/2024", attributes.getPeriods().get(0).period);
+		assertEquals("\\d/06/2024", attributes.getPeriods().get(1).period);
 		assertEquals(2, attributes.getUsers().size());
-		assertEquals("Pete", attributes.getUsers().get(0).user);
-		assertEquals("Karen", attributes.getUsers().get(1).user);
+		assertEquals("abc", attributes.getUsers().get(0).user);
+		assertEquals("def", attributes.getUsers().get(1).user);
 	}
 
 	@Test
 	public void analyse_7() throws Exception {
 		// given
-		// [23/08/2025, 12:15:10 AM] abc:
+		// 8/21/25, 11:18 PM - Nachrichten
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 3 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 7 WhatsApp with Hab.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
 		assertNotNull(attributes);
-		assertEquals("d/M/yyyy", attributes.getDateFormat());
-		assertEquals(1, attributes.getPeriods().size());
-		assertEquals("\\d/08/2025", attributes.getPeriods().get(0).period);
+		assertEquals("M/d/yy", attributes.getDateFormat());
+		assertEquals(2, attributes.getPeriods().size());
+		assertEquals("8/\\d/25", attributes.getPeriods().get(0).period);
+		assertEquals("9/\\d/25", attributes.getPeriods().get(1).period);
 		assertEquals(2, attributes.getUsers().size());
-		assertEquals("Pete", attributes.getUsers().get(0).user);
-		assertEquals("Karen", attributes.getUsers().get(1).user);
+		assertEquals("abc", attributes.getUsers().get(0).user);
+		assertEquals("def", attributes.getUsers().get(1).user);
 	}
 }
