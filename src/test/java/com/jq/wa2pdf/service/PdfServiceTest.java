@@ -33,99 +33,43 @@ public class PdfServiceTest {
 
 	@Test
 	public void create_1() throws Exception {
-		// given
-		final Attributes attributes = this.chartService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 1 WhatsApp con abc.zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 1 WhatsApp con abc");
 	}
 
 	@Test
 	public void create_2() throws Exception {
-		// given
-		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 2 de WhatsApp con .zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 2 de WhatsApp con ");
 	}
 
 	@Test
 	public void create_3() throws Exception {
-		// given
-		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 3 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_.zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 3 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_");
 	}
 
 	@Test
 	public void create_4() throws Exception {
-		// given
-		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 4 WhatsApp - def.zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 4 WhatsApp - def");
 	}
 
 	@Test
 	public void create_5() throws Exception {
-		// given
-		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 5 WhatsApp - Schafkopf.zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 5 WhatsApp - Schafkopf");
 	}
 
 	@Test
 	public void create_6() throws Exception {
-		// given
-		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 6 WhatsApp with +81 234543 3463.zip"), null,
-				UUID.randomUUID().toString());
-
-		// when
-		this.pdfService.create(attributes.id, attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
-
-		// then
-		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+		test("Chat 6 WhatsApp with +81 234543 3463");
 	}
 
 	@Test
 	public void create_7() throws Exception {
+		test("Chat 7 WhatsApp with Hab");
+	}
+
+	private void test(final String filename) {
 		// given
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 7 WhatsApp with Hab.zip"), null,
+				this.getClass().getResourceAsStream("/zip/" + filename + ".zip"), null,
 				UUID.randomUUID().toString());
 
 		// when
