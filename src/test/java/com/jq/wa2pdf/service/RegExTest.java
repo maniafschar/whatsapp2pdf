@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import com.vdurmont.emoji.Emoji;
 import com.vdurmont.emoji.EmojiManager;
 
-public class PdfServiceTest {
+public class RegExTest {
 	private final Pattern start = Pattern.compile("^.?\\[[0-9/:-\\\\,\\\\. (|\u202fAM|\u202fPM)]+\\] ([^:].*?)");
 
 	@Test
