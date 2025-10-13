@@ -24,7 +24,7 @@ import com.jq.wa2pdf.service.ExtractService.Attributes;
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
 				"server.port=9001", "server.servlet.context-path=/rest" })
 @ActiveProfiles("test")
-public class PdfService2Test {
+public class PdfServiceTest {
 	@Autowired
 	private PdfService pdfService;
 
