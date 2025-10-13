@@ -46,13 +46,14 @@ class ChartService {
 		final int marginX = (image.getWidth() - marginLegend) / xAxis.size();
 		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
 				xAxis, dateFormat);
-		final PlotData plotData = this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors, formatter);
+		final PlotData plotData = this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis,
+				colors, formatter);
 		this.drawCharts(g, marginLegend, marginPlot, heightPlot, plotData);
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
-		return plotData.error.length() > 0 ? plotData.error.toString() + xAxis: null;
+		return plotData.error.length() > 0 ? plotData.error.toString() + xAxis : null;
 	}
 
 	private List<String> createXAxis(final String period, final SimpleDateFormat formatter) throws ParseException {
@@ -190,7 +191,6 @@ class ChartService {
 	}
 
 	private class Plot {
-		private final StringBuilder error = new StringBuilder();
 		private final String user;
 		private final Polygon chats = new Polygon();
 		private final Polygon words = new Polygon();
@@ -208,6 +208,7 @@ class ChartService {
 		private int chatsMax = 0;
 		private int wordsMax = 0;
 		private int lettersMax = 0;
+		private final StringBuilder error = new StringBuilder();
 		private final List<Plot> plots = new ArrayList<>();
 	}
 }
