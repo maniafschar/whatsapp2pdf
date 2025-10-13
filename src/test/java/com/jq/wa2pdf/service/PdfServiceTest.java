@@ -31,21 +31,6 @@ public class PdfServiceTest {
 	@Autowired
 	private AdminService adminService;
 
-	private void assertCreation(final String id, final String period) {
-		for (int i = 0; i < 20; i++) {
-			Thread.sleep(500L);
-			final Path path = this.pdfService.get(id, period);
-			if (path != null) {
-				final AdminData adminData = this.adminService.init();
-				if (adminData.getTickets().size() > 0)
-					throw new RuntimeException("PDF creation error\n" +
-							adminData.getTickets().stream().map(e -> e.getNote()).collect(Collectors.joining("\n")));
-				return;
-			}
-		}
-		throw new RuntimeException("PDF creation timed out!");
-	}
-
 	@Test
 	public void create_1() throws Exception {
 		// given
@@ -58,7 +43,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -73,7 +58,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -88,7 +73,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -103,7 +88,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -118,7 +103,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -133,7 +118,7 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
 	}
 
 	@Test
@@ -148,6 +133,21 @@ public class PdfServiceTest {
 				attributes.getUsers().get(0).user, null);
 
 		// then
-		assertCreation(attributes.getPeriods().get(0).period, attributes.getUsers().get(0).user);
+		assertCreation(attributes.id, attributes.getPeriods().get(0).period);
+	}
+
+	private void assertCreation(final String id, final String period) {
+		for (int i = 0; i < 20; i++) {
+			Thread.sleep(500L);
+			final Path path = this.pdfService.get(id, period);
+			if (path != null) {
+				final AdminData adminData = this.adminService.init();
+				if (adminData.getTickets().size() > 0)
+					throw new RuntimeException("PDF creation error\n" +
+							adminData.getTickets().stream().map(e -> e.getNote()).collect(Collectors.joining("\n")));
+				return;
+			}
+		}
+		throw new RuntimeException("PDF creation timed out!");
 	}
 }
