@@ -25,7 +25,7 @@ import com.jq.wa2pdf.repository.Repository;
 		TestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = {
 				"server.port=9001", "server.servlet.context-path=/rest" })
 @ActiveProfiles("test")
-public class WhatsApp2PdfApplication {
+public class Application {
 	private static String url = "http://localhost:9000/";
 	private WebDriver driver;
 

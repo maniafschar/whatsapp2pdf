@@ -11,7 +11,7 @@ import com.twelvemonkeys.imageio.plugins.webp.WebPImageReaderSpi;
 @SpringBootApplication
 @EnableAsync
 public class WhatsApp2PdfApplication {
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		IIORegistry.getDefaultInstance().registerServiceProvider(new WebPImageReaderSpi());
 		new SpringApplicationBuilder(WhatsApp2PdfApplication.class).run(args);
 	}
