@@ -486,8 +486,10 @@ public class PdfService {
 			table.setWidth(UnitValue.createPercentValue(100f));
 			table.setKeepTogether(true);
 			final String idChart = ExtractService.filename + UUID.randomUUID().toString() + ".png";
-			PdfService.this.chartService.createImage(this.total, this.dir.resolve(idChart), this.colors,
-					this.dateFormat);
+			final String error = PdfService.this.chartService.createImage(
+					this.total, this.dir.resolve(idChart), this.colors, this.dateFormat);
+			if (error != null)
+				PdfService.this.adminService.createTicket(new Ticket("Chart Service Error\n" + error));
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);
