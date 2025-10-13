@@ -28,7 +28,7 @@ import com.jq.wa2pdf.util.DateHandler;
 
 @Service
 class ChartService {
-	void createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors,
+	String createImage(final List<Statistics> data, final Path file, final Map<String, Color> colors,
 			final String dateFormat) throws IOException, ParseException {
 		final SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
 		final List<String> xAxis = this.createXAxis(data.get(0).getPeriod(), formatter);
@@ -46,12 +46,13 @@ class ChartService {
 		final int marginX = (image.getWidth() - marginLegend) / xAxis.size();
 		this.drawLegend(g, data, image.getWidth(), image.getHeight(), marginLegend, marginPlot, marginX, heightPlot,
 				xAxis, dateFormat);
-		this.drawCharts(g, marginLegend, marginPlot, heightPlot,
-				this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors, formatter));
+		final PlotData plotData = this.preparePlotData(data, marginLegend, marginPlot, marginX, heightPlot, xAxis, colors, formatter);
+		this.drawCharts(g, marginLegend, marginPlot, heightPlot, plotData);
 		g.dispose();
 		image.flush();
 		final File f = file.toAbsolutePath().toFile();
 		ImageIO.write(image, f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('.') + 1), f);
+		return plotData.error.length() > 0 ? plotData.error.toString() + xAxis: null;
 	}
 
 	private List<String> createXAxis(final String period, final SimpleDateFormat formatter) throws ParseException {
@@ -87,7 +88,9 @@ class ChartService {
 					return false;
 				}
 			}).findFirst().orElse(null);
-			if (date != null) {
+			if (date == null)
+				plotData.error.append(dataUser.user + " " + dataUser.period + "\n");
+			else {
 				Plot plot = plotData.plots.stream().filter(e -> e.user.equals(dataUser.user)).findFirst()
 						.orElse(null);
 				if (plot == null) {
@@ -187,6 +190,7 @@ class ChartService {
 	}
 
 	private class Plot {
+		private final StringBuilder error = new StringBuilder();
 		private final String user;
 		private final Polygon chats = new Polygon();
 		private final Polygon words = new Polygon();
