@@ -17,7 +17,8 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(Throwable.class)
 	public ResponseEntity<Object> handleAllExceptions(final Throwable ex, final WebRequest request) {
-		this.adminService.createTicket(new Ticket(request.getDescription(false) + "\n" + Utilities.stackTraceToString(ex)));
+		this.adminService.createTicket(new Ticket("ERROR\n" + GlobalExceptionHandler.class.getSimpleName() + "\n" +
+				request.getDescription(false) + "\n" + Utilities.stackTraceToString(ex)));
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
