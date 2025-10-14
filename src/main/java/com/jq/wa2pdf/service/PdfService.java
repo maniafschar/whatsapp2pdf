@@ -489,7 +489,7 @@ public class PdfService {
 			final String error = PdfService.this.chartService.createImage(
 					this.total, this.dir.resolve(idChart), this.colors, this.dateFormat);
 			if (error != null)
-				PdfService.this.adminService.createTicket(new Ticket("Error\nChartService\n" + error));
+				PdfService.this.adminService.createTicket(new Ticket(Ticket.ERROR + "ChartService\n" + error));
 			final Cell cellChart = this.createCell(idChart, true);
 			((Image) cellChart.getChildren().get(0)).setAutoScaleWidth(true);
 			cellChart.setPadding(0);
@@ -699,7 +699,7 @@ public class PdfService {
 							.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
 				if (s == null)
 					PdfService.this.adminService
-							.createTicket(new Ticket("ERROR\nemoji not found: " + emoji + " " + id + "\n" + text));
+							.createTicket(new Ticket(Ticket.ERROR + "emoji not found: " + emoji + " " + id + "\n" + text));
 				else {
 					try {
 						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
@@ -759,7 +759,7 @@ public class PdfService {
 						}
 					}
 				} catch (final Exception ex) {
-					PdfService.this.adminService.createTicket(new Ticket("ERROR\nfillLinkPreview\n" +
+					PdfService.this.adminService.createTicket(new Ticket(Ticket.ERROR + "fillLinkPreview\n" +
 							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTraceToString(ex)));
 				}
 			}
