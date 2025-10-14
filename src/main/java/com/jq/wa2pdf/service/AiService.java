@@ -117,7 +117,8 @@ public class AiService {
 		}
 		if (response.adjectives.size() > 0)
 			response.text = response.text.substring(0, first).trim();
-		this.adminService.createTicket(new Ticket("AI\n" + error + summary));
+		this.adminService.createTicket(new Ticket((error.length() > 0 ? Ticket.ERROR : "") +
+				"AI\n" + error + summary));
 		return response;
 	}
 
