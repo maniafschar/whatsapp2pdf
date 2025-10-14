@@ -45,6 +45,7 @@ public class ExtractServiceTest {
 		assertEquals(2, attributes.getUsers().size());
 		assertEquals("abc", attributes.getUsers().get(0).user);
 		assertEquals("def", attributes.getUsers().get(1).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -70,6 +71,7 @@ public class ExtractServiceTest {
 		assertEquals("gh i", attributes.getUsers().get(2).user);
 		assertEquals("jkl", attributes.getUsers().get(3).user);
 		assertEquals("mn ❤", attributes.getUsers().get(4).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -90,6 +92,7 @@ public class ExtractServiceTest {
 		assertEquals(2, attributes.getUsers().size());
 		assertEquals("Pete", attributes.getUsers().get(0).user);
 		assertEquals("Karen", attributes.getUsers().get(1).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -110,6 +113,7 @@ public class ExtractServiceTest {
 		assertEquals(2, attributes.getUsers().size());
 		assertEquals("def", attributes.getUsers().get(0).user);
 		assertEquals("abc", attributes.getUsers().get(1).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -153,6 +157,7 @@ public class ExtractServiceTest {
 		assertEquals("Suzanne Heureuse", attributes.getUsers().get(12).user);
 		assertEquals("\u200eDu", attributes.getUsers().get(13).user);
 		assertEquals("Monika Roitner", attributes.getUsers().get(14).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -174,6 +179,7 @@ public class ExtractServiceTest {
 		assertEquals(2, attributes.getUsers().size());
 		assertEquals("abc", attributes.getUsers().get(0).user);
 		assertEquals("def", attributes.getUsers().get(1).user);
+		this.extractService.delete(attributes.getId());
 	}
 
 	@Test
@@ -195,5 +201,6 @@ public class ExtractServiceTest {
 		assertEquals(2, attributes.getUsers().size());
 		assertEquals("abc", attributes.getUsers().get(0).user);
 		assertEquals("def", attributes.getUsers().get(1).user);
+		this.extractService.delete(attributes.getId());
 	}
 }
