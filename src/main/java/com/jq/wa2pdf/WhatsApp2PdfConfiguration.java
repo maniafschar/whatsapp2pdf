@@ -45,7 +45,8 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 			@Override
 			public void handleUncaughtException(final Throwable ex, final Method method, final Object... obj) {
 				WhatsApp2PdfConfiguration.this.adminService.createTicket(
-						new Ticket(method.toGenericString() + "\n" + (obj == null ? ""
+						new Ticket("ERROR\n" + AsyncUncaughtExceptionHandler.class.getSimpleName() + "\n" +
+								method.toGenericString() + "\n" + (obj == null ? ""
 								: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
 										.collect(Collectors.joining(", ")) + "\n")
 								+ Utilities.stackTraceToString(ex)));
