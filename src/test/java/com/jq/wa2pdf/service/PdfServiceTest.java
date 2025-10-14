@@ -81,17 +81,21 @@ public class PdfServiceTest {
 	}
 
 	private void assertCreation(final String id, final String period) throws Exception {
-		for (int i = 0; i < 20; i++) {
-			Thread.sleep(500L);
-			final Path path = this.pdfService.get(id, period);
-			if (path != null) {
-				final AdminData adminData = this.adminService.init();
-				if (adminData.getTickets().size() > 0)
-					throw new RuntimeException("PDF creation error\n" +
-							adminData.getTickets().stream().map(e -> e.getNote()).collect(Collectors.joining("\n")));
-				return;
+		try{
+			for (int i = 0; i < 20; i++) {
+				Thread.sleep(500L);
+				final Path path = this.pdfService.get(id, period);
+				if (path != null) {
+					final AdminData adminData = this.adminService.init();
+					if (adminData.getTickets().size() > 0)
+						throw new RuntimeException("PDF creation error\n" +
+								adminData.getTickets().stream().map(e -> e.getNote()).collect(Collectors.joining("\n")));
+					return;
+				}
 			}
+			throw new RuntimeException("PDF creation timed out!");
+		} finally {
+			this.extractService.delete(id);
 		}
-		throw new RuntimeException("PDF creation timed out!");
 	}
 }
