@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.jq.wa2pdf.TestConfig;
 import com.jq.wa2pdf.WhatsApp2PdfApplication;
+import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.AdminService.AdminData;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
 
