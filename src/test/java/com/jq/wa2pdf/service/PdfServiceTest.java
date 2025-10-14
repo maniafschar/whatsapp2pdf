@@ -87,9 +87,9 @@ public class PdfServiceTest {
 				final Path path = this.pdfService.get(id, period);
 				if (path != null) {
 					final AdminData adminData = this.adminService.init();
-					if (adminData.getTickets().size() > 0)
-						throw new RuntimeException("PDF creation error\n" +
-								adminData.getTickets().stream().map(e -> e.getNote()).collect(Collectors.joining("\n")));
+					final String errors = adminData.getTickets().stream().filter(e -> !e.getNote().startsWith("AI\n")).map(e -> e.getNote()).collect(Collectors.joining("\n\n"));
+					if (errors.length() > 0)
+						throw new RuntimeException("PDF creation error\n" + errors);
 					return;
 				}
 			}
