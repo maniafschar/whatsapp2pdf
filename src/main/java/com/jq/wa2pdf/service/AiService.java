@@ -171,7 +171,7 @@ public class AiService {
 			return response;
 		} catch (final Exception ex) {
 			ex.printStackTrace();
-			this.adminService.createTicket(new Ticket("ERROR\n" + Utilities.stackTraceToString(ex)));
+			this.adminService.createTicket(new Ticket(Ticket.ERROR + Utilities.stackTraceToString(ex)));
 			return null;
 		}
 	}
