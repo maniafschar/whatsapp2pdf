@@ -7,6 +7,7 @@ import com.jq.wa2pdf.util.Utilities;
 
 @Entity
 public class Ticket extends BaseEntity {
+	public static final String ERROR = "ERROR\n";
 	@Column(columnDefinition = "TEXT")
 	private String note;
 	private boolean deleted = false;
