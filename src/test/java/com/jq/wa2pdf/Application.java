@@ -60,7 +60,7 @@ public class Application {
 	public void afterEach() throws Exception {
 		this.driver.close();
 		new ProcessBuilder("./web.sh", "stop").start();
-		final String dir = System.getProperty("java.io.tmpdir") + '/';
+		final String dir = System.getProperty("java.io.tmpdir") + File.separatorChar;
 		for (final String file : Paths.get(dir).toFile().list()) {
 			if (file.startsWith("whatsapp2pdf_") && new File(dir + file).isDirectory())
 				FileUtils.forceDelete(new File(dir + file));
