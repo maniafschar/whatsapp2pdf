@@ -1,9 +1,12 @@
 package com.jq.wa2pdf;
 
+import java.io.File;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,6 +60,11 @@ public class Application {
 	public void afterEach() throws Exception {
 		this.driver.close();
 		new ProcessBuilder("./web.sh", "stop").start();
+		final String dir = System.getProperty("java.io.tmpdir") + '/';
+		for (final String file : Paths.get(dir).toFile().list()) {
+			if (file.startsWith("whatsapp2pdf_") && new File(dir + file).isDirectory())
+				FileUtils.forceDelete(new File(dir + file));
+		}
 	}
 
 	static WebDriver createWebDriver(final int width, final int height) {
