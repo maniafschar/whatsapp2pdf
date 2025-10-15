@@ -1,9 +1,9 @@
 package com.jq.wa2pdf.entity;
 
+import com.jq.wa2pdf.util.Utilities;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-
-import com.jq.wa2pdf.util.Utilities;
 
 @Entity
 public class Ticket extends BaseEntity {
@@ -18,11 +18,11 @@ public class Ticket extends BaseEntity {
 
 	public Ticket(final String note) {
 		this();
-		setNote(note);
+		this.setNote(note);
 	}
 
 	public String getNote() {
-		return note;
+		return this.note;
 	}
 
 	public void setNote(final String note) {
@@ -30,7 +30,7 @@ public class Ticket extends BaseEntity {
 	}
 
 	public boolean isDeleted() {
-		return deleted;
+		return this.deleted;
 	}
 
 	public void setDeleted(final boolean deleted) {
