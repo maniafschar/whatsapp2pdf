@@ -115,8 +115,7 @@ public class ExtractService {
 		if (tempDir.resolve(filename).toFile().exists())
 			return tempDir.resolve(filename);
 		for (final String file : tempDir.toFile().list()) {
-			if (file.toLowerCase().contains("whatsapp") && file.toLowerCase().contains("chat")
-					&& file.toLowerCase().endsWith(".txt"))
+			if (file.toLowerCase().contains("whatsapp") && file.toLowerCase().endsWith(".txt"))
 				return tempDir.resolve(file);
 		}
 		throw new IOException("Chat file not found!");
@@ -161,8 +160,8 @@ public class ExtractService {
 
 	String getPatternStart(final String date) {
 		return "^\u200E?((\\[{date}])|({date} -)) ([^:].*?):.*"
-				.replace("{date}", (date == null ? "\\d{1,2}[\\.|/]\\d{1,2}[\\.|/]\\d{2,4}" : date)
-						+ ", \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)");
+				.replace("{date}", (date == null ? "\\d{1,2}[.|/]\\d{1,2}[.|/]\\d{2,4}" : date)
+						+ ",? \\d{1,2}:\\d{1,2}(:\\d{1,2})?(|.AM|.PM|.am|.pm)");
 	}
 
 	public Attributes analyse(final InputStream in, final String filename, final String id) throws IOException {
