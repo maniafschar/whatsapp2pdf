@@ -661,8 +661,10 @@ public class PdfService {
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
 					if (!mediaId.startsWith(ExtractService.filename)) {
 						image.setAutoScale(true);
-						if (h > 400)
-							image.setMinHeight(400);
+						if (h > 320)
+							cell.setMinHeight(320);
+						cell.setMaxHeight(550);
+						cell.setMaxWidth(550);
 					}
 					cell.add(image);
 				}
@@ -738,7 +740,7 @@ public class PdfService {
 				try (final BufferedReader input = new BufferedReader(
 						new InputStreamReader(new URI(text).toURL().openStream()))) {
 					String line;
-					final Pattern content = Pattern.compile("content=\"([^\"].*)\"");
+					final Pattern content = Pattern.compile("content=\"([^\"].*?)\"");
 					while ((line = input.readLine()) != null) {
 						final int i = line.indexOf("property=\"og:image\"");
 						if (i > -1) {
