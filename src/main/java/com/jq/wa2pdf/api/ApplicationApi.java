@@ -27,7 +27,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.jq.wa2pdf.entity.Feedback;
-import com.jq.wa2pdf.entity.Log;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.AdminService;
 import com.jq.wa2pdf.service.ExtractService;
@@ -42,6 +41,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("api")
 public class ApplicationApi {
+	public static final int STATUS_PROCESSING_PDF = 566;
+
 	@Autowired
 	private PdfService pdfService;
 
@@ -92,7 +93,7 @@ public class ApplicationApi {
 			if (Files.exists(path))
 				throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
 						IOUtils.toString(path.toUri().toURL(), StandardCharsets.UTF_8));
-			response.sendError(Log.STATUS_PROCESSING_PDF);
+			response.sendError(STATUS_PROCESSING_PDF);
 		} else if (sendFile) {
 			response.setHeader("Content-Disposition",
 					"attachment; filename=\"" + this.sanatizeFilename(this.extractService.getFilename(id)) +

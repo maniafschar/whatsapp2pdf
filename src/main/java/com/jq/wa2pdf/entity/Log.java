@@ -2,14 +2,13 @@ package com.jq.wa2pdf.entity;
 
 import org.springframework.http.HttpStatus;
 
+import com.jq.wa2pdf.api.ApplicationApi;
 import com.jq.wa2pdf.util.Utilities;
 
 import jakarta.persistence.Entity;
 
 @Entity
 public class Log extends BaseEntity {
-	public static final int STATUS_PROCESSING_PDF = 566;
-
 	private String method = "";
 	private String body = "";
 	private String referer = "";
@@ -24,7 +23,7 @@ public class Log extends BaseEntity {
 		ErrorAuthentication, ErrorClient, ErrorRedirection, ErrorServer, Ok;
 
 		private static LogStatus map(final int status) {
-			return status < 300 || status == STATUS_PROCESSING_PDF ? Ok
+			return status < 300 || status == ApplicationApi.STATUS_PROCESSING_PDF ? Ok
 					: status == HttpStatus.UNAUTHORIZED.value() ? ErrorAuthentication
 							: status < 400 ? ErrorRedirection : status < 500 ? ErrorClient : ErrorServer;
 		}
