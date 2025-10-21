@@ -644,9 +644,9 @@ public class PdfService {
 				} else {
 					final double max = 800;
 					final int w = originalImage.getWidth(), h = originalImage.getHeight();
-					if (!mediaId.matches(ExtractService.filename
-							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png")
-							&& (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
+					final boolean internalMedia = mediaId.matches(ExtractService.filename
+							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png");
+					if (!internalMedia && (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
 						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
 						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
 								BufferedImage.TYPE_4BYTE_ABGR);
@@ -659,7 +659,7 @@ public class PdfService {
 					}
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
-					if (!mediaId.startsWith(ExtractService.filename)) {
+					if (!internalMedia) {
 						image.setAutoScale(true);
 						if (h > 320)
 							cell.setMinHeight(320);
