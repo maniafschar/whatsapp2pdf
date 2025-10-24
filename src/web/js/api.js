@@ -260,7 +260,7 @@ class api {
 						param.success(response);
 					}
 				} else {
-					if (api.status < 500) {
+					if (xhr.status < 500) {
 						var xhrError = new XMLHttpRequest();
 						xhrError.open('POST', api.url + '/rest/api/ticket', true);
 						xhrError.setRequestHeader('Content-Type', 'application/json');
@@ -303,5 +303,6 @@ class api {
 	}
 
 }
+
 
 
