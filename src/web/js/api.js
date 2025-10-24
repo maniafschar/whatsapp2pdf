@@ -100,7 +100,7 @@ class api {
 				api.feedbackStatus = 'You already successfully added a feedback. You may edit it with the link in the email we sent you.';
 			},
 			error: xhr => {
-				document.querySelector('popup content error').innerHTML = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
+				document.querySelector('popup content error').innerText = xhr.status < 500 ? 'The server is unavailable. Please try again later.' : 'Saving feedback failed: ' + xhr.responseText;
 			}
 		});
 	}
@@ -233,7 +233,7 @@ class api {
 								error = 'Creation failed: ' + error;
 							}
 						}
-						document.getElementsByTagName('error')[0].innerHTML = error;
+						document.getElementsByTagName('error')[0].innerText = error;
 					}
 				}
 			});
@@ -303,6 +303,7 @@ class api {
 	}
 
 }
+
 
 
 
