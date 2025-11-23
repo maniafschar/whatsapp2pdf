@@ -160,8 +160,9 @@ public class ExtractService {
 
 	String getPatternStart(final String date) {
 		return "^\u200E?((\\[{date}])|({date} -)) ([^:].*?):.*"
-				.replace("{date}", (date == null ? "\\d{1,2}[.|/]\\d{1,2}[.|/]\\d{2,4}" : date)
-						+ ",? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
+				.replace("{date}",
+						(date == null ? "(\\d{1,2}[.|/]\\d{1,2}[.|/]\\d{2,4}|\\d{4}-\\d{2}-\\d{2})" : date)
+								+ ",? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
 	}
 
 	public Attributes analyse(final InputStream in, final String filename, final String id) throws IOException {

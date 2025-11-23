@@ -44,7 +44,8 @@ public class PdfServiceTest {
 			"Chat 7 WhatsApp with Hab",
 			"Chat 8 Conversa do WhatsApp com A K",
 			"Chat 9 WhatsApp den Za",
-			"Chat 10 WhatsApp con RED UDR"
+			"Chat 10 WhatsApp con RED UDR",
+			"Chat 11 WhatsApp Chat"
 	})
 	void test(final String filename) throws Exception {
 		// given
