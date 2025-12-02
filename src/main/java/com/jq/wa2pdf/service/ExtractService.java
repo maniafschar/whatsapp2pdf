@@ -151,7 +151,8 @@ public class ExtractService {
 		final StringBuilder s = new StringBuilder();
 		for (final String file : getTempDir(id).toFile().list()) {
 			if (!file.startsWith(filename))
-				s.append("|" + file.replace(".", "\\."));
+				s.append("|" + file.replace(".", "\\.").replace("(", "\\(").replace("[", "\\[").replace("{", "\\{")
+						.replace(")", "\\)").replace("]", "\\]").replace("}", "\\}"));
 		}
 		if (s.length() > 0)
 			return ".*(" + s.delete(0, 1) + ").*";
