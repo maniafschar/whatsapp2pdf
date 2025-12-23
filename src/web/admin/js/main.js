@@ -156,7 +156,6 @@ class ui {
 						row.push(this.list[i].id);
 						row.push(ui.formatTime(this.list[i].createdAt));
 						row.push(this.list[i].logStatus);
-						row.push(this.list[i].ip ? '<a href="https://whatismyipaddress.com/ip/' + this.list[i].ip + '" target="sc_ip">' + this.list[i].ip + '</a>' : '');
 						row.push(this.list[i].time);
 						row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.trim(ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : '')));
 						row.push(this.list[i].referer);
@@ -324,7 +323,7 @@ class ui {
 		for (var i = 0; i < data.columns.length; i++) {
 			if (!narrowView || !data.columns[i].excludeNarrow) {
 				var th = tr.appendChild(document.createElement('th'));
-				th.innerHTML = data.columns[i].label;
+				th.innerText = data.columns[i].label;
 				th.setAttribute('style', 'w' + (i + 1));
 				if (data.columns[i].sort) {
 					th.setAttribute('onclick', 'ui.sortColumn(event)');
@@ -356,7 +355,13 @@ class ui {
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
 					if (!narrowView || !data.columns[i2].excludeNarrow) {
 						var td = tr.appendChild(document.createElement('td'));
-						td.innerHTML = d[i][i2];
+						if (data.columns[i2].label == 'ip' && d[i][i2]) {
+							var a = td.appendChild(document.createElement('a'));
+							a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + this.list[i].ip);
+							a.setAttribute('target', 'sc_ip');
+							a.innerText = d[i][i2];
+						} else
+							td.innerText = d[i][i2];
 						td.setAttribute('style', 'w' + (i2 + 1));
 						if (data.columns[i2].label == 'createdAt') {
 							td.setAttribute('onclick', 'ui.openDetails(event)');
