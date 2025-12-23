@@ -669,7 +669,8 @@ public class PdfService {
 					cell.add(image);
 				}
 			} catch (final IOException ex) {
-				throw new RuntimeException(ex);
+				// throw new RuntimeException(ex);
+				cell.add(new Paragraph(mediaId + ":\n" + ex.getMessage()));
 			}
 		}
 

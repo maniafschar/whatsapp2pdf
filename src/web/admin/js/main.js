@@ -317,15 +317,24 @@ class ui {
 	static renderTable(data) {
 		var d = data.convert();
 		var narrowView = ui.isNarrowView();
-		var s = '<thead><tr>';
+		document.querySelector(data.selector).innerHTML = '';
+		var table = document.querySelector(data.selector).appendChild(document.createElement('table'));
+		var thead = table.appendChild(document.createElement('thead'));
+		var tr = thead.appendChild(document.createElement('tr'));
 		for (var i = 0; i < data.columns.length; i++) {
-			if (!narrowView || !data.columns[i].excludeNarrow)
-				s += '<th' +
-					(data.columns[i].sort ? ' onclick="ui.sortColumn(event)" class="clickable"' : '') +
-					(data.columns[i].filter ? ' onclick="ui.openFilter(event)" class="clickable"' : '') +
-					' [[w' + (i + 1) + ']]>' + data.columns[i].label + '</th>';
+			if (!narrowView || !data.columns[i].excludeNarrow) {
+				var th = tr.appendChild(document.createElement('th'));
+				th.innerHTML = data.columns[i].label;
+				th.setAttribute('style', 'w' + (i + 1));
+				if (data.columns[i].sort) {
+					th.setAttribute('onclick', 'ui.sortColumn(event)');
+					th.setAttribute('class', 'clickable');
+				} else if (data.columns[i].filter) {
+					th.setAttribute('onclick', 'ui.openFilter(event)');
+					th.setAttribute('class', 'clickable');
+				}
+			}
 		}
-		s += '</tr></thead>';
 		if (data.sort) {
 			var column = parseInt(data.sort.substring(0, data.sort.indexOf('-'))) + (narrowView ? 1 : 0);
 			var factor = data.sort.indexOf('-asc') > 0 ? 1 : -1;
@@ -340,27 +349,30 @@ class ui {
 			}
 			return false;
 		};
+		var tbody = table.appendChild(document.createElement('tbody'));
 		for (var i = 0; i < d.length; i++) {
 			if (!isFiltered(data, d[i])) {
-				s += '<tr>';
+				tr = tbody.appendChild(document.createElement('tr'));
 				for (var i2 = 0; i2 < data.columns.length; i2++) {
-					if (!narrowView || !data.columns[i2].excludeNarrow)
-						s += '<td' + (data.columns[i2].label == 'createdAt' ? ' onclick="ui.openDetails(event)" i="' + ui.data.indexOf(data) + '-' + d[i][0] + '" class="clickable"' : '') + ' [[w' + (i2 + 1) + ']]>' + d[i][i2] + '</td>';
+					if (!narrowView || !data.columns[i2].excludeNarrow) {
+						var td = tr.appendChild(document.createElement('td'));
+						td.innerHTML = d[i][i2];
+						td.setAttribute('style', 'w' + (i2 + 1));
+						if (data.columns[i2].label == 'createdAt') {
+							td.setAttribute('onclick', 'ui.openDetails(event)');
+							td.setAttribute('i', ui.data.indexOf(data) + '-' + d[i][0]);
+							td.setAttribute('class', 'clickable');
+						}
+					}
 				}
-				s += '</tr>';
 			}
 		}
-		document.querySelector(data.selector).innerHTML = '<table>' + ui.replaceWidths(data.widths(narrowView), s) + '</table>';
+		for (var i = 0; i < data.widths(narrowView).length; i++)
+			table.querySelectorAll('[style="w' + (i + 1) + '"]').forEach(e => e.setAttribute('style', 'width:' + data.widths(narrowView)[i] + '%'));
 		document.querySelector(data.selector + ' tr').querySelectorAll('th').forEach(e => e.classList.remove('asc', 'desc'));
 		if (data.sort)
 			document.querySelector(data.selector + ' tr').querySelectorAll('th')[parseInt(data.sort.substring(0, data.sort.indexOf('-')))].classList.add(data.sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
 		document.querySelector(data.selector).dispatchEvent(new CustomEvent('changed'));
-	}
-
-	static replaceWidths(widths, s) {
-		for (var i = 0; i < widths.length; i++)
-			s = s.replaceAll(' [[w' + (i + 1) + ']]>', ' style="width:' + widths[i] + '%;">');
-		return s;
 	}
 
 	static showTab(i) {

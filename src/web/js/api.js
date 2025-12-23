@@ -238,7 +238,9 @@ class api {
 				}
 			});
 		}
-		if (document.querySelector('period .spinner'))
+		if (!period)
+			download();
+		else if (document.querySelector('period .spinner'))
 			setTimeout(download, 1000);
 	}
 
