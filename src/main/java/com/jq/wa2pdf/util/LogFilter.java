@@ -67,7 +67,7 @@ public class LogFilter implements Filter {
 				log.setStatus(HttpStatus.UNAUTHORIZED.value());
 			}
 		} finally {
-			if (log.getStatus() != ApplicationApi.STATUS_PROCESSING_PDF) {
+			if (res.getStatus() != ApplicationApi.STATUS_PROCESSING_PDF) {
 				log.setTime((int) (System.currentTimeMillis() - time));
 				if (log.getStatus() == 0)
 					log.setStatus(res.getStatus());
