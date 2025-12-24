@@ -360,8 +360,9 @@ class ui {
 							var a = td.appendChild(document.createElement('a'));
 							a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + d[i][i2]);
 							a.setAttribute('target', 'sc_ip');
-						}
-						td.innerHTML = d[i][i2];
+							a.innerHTML = d[i][i2];
+						} else
+							td.innerHTML = d[i][i2];
 						td.setAttribute('style', 'w' + (i2 + 1));
 						if (data.columns[i2].label == 'createdAt') {
 							td.setAttribute('onclick', 'ui.openDetails(event)');
