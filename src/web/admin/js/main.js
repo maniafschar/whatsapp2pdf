@@ -357,7 +357,7 @@ class ui {
 						var td = tr.appendChild(document.createElement('td'));
 						if (data.columns[i2].label == 'ip' && d[i][i2]) {
 							var a = td.appendChild(document.createElement('a'));
-							a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + this.list[i].ip);
+							a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + d[i][i2]);
 							a.setAttribute('target', 'sc_ip');
 							a.innerText = d[i][i2];
 						} else
