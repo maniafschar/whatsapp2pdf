@@ -746,8 +746,11 @@ public class PdfService {
 						final int i = line.indexOf("property=\"og:image\"");
 						if (i > -1) {
 							line = line.substring(line.lastIndexOf('<', i));
-							if (line.contains(">"))
-								line += " " + input.readLine();
+							String s;
+							while (!line.contains(">") && (s = input.readLine()) != null)
+								line += " " + s;
+							if (!line.contains(">"))
+								break;
 							line = line.substring(0, line.indexOf('>'));
 							final Matcher matcher = content.matcher(line);
 							if (matcher.find()) {
