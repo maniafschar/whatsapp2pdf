@@ -156,6 +156,7 @@ class ui {
 						row.push(this.list[i].id);
 						row.push(ui.formatTime(this.list[i].createdAt));
 						row.push(this.list[i].logStatus);
+						row.push(this.list[i].ip);
 						row.push(this.list[i].time);
 						row.push(this.list[i].method + ' ' + this.list[i].uri + (this.list[i].query ? '?' + this.list[i].query : '') + ui.trim(ui.sanitizeText(this.list[i].body ? '<br/>' + this.list[i].body : '')));
 						row.push(this.list[i].referer);
@@ -360,7 +361,7 @@ class ui {
 							a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + d[i][i2]);
 							a.setAttribute('target', 'sc_ip');
 						}
-						td.innerText = d[i][i2];
+						td.innerHTML = d[i][i2];
 						td.setAttribute('style', 'w' + (i2 + 1));
 						if (data.columns[i2].label == 'createdAt') {
 							td.setAttribute('onclick', 'ui.openDetails(event)');
