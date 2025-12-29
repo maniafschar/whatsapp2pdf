@@ -1,9 +1,14 @@
 package com.jq.wa2pdf.service;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.imageio.IIOException;
+import javax.imageio.ImageIO;
+
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -45,9 +50,11 @@ public class PdfServiceTest {
 			"Chat 8 Conversa do WhatsApp com A K",
 			"Chat 9 WhatsApp den Za",
 			"Chat 10 WhatsApp con RED UDR",
-			"Chat 11 WhatsApp Chat"
+			"Chat 11 WhatsApp Chat",
+			"Chat 12 WhatsApp Kyrilish",
+			"Chat 13 WhatsApp Strange Date"
 	})
-	void test(final String filename) throws Exception {
+	void pdf(final String filename) throws Exception {
 		// given
 		final Attributes attributes = this.extractService.analyse(
 				this.getClass().getResourceAsStream("/zip/" + filename + ".zip"), null,
@@ -79,6 +86,32 @@ public class PdfServiceTest {
 			throw new RuntimeException("PDF creation timed out!");
 		} finally {
 			this.extractService.delete(id);
+		}
+	}
+
+	@Test
+	void webp_failure1() throws IOException {
+		// given
+
+		try {
+			// when
+			ImageIO.read(this.getClass().getResourceAsStream("/image/failure1.webp"));
+			throw new RuntimeException("Exception expected");
+		} catch (final IIOException ex) {
+			// then exception, don't know why... maybe one day the bug is fixed...
+		}
+	}
+
+	@Test
+	void webp_failure2() throws IOException {
+		// given
+
+		try {
+			// when
+			ImageIO.read(this.getClass().getResourceAsStream("/image/failure2.webp"));
+			throw new RuntimeException("Exception expected");
+		} catch (final IIOException ex) {
+			// then exception, don't know why... maybe one day the bug is fixed...
 		}
 	}
 }

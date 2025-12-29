@@ -1,7 +1,12 @@
 package com.jq.wa2pdf.util;
 
 public class DateHandler {
+	public static String replaceStrangeWhitespace(final String date) {
+		return date.replace(". ", ".");
+	}
+
 	public static String replaceDay(String date, final String dateFormat) {
+		date = replaceStrangeWhitespace(date);
 		date = date.substring(0, date.indexOf(' ')).replace(",", "");
 		if (dateFormat.startsWith("M/d/"))
 			return date.split("/")[0] + "/\\d/" + date.split("/")[2];
@@ -35,7 +40,7 @@ public class DateHandler {
 		if (date.contains("/"))
 			return "d/M/" + (date.split("/")[2].length() > 2 ? "yyyy" : "yy");
 		if (date.contains("."))
-			return "d.M." + (date.split("\\.")[2].length() > 2 ? "yyyy" : "yy");
+			return "d.M." + (replaceStrangeWhitespace(date).split("\\.")[2].length() > 2 ? "yyyy" : "yy");
 		if (date.contains("-"))
 			return (date.split("-")[0].length() > 2 ? "yyyy" : "yy") + "-M-d";
 		throw new IllegalArgumentException("Unknown date format: " + date);

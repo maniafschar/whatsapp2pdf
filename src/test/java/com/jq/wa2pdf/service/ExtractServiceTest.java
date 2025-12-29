@@ -70,7 +70,7 @@ public class ExtractServiceTest {
 		assertEquals("deñ", attributes.getUsers().get(1).user);
 		assertEquals("gh i", attributes.getUsers().get(2).user);
 		assertEquals("jkl", attributes.getUsers().get(3).user);
-		assertEquals("mn ❤", attributes.getUsers().get(4).user);
+		assertEquals("mn", attributes.getUsers().get(4).user);
 		this.extractService.delete(attributes.getId());
 	}
 
@@ -155,7 +155,7 @@ public class ExtractServiceTest {
 		assertEquals("Markus Hüttl", attributes.getUsers().get(10).user);
 		assertEquals("Barbara Seickel", attributes.getUsers().get(11).user);
 		assertEquals("Suzanne Heureuse", attributes.getUsers().get(12).user);
-		assertEquals("\u200eDu", attributes.getUsers().get(13).user);
+		assertEquals("Du", attributes.getUsers().get(13).user);
 		assertEquals("Monika Roitner", attributes.getUsers().get(14).user);
 		this.extractService.delete(attributes.getId());
 	}

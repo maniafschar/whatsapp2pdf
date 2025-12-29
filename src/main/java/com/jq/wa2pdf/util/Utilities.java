@@ -20,4 +20,19 @@ public class Utilities {
 			s = s.replaceAll("\r", "").replaceAll("\n\n", "\n").trim();
 		return s != null && s.length() > length ? s.substring(0, length - 1) + "…" : s;
 	}
+
+	public static String extractUser(final String line, final String separator) {
+		final String s = line
+				.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
+				.trim();
+		String result = "";
+		for (int i = 0; i < s.length(); i++) {
+			if (Character.isLetterOrDigit(s.charAt(i)))
+				result += s.charAt(i);
+			else if (Character.isWhitespace(s.charAt(i)))
+				result += " ";
+		}
+		result = result.trim();
+		return result.length() == 0 ? "" + s.hashCode() : result;
+	}
 }

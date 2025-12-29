@@ -34,13 +34,13 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.PatternColor;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.font.PdfFontFactory.EmbeddingStrategy;
 import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfDocumentInfo;
@@ -149,7 +149,9 @@ public class PdfService {
 			this.user = user;
 			this.id = id;
 			this.type = type;
-			fontMessage = PdfFontFactory.createFont(StandardFonts.HELVETICA);
+			fontMessage = PdfFontFactory.createFont(
+					IOUtils.toByteArray(this.getClass().getResourceAsStream("/font/RobotoSlab-VariableFont_wght.ttf")),
+					EmbeddingStrategy.FORCE_EMBEDDED);
 		}
 
 		private void create() throws IOException, FontFormatException, ParseException {
@@ -215,7 +217,8 @@ public class PdfService {
 				while ((line = input.readLine()) != null) {
 					line = line.replaceAll("\u200E", "");
 					if (line.trim().length() > 0 && patternStart.matcher(line).matches()) {
-						final boolean inMonth = patternMonth.matcher(line).matches();
+						final boolean inMonth = patternMonth.matcher(DateHandler.replaceStrangeWhitespace(line))
+								.matches();
 						if (foundMonth && !inMonth)
 							break;
 						foundMonth = inMonth;
@@ -226,10 +229,9 @@ public class PdfService {
 								this.addMessage(user, date, lastChat);
 							if (separator == null)
 								separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
-							user = line
-									.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
-									.trim();
-							date = line.substring(0, line.indexOf(separator)).trim();
+							user = Utilities.extractUser(line, separator);
+							date = DateHandler.replaceStrangeWhitespace(line);
+							date = date.substring(0, date.indexOf(separator)).trim();
 							users.add(user);
 							line = line.substring(line.indexOf(": ") + 2);
 							final Matcher m = patternMedia.matcher(line);

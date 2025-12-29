@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jq.wa2pdf.util.DateHandler;
+import com.jq.wa2pdf.util.Utilities;
 
 @Service
 public class ExtractService {
@@ -162,7 +163,7 @@ public class ExtractService {
 	String getPatternStart(final String date) {
 		return "^\u200E?((\\[{date}])|({date} -)) ([^:].*?):.*"
 				.replace("{date}",
-						(date == null ? "(\\d{1,2}[.|/]\\d{1,2}[.|/]\\d{2,4}|\\d{4}-\\d{2}-\\d{2})" : date)
+						(date == null ? "(\\d{1,2}[.|/] ?\\d{1,2}[.|/] ?\\d{2,4}|\\d{4}-\\d{2}-\\d{2})" : date)
 								+ ",? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
 	}
 
@@ -194,9 +195,7 @@ public class ExtractService {
 					if (matcher.matches()) {
 						if (separator == null)
 							separator = line.startsWith("[") || line.substring(1).startsWith("[") ? "]" : "-";
-						final String u = line
-								.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
-								.trim();
+						final String u = Utilities.extractUser(line, separator);
 						user = attributes.users.stream().filter(e -> e.user.equals(u)).findFirst().orElse(null);
 						if (user == null) {
 							user = new Statistics();

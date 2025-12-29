@@ -34,7 +34,7 @@ public class WordCloudService {
 					IOUtils.toString(WordCloudService.class.getResourceAsStream("/stopWords.txt"),
 							StandardCharsets.UTF_8).split("\n"));
 			FONT = Font.createFont(Font.TRUETYPE_FONT,
-					WordCloudService.class.getResourceAsStream("/font/Comfortaa-Regular.ttf"));
+					WordCloudService.class.getResourceAsStream("/font/RobotoSlab-VariableFont_wght.ttf"));
 		} catch (final Exception ex) {
 			throw new RuntimeException(ex);
 		}
