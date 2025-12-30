@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -740,30 +741,35 @@ public class PdfService {
 		private boolean fillLinkPreview(final Cell cell, final String text) {
 			if (text.startsWith("https://") && !text.contains(" ") && !text.contains("\n")) {
 				String uri = null;
-				try (final BufferedReader input = new BufferedReader(
-						new InputStreamReader(new URI(text).toURL().openStream()))) {
-					String line;
-					final Pattern content = Pattern.compile("content=\"([^\"].*?)\"");
-					while ((line = input.readLine()) != null) {
-						final int i = line.indexOf("property=\"og:image\"");
-						if (i > -1) {
-							line = line.substring(line.lastIndexOf('<', i));
-							String s;
-							while (!line.contains(">") && (s = input.readLine()) != null)
-								line += " " + s;
-							if (!line.contains(">"))
-								break;
-							line = line.substring(0, line.indexOf('>'));
-							final Matcher matcher = content.matcher(line);
-							if (matcher.find()) {
-								uri = matcher.group(1);
-								final File f = this.dir
-										.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".jpg")
-										.toAbsolutePath().toFile();
-								IOUtils.write(IOUtils.toByteArray(new URI(uri).toURL().openStream()),
-										new FileOutputStream(f));
-								this.fillMedia(cell, f.getName());
-								return true;
+				try {
+					final URLConnection urlConnection = new URI(text).toURL().openConnection();
+					urlConnection.setReadTimeout(1000);
+					urlConnection.setConnectTimeout(1000);
+					try (final BufferedReader input = new BufferedReader(
+							new InputStreamReader(urlConnection.getInputStream()))) {
+						String line;
+						final Pattern content = Pattern.compile("content=\"([^\"].*?)\"");
+						while ((line = input.readLine()) != null) {
+							final int i = line.indexOf("property=\"og:image\"");
+							if (i > -1) {
+								line = line.substring(line.lastIndexOf('<', i));
+								String s;
+								while (!line.contains(">") && (s = input.readLine()) != null)
+									line += " " + s;
+								if (!line.contains(">"))
+									break;
+								line = line.substring(0, line.indexOf('>'));
+								final Matcher matcher = content.matcher(line);
+								if (matcher.find()) {
+									uri = matcher.group(1);
+									final File f = this.dir
+											.resolve(ExtractService.filename + UUID.randomUUID().toString() + ".jpg")
+											.toAbsolutePath().toFile();
+									IOUtils.write(IOUtils.toByteArray(new URI(uri).toURL().openStream()),
+											new FileOutputStream(f));
+									this.fillMedia(cell, f.getName());
+									return true;
+								}
 							}
 						}
 					}
