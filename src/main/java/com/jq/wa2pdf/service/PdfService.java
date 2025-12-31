@@ -239,6 +239,7 @@ public class PdfService {
 							if (m.matches()) {
 								lastChat = null;
 								this.addMessage(user, date, m.group(1), true);
+								i += 14;
 							} else
 								lastChat = line;
 						}
@@ -303,6 +304,8 @@ public class PdfService {
 									this.sanitizeDestination(
 											((Text) ((Paragraph) table.getCell(0, 0).getChildren().get(0))
 													.getChildren().get(0)).getText())));
+				if (this.type == Type.Preview && this.document.getPdfDocument().getNumberOfPages() > 4)
+					break;
 			}
 			if (this.type == Type.Preview)
 				this.addPreviewInfo();
