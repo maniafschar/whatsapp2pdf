@@ -119,6 +119,10 @@ public class ExtractService {
 			if (file.toLowerCase().contains("whatsapp") && file.toLowerCase().endsWith(".txt"))
 				return tempDir.resolve(file);
 		}
+		for (final String file : tempDir.toFile().list()) {
+			if (file.toLowerCase().endsWith(".txt"))
+				return tempDir.resolve(file);
+		}
 		throw new IOException("Chat file not found!");
 	}
 
