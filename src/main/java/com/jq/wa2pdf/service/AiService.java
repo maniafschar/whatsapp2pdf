@@ -129,9 +129,9 @@ public class AiService {
 		}
 		String s = "";
 		for (final String line : adjectives.split("\n")) {
-			final List<String> emojis = EmojiParser.extractEmojis(line);
 			s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).replace("*", "").replace(".", "")
 					.trim();
+			final List<String> emojis = EmojiParser.extractEmojis(s);
 			if (emojis.size() > 0) {
 				s = s.substring(0, s.indexOf(emojis.get(0))).trim();
 				response.adjectives.get(user).addAll(
