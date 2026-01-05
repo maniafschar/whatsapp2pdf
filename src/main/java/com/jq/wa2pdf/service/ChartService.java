@@ -110,10 +110,14 @@ class ChartService {
 				}
 				// print entry
 				final int x = marginLegend + marginX * (1 + index);
-				plot.chats.addPoint(x, heightPlot - heightPlot * dataUser.chats / plotData.chatsMax);
-				plot.words.addPoint(x, 2 * heightPlot + marginPlot - heightPlot * dataUser.words / plotData.wordsMax);
-				plot.letters.addPoint(x,
-						3 * heightPlot + 2 * marginPlot - heightPlot * dataUser.letters / plotData.lettersMax);
+				if (plotData.chatsMax > 0)
+					plot.chats.addPoint(x, heightPlot - heightPlot * dataUser.chats / plotData.chatsMax);
+				if (plotData.wordsMax > 0)
+					plot.words.addPoint(x,
+							2 * heightPlot + marginPlot - heightPlot * dataUser.words / plotData.wordsMax);
+				if (plotData.lettersMax > 0)
+					plot.letters.addPoint(x,
+							3 * heightPlot + 2 * marginPlot - heightPlot * dataUser.letters / plotData.lettersMax);
 				plot.lastIndex = index;
 			}
 		}
