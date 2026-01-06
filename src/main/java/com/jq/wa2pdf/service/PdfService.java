@@ -776,6 +776,8 @@ public class PdfService {
 							}
 						}
 					}
+				} catch (final IOException ex) {
+					// no preview available, continue
 				} catch (final Exception ex) {
 					PdfService.this.adminService.createTicket(new Ticket(Ticket.ERROR + "fillLinkPreview\n" +
 							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTraceToString(ex)));
