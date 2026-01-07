@@ -58,6 +58,6 @@ public class Utilities {
 		}
 		if (Utilities.class.getResourceAsStream("/emoji/" + id + "_fe0f.png") != null)
 			id += "_fe0f";
-		return id;
+		return Utilities.class.getResourceAsStream("/emoji/" + id + ".png") == null ? null : id;
 	}
 }

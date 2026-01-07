@@ -606,7 +606,7 @@ public class PdfService {
 				summary.setMarginTop(15);
 				this.document.add(summary);
 			}
-			if (this.aiSummary.image != null) {
+			if (this.aiSummary != null && this.aiSummary.image != null) {
 				final String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
 				IOUtils.write(this.aiSummary.image,
 						new FileOutputStream(this.dir.resolve(mediaId).toAbsolutePath().toFile()));
@@ -716,7 +716,7 @@ public class PdfService {
 						throw new RuntimeException(e);
 					}
 				}
-				text = text.substring(text.indexOf(emoji) + emoji.length());
+				text = text.substring(emoji.length());
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
 				if (emojis.size() == 0 && this.fillLinkPreview(cell, text))
