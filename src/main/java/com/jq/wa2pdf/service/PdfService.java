@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URLConnection;
@@ -581,7 +580,7 @@ public class PdfService {
 			}
 		}
 
-		private void addAISummery() {
+		private void addAISummery() throws IOException {
 			final String text;
 			if (this.type == Type.Preview)
 				text = "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights.";
@@ -606,6 +605,16 @@ public class PdfService {
 				summary.addCell(this.createCell(text));
 				summary.setMarginTop(15);
 				this.document.add(summary);
+			}
+			if (this.aiSummary.image != null) {
+				final String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
+				IOUtils.write(this.aiSummary.image,
+						new FileOutputStream(this.dir.resolve(mediaId).toAbsolutePath().toFile()));
+				final Table image = new Table(1);
+				image.setWidth(UnitValue.createPercentValue(100f));
+				image.addCell(this.createCell(text, true));
+				image.setMarginTop(15);
+				this.document.add(image);
 			}
 		}
 
@@ -685,34 +694,21 @@ public class PdfService {
 			final List<String> emojis = EmojiParser.extractEmojis(text);
 			boolean hasText = false;
 			for (final String emoji : emojis) {
-				if (text.substring(0, text.indexOf(emoji)).trim().length() > 0) {
+				if (text.indexOf(emoji) > 0) {
 					paragraph.add(this.createText(text.substring(0, text.indexOf(emoji)), fontMessage));
+					text = text.substring(text.indexOf(emoji));
 					hasText = true;
 				}
-				String id = "";
-				for (int i = 0; i < emoji.length(); i++) {
-					if (emoji.codePointAt(i) != 56614)
-						id += "_" + Integer.toHexString(emoji.codePointAt(i));
-				}
-				final int position = text.indexOf("\ufe0f");
-				if (position > emoji.length() && position < 9) {
-					for (int i = emoji.length(); i <= position; i++)
-						id += "_" + Integer.toHexString(text.codePointAt(i));
-				}
-				id = id.substring(1);
-				InputStream s = PdfService.class.getResourceAsStream("/emoji/" + id + ".png");
-				if (s == null && id.contains("_"))
-					s = PdfService.class.getResourceAsStream("/emoji/" + id.split("_")[0] + ".png");
-				if (s == null)
-					s = PdfService.class
-							.getResourceAsStream("/emoji/" + (id.contains("_") ? id.split("_")[0] : id) + "_fe0f.png");
-				if (s == null)
+				final String id = Utilities.getEmojiId(text);
+				if (id == null)
 					PdfService.this.adminService
 							.createTicket(
 									new Ticket(Ticket.ERROR + "emoji not found: " + emoji + " " + id + "\n" + text));
 				else {
 					try {
-						final Image image = new Image(ImageDataFactory.create(IOUtils.toByteArray(s)));
+						final Image image = new Image(
+								ImageDataFactory.create(
+										IOUtils.toByteArray(PdfService.class.getResource("/emoji/" + id + ".png"))));
 						image.setHeight(15f);
 						image.setMarginBottom(-2f);
 						paragraph.add(image);

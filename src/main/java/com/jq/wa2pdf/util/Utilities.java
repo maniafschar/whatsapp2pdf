@@ -35,4 +35,29 @@ public class Utilities {
 		result = result.trim();
 		return result.length() == 0 ? "" + s.hashCode() : result;
 	}
+
+	public static String getEmojiId(String emoji) {
+		for (int i = 0; i < emoji.length(); i++) {
+			if (Character.isWhitespace(emoji.charAt(i))) {
+				emoji = emoji.substring(0, i);
+				break;
+			}
+		}
+		String id = "";
+		for (int i = 0; i < emoji.length(); i++) {
+			if (emoji.codePointAt(i) < 56576 || emoji.codePointAt(i) > 57343)
+				id += "_" + Integer.toHexString(emoji.codePointAt(i));
+		}
+		id = id.substring(1);
+		if (Utilities.class.getResourceAsStream("/emoji/" + id + ".png") == null) {
+			while (id.contains("_")) {
+				id = id.substring(0, id.lastIndexOf('_'));
+				if (Utilities.class.getResourceAsStream("/emoji/" + id + ".png") != null)
+					break;
+			}
+		}
+		if (Utilities.class.getResourceAsStream("/emoji/" + id + "_fe0f.png") != null)
+			id += "_fe0f";
+		return id;
+	}
 }
