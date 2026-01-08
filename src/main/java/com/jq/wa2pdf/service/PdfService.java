@@ -732,11 +732,13 @@ public class PdfService {
 					s += text.substring(0, 1);
 					if (EmojiManager.isEmoji(s)) {
 						String code = "";
-						for (int i = 0; i < s.length(); i++)
+						for (int i = 0; i < s.length(); i++) {
 							code += '_' + s.codePointAt(i);
-						PdfService.this.adminService
-								.createTicket(
-										new Ticket(Ticket.ERROR + "emoji not found: " + code.substring(1)));
+							if (s.codePointAt(i) > 65536)
+								i++;
+						}
+						PdfService.this.adminService.createTicket(
+								new Ticket(Ticket.ERROR + "emoji not found: " + code.substring(1)));
 					}
 					if (text.length() < 2) {
 						if (s.length() > 0)
