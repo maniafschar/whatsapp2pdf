@@ -569,7 +569,7 @@ public class PdfService {
 				cell.setWidth(UnitValue.createPercentValue(100f));
 				cellTable.addCell(cell);
 				final String name = names.remove(0);
-				cell = this.createCell(name.replace("abc", "Julia").replace("def", "Romeo"), TextAlignment.CENTER);
+				cell = this.createCell(name, TextAlignment.CENTER);
 				cell.setPaddingTop(0);
 				cell.setStrokeWidth(2);
 				cellTable.addCell(cell);
