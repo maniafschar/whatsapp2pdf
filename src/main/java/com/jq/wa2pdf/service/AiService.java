@@ -8,9 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,32 +16,31 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.ImmutableList;
 import com.google.genai.Client;
 import com.google.genai.ResponseStream;
 import com.google.genai.types.Content;
 import com.google.genai.types.GenerateContentConfig;
 import com.google.genai.types.GenerateContentResponse;
-import com.google.genai.types.GoogleSearch;
 import com.google.genai.types.Part;
+import com.google.genai.types.Schema;
 import com.google.genai.types.ThinkingConfig;
-import com.google.genai.types.Tool;
+import com.google.genai.types.Type;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.util.Utilities;
-import com.vdurmont.emoji.EmojiParser;
 
 @Service
 public class AiService {
-	public static AiType type = AiType.Gemini;
+	private static AiType type = AiType.Gemini;
 	private static final String promptSummerize = "Summarize this WhatsApp chat in about 300 words "
 			+ "in the language they speak and at the end of the summary add for each user "
 			+ "in one line 3 comma separated adjectives and 3 emojis mainly discribing "
 			+ "their mood during conversation:";
-	private static final String promptImage = "Summarize this WhatsApp chat in about 300 words "
-			+ "in the language they speak and at the end of the summary add for each user "
-			+ "in one line 3 comma separated adjectives and 3 emojis mainly discribing "
-			+ "their mood during conversation:";
+	private static final String promptImage = "Create an image expressing the feelings of the people in this text:";
 
 	@Autowired
 	private AdminService adminService;
@@ -55,15 +51,15 @@ public class AiService {
 	@Value("${app.google.gemini.apiKey}")
 	private String geminiKey;
 
-	public enum AiType {
+	private enum AiType {
 		GPT, Gemini, None
 	}
 
-	class AiSummary {
-		String text;
-		byte[] image;
-		final Map<String, List<String>> adjectives = new HashMap<>();
-		final Map<String, List<String>> emojis = new HashMap<>();
+	public static class AiSummary {
+		public String text;
+		public byte[] image;
+		public final Map<String, List<String>> adjectives = new HashMap<>();
+		public final Map<String, List<String>> emojis = new HashMap<>();
 	}
 
 	public AiSummary summerize(final String text, final Set<String> users) {
@@ -73,12 +69,29 @@ public class AiService {
 				: type == AiType.GPT ? this.summerizeGPT(text, users) : null;
 	}
 
-	private AiSummary summerizeGemini(final String text, final Set<String> users) {
+	protected AiSummary summerizeGemini(final String text, final Set<String> users) {
 		final List<Content> contents = ImmutableList.of(Content.builder().role("user")
 				.parts(ImmutableList.of(Part.fromText(promptSummerize + "\n" + text))).build());
+		final Map<String, Schema> attributes = new HashMap<>();
+		attributes.put("name", Schema.builder().type(Type.Known.STRING).build());
+		attributes.put("adjectives", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
+				.type(Type.Known.STRING).build()).build());
+		attributes.put("emojis", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
+				.type(Type.Known.STRING).build()).build());
+		final Map<String, Schema> schema = new HashMap<>();
+		schema.put("summary", Schema.builder().type(Type.Known.STRING).build());
+		schema.put("attributes", Schema.builder().type(Type.Known.ARRAY).items(Schema.builder()
+				.type(Type.Known.OBJECT).properties(attributes).required(Arrays.asList("name", "adjectives", "emojis"))
+				.build()).build());
 		final GenerateContentConfig config = GenerateContentConfig.builder()
-				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build())
-				.tools(Arrays.asList(Tool.builder().googleSearch(GoogleSearch.builder().build()).build())).build();
+				.thinkingConfig(ThinkingConfig.builder().thinkingBudget(0).build()).responseMimeType("application/json")
+				.responseSchema(Schema.builder()
+						.type(Type.Known.OBJECT)
+						.properties(schema)
+						.required(Arrays.asList("summary", "attributes"))
+						.propertyOrdering(Arrays.asList("summary", "attributes"))
+						.build())
+				.build();
 		try (final ResponseStream<GenerateContentResponse> responseStream = Client.builder().apiKey(this.geminiKey)
 				.build().models.generateContentStream("gemini-2.5-flash-lite", contents, config)) {
 			final StringBuffer s = new StringBuffer();
@@ -90,7 +103,7 @@ public class AiService {
 				for (final Part part : parts)
 					s.append(part.text().orElse(""));
 			}
-			final AiSummary aiSummary = this.parseAdjectives(s.toString(), users);
+			final AiSummary aiSummary = this.convert(s.toString(), users);
 			aiSummary.image = this.imageGemini(aiSummary.text);
 			return aiSummary;
 		}
@@ -113,71 +126,39 @@ public class AiService {
 		return null;
 	}
 
-	AiSummary parseAdjectives(final String summary, final Set<String> users) {
-		final AiSummary response = new AiSummary();
-		response.text = summary;
+	protected AiSummary convert(final String summary, final Set<String> users) {
 		String error = "";
-		final StringBuilder adjectives = new StringBuilder(response.text.toLowerCase());
-		int first = Integer.MAX_VALUE;
-		for (final String user : users) {
-			String u = user.trim().toLowerCase();
-			Matcher matcher = Pattern.compile("^([^:^\n]*" + u + ")[^:^\n]*:.*$", Pattern.MULTILINE)
-					.matcher(adjectives.toString());
-			boolean found = matcher.find();
-			if (!found && u.contains(" ")) {
-				u = u.split(" ")[0];
-				matcher = Pattern.compile("^([^:^\n]*" + u + ")[^:^\n]*:.*$", Pattern.MULTILINE)
-						.matcher(adjectives.toString());
-				found = matcher.find();
+		try {
+			final JsonNode node = new ObjectMapper().readTree(summary);
+			final AiSummary response = new AiSummary();
+			response.text = node.get("summary").asText().trim();
+			final ArrayNode attributes = (ArrayNode) node.get("attributes");
+			for (final String user : users) {
+				final String u = user.trim().toLowerCase();
+				for (final JsonNode attribute : attributes) {
+					if (u.contains(Utilities.extractUser(attribute.get("name").asText(), null).toLowerCase())) {
+						response.adjectives.put(user, this.convertList((ArrayNode) attribute.get("adjectives")));
+						response.emojis.put(user, this.convertList((ArrayNode) attribute.get("emojis")));
+						break;
+					}
+				}
+				if (!response.adjectives.containsKey(user))
+					error += user + " not found\n";
 			}
-			if (found) {
-				final int pos = matcher.start(1);
-				if (first > pos)
-					first = pos;
-				this.parseAdjectivesOfUser(response, user, adjectives.substring(pos));
-			} else
-				error += user + " not found\n";
+			return response;
+		} catch (final JsonProcessingException ex) {
+			throw new RuntimeException(ex);
+		} finally {
+			this.adminService.createTicket(new Ticket((error.length() > 0 ? Ticket.ERROR : "") +
+					"AI\n" + error + summary));
 		}
-		if (response.adjectives.size() > 0)
-			response.text = response.text.substring(0, first).trim();
-		this.adminService.createTicket(new Ticket((error.length() > 0 ? Ticket.ERROR : "") +
-				"AI\n" + error + summary));
-		return response;
 	}
 
-	private void parseAdjectivesOfUser(final AiSummary response, final String user, final String adjectives) {
-		if (!response.adjectives.containsKey(user)) {
-			response.adjectives.put(user, new ArrayList<>());
-			response.emojis.put(user, new ArrayList<>());
-		}
-		String s = "";
-		for (final String line : adjectives.split("\n")) {
-			s += (line.contains(":") ? line.substring(line.indexOf(':') + 1) : line).replace("*", "").replace(".", "")
-					.trim();
-			final List<String> emojis = EmojiParser.extractEmojis(s);
-			if (emojis.size() > 0) {
-				s = s.substring(0, s.indexOf(emojis.get(0))).trim();
-				response.adjectives.get(user).addAll(
-						Arrays.asList(s.replace("\ufe0f", "").trim().split(",")).stream()
-								.map(e -> e.trim()).collect(Collectors.toList()));
-				for (int i = 0; i < emojis.size(); i++) {
-					String e = emojis.get(i);
-					final int start = line.indexOf(e);
-					final int position = Math.min(line.indexOf("\ufe0f", start),
-							i < emojis.size() - 1 ? line.indexOf(emojis.get(i + 1)) - 1
-									: Integer.MAX_VALUE);
-					if (position > -1) {
-						for (int i2 = start + e.length(); i2 <= position
-								&& line.codePointAt(i2) > 128; i2++)
-							e += line.charAt(i2);
-					}
-					response.emojis.get(user).add(e);
-				}
-				if (response.adjectives.get(user).size() > 2)
-					break;
-				s = "";
-			}
-		}
+	private List<String> convertList(final ArrayNode node) {
+		final List<String> list = new ArrayList<>();
+		for (int i = 0; i < node.size(); i++)
+			list.add(node.get(i).asText().toLowerCase().replace("**", ""));
+		return list;
 	}
 
 	private AiSummary summerizeGPT(final String text, final Set<String> users) {

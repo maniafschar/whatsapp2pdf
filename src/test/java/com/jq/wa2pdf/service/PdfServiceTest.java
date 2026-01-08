@@ -22,6 +22,7 @@ import com.jq.wa2pdf.WhatsApp2PdfApplication;
 import com.jq.wa2pdf.entity.Ticket;
 import com.jq.wa2pdf.service.AdminService.AdminData;
 import com.jq.wa2pdf.service.ExtractService.Attributes;
+import com.jq.wa2pdf.service.PdfService.Type;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { WhatsApp2PdfApplication.class,
@@ -64,7 +65,7 @@ public class PdfServiceTest {
 
 		// when
 		this.pdfService.create(attributes.getId(), attributes.getPeriods().get(0).period,
-				attributes.getUsers().get(0).user, null);
+				attributes.getUsers().get(0).user, Type.Summary);
 
 		// then
 		this.assertCreation(attributes.getId(), attributes.getPeriods().get(0).period);
@@ -72,7 +73,7 @@ public class PdfServiceTest {
 
 	private void assertCreation(final String id, final String period) throws Exception {
 		try {
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 2000; i++) {
 				Thread.sleep(500L);
 				final Path path = this.pdfService.get(id, period);
 				if (path != null) {
@@ -80,8 +81,10 @@ public class PdfServiceTest {
 					final String errors = adminData.getTickets().stream()
 							.filter(e -> e.getNote().startsWith(Ticket.ERROR)).map(e -> e.getNote())
 							.collect(Collectors.joining("\n\n"));
-					if (errors.length() > 0)
+					if (errors.length() > 0) {
+						adminData.getTickets().stream().forEach(e -> this.adminService.deleteTicket(e.getId()));
 						throw new RuntimeException("PDF creation error\n" + errors);
+					}
 					return;
 				}
 			}

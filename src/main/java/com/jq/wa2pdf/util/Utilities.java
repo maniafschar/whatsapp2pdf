@@ -22,9 +22,10 @@ public class Utilities {
 	}
 
 	public static String extractUser(final String line, final String separator) {
-		final String s = line
-				.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
-				.trim();
+		final String s = separator == null ? line
+				: line
+						.substring(line.indexOf(separator) + 1, line.indexOf(":", line.indexOf(separator)))
+						.trim();
 		String result = "";
 		for (int i = 0; i < s.length(); i++) {
 			if (Character.isLetterOrDigit(s.charAt(i)))
@@ -48,7 +49,8 @@ public class Utilities {
 			if (emoji.codePointAt(i) < 56576 || emoji.codePointAt(i) > 57343)
 				id += "_" + Integer.toHexString(emoji.codePointAt(i));
 		}
-		id = id.substring(1);
+		if (id.length() > 0)
+			id = id.substring(1);
 		if (Utilities.class.getResourceAsStream("/emoji/" + id + ".png") == null) {
 			while (id.contains("_")) {
 				id = id.substring(0, id.lastIndexOf('_'));

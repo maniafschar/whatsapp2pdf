@@ -1,7 +1,7 @@
 package com.jq.wa2pdf.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -49,21 +49,23 @@ public class AiServiceTest {
 		final AiSummary summary = this.aiService.summerize(text, this.users);
 
 		// then
-		assertNull(summary);
+		assertNotNull(summary);
+		assertNotNull(summary.image);
+		assertNotNull(summary.text);
+		assertEquals(2, summary.adjectives.size());
+		assertEquals(2, summary.emojis.size());
 	}
 
 	@Test
-	public void parseAdjectives_1() {
+	public void convert_1() {
 		// given
-		final String text = "yxz\n########\n**Romeo:**\n" +
-				"* **Adjectives:** Assertive, guarded, playful\n" +
-				"* **Emojis:** 😉, 😁, 👌\n" +
-				"**Julia:**\n" +
-				"* **Adjectives:** Persistent, longing, provocative\n" +
-				"* **Emojis:** 🎉, 🏋️, 🥵";
+		final String text = "{\"summary\":\"yxz\\n########\\n\\n\",\"attributes\":["
+				+ "{\"name\":\"ROmeo\",\"adjectives\":[\"Assertive\",\"guarded\",\"playful\"],\"emojis\":[\"😉\",\"😁\",\"👌\"]},"
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"Persistent\",\"longing\",\"provocative\"],\"emojis\":[\"🎉\",\"🏋️\",\"🥵\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[assertive, guarded, playful]", summary.adjectives.get(this.romeo).toString());
@@ -74,21 +76,15 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_2() {
+	public void convert_2() {
 		// when
-		final String text = "abc\n\ndef.\n########\n\n"
-				+ "**Julia:**\n" +
-				"*   Gefühlvoll 🎉\n" +
-				"*   Loyal 🏋️\n" +
-				"*   Stark 🥵\n" +
-				"\n" +
-				"**ROmeo:**\n" +
-				"*   Leidenschaftlich 😉\n" +
-				"*   Emotional 😁\n" +
-				"*   Unsicher 👌";
+		final String text = "{\"summary\":\"abc\\n\\ndef.\\n########\\n\\n\",\"attributes\":["
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"Gefühlvoll\",\"Loyal\",\"Stark\"],\"emojis\":[\"🎉\",\"🏋️\",\"🥵\"]},"
+				+ "{\"name\":\"ROmeo\",\"adjectives\":[\"Leidenschaftlich\",\"Emotional\",\"Unsicher\"],\"emojis\":[\"😉\",\"😁\",\"👌\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[leidenschaftlich, emotional, unsicher]", summary.adjectives.get(this.romeo).toString());
@@ -99,21 +95,18 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_3() {
+	public void convert_3() {
 		// when
-		final String text = "abc\n\ndef.\n########\n"
-				+ "**romeo:**\n"
-				+ "* **adjektive:** leidenschaftlich, sehnsüchtig, kämpferisch\n"
-				+ "* **emojis:** ❤️, 😘, 🔥\n"
-				+ "**julia:**\n"
-				+ "* **adjektive:** zärtlich, emotional, unsicher\n"
-				+ "* **emojis:** 😘, 🥺, 💖";
+		final String text = "{\"summary\":\"abc\\n\\ndef.\\n########\\n\",\"attributes\":["
+				+ "{\"name\":\"Romeo\",\"adjectives\":[\"leidenschaftlich\",\"sehnsüchtig\",\"kämpferisch\"],\"emojis\":[\"❤️\",\"😘\",\"🔥\"]},"
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"zärtlich\",\"emotional\",\"unsicher\"],\"emojis\":[\"😘\",\"🥺\",\"💖\"]}"
+				+ "]}";
 		final String name = this.julia + " Klöckner";
 		this.users.remove(this.julia);
 		this.users.add(name);
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[leidenschaftlich, sehnsüchtig, kämpferisch]", summary.adjectives.get(this.romeo).toString());
@@ -124,14 +117,15 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_4() {
+	public void convert_4() {
 		// when
-		final String text = "abc\n\ndef.\n########\n"
-				+ "Julia: **emotional, leidenschaftlich, nachdenklich** ❤️😘🔥\n"
-				+ "Romeo: **sehnsüchtig, aufgewühlt, aufrichtig** 😘🥺💖";
+		final String text = "{\"summary\":\"abc\\n\\ndef.\\n########\\n\",\"attributes\":["
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"**emotional**\",\"leidenschaftlich\",\"**nachdenklich**\"],\"emojis\":[\"❤️\",\"😘\",\"🔥\"]},"
+				+ "{\"name\":\"Romeo\",\"adjectives\":[\"**sehnsüchtig**\",\"aufgewühlt\",\"**aufrichtig**\"],\"emojis\":[\"😘\",\"🥺\",\"💖\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[sehnsüchtig, aufgewühlt, aufrichtig]", summary.adjectives.get(this.romeo).toString());
@@ -142,14 +136,15 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_5() {
+	public void convert_5() {
 		// when
-		final String text = "abc\n\ndef.\n########\n"
-				+ "Romeo: Liebevoll, leidend, hoffnungsvoll 🥰😔❤️\n"
-				+ "Julia: Emotional, ambivalent, stark 😥😌💞";
+		final String text = "{\"summary\":\"abc\\n\\ndef.\\n########\\n\",\"attributes\":["
+				+ "{\"name\":\"RoMeo\",\"adjectives\":[\"Liebevoll\",\"leidend\",\"hoffnungsvoll\"],\"emojis\":[\"🥰\",\"😔\",\"❤️\"]},"
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"Emotional\",\"ambivalent\",\"stark\"],\"emojis\":[\"😥\",\"😌\",\"💞\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[liebevoll, leidend, hoffnungsvoll]", summary.adjectives.get(this.romeo).toString());
@@ -160,14 +155,15 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_6() {
+	public void convert_6() {
 		// when
-		final String text = "abc\n\ndef.\n\n"
-				+ "**Romeo**: Liebevoll, leidend, hoffnungsvoll 🥰😔❤️\n"
-				+ "**Julia:** Emotional, ambivalent, stark 😥😌💞";
+		final String text = "{\"summary\":\"abc\\n\\ndef.\\n\\n\",\"attributes\":["
+				+ "{\"name\":\"**Romeo**\",\"adjectives\":[\"Liebevoll\",\"leidend\",\"hoffnungsvoll\"],\"emojis\":[\"🥰\",\"😔\",\"❤️\"]},"
+				+ "{\"name\":\"**Julia:**\",\"adjectives\":[\"Emotional\",\"ambivalent\",\"stark\"],\"emojis\":[\"😥\",\"😌\",\"💞\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[liebevoll, leidend, hoffnungsvoll]", summary.adjectives.get(this.romeo).toString());
@@ -178,14 +174,15 @@ public class AiServiceTest {
 	}
 
 	@Test
-	public void parseAdjectives_7() {
+	public void convert_7() {
 		// when
-		final String text = "abc\ndef.\n"
-				+ "Julia: emotional, impulsiv, liebesbedürftig 😘💔😊\n"
-				+ "RoMeo: sehnsüchtig, nachdenklich, hoffnungsvoll 🥺❤️😊";
+		final String text = "{\"summary\":\"abc\\ndef.\",\"attributes\":["
+				+ "{\"name\":\"Julia\",\"adjectives\":[\"emotional\",\"impulsiv\",\"liebesbedürftig\"],\"emojis\":[\"😘\",\"💔\",\"😊\"]},"
+				+ "{\"name\":\"RoMeo\",\"adjectives\":[\"sehnsüchtig\",\"nachdenklich\",\"hoffnungsvoll\"],\"emojis\":[\"🥺\",\"❤️\",\"😊\"]}"
+				+ "]}";
 
 		// when
-		final AiSummary summary = this.aiService.parseAdjectives(text, this.users);
+		final AiSummary summary = this.aiService.convert(text, this.users);
 
 		// then
 		assertEquals("[sehnsüchtig, nachdenklich, hoffnungsvoll]", summary.adjectives.get(this.romeo).toString());

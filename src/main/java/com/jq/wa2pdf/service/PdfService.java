@@ -141,6 +141,12 @@ public class PdfService {
 		private final String id;
 		private final Type type;
 		private final StringBuilder text = new StringBuilder();
+		private final Pattern patternEmail = Pattern.compile(
+				"((\\.+)(?=.*@)|(\\+.*(?=@)))",
+				Pattern.CASE_INSENSITIVE);
+		private final Pattern patternUrl = Pattern.compile(
+				"((https?|ftp|gopher|telnet|file|Unsure|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)",
+				Pattern.CASE_INSENSITIVE);
 
 		private PDF(final String id, final String period, final String user, final Type type)
 				throws IOException {
@@ -233,7 +239,8 @@ public class PdfService {
 							date = DateHandler.replaceStrangeWhitespace(line);
 							date = date.substring(0, date.indexOf(separator)).trim();
 							users.add(user);
-							line = line.substring(line.indexOf(": ") + 2);
+							line = line.substring(line.indexOf(":", line.indexOf(separator) + separator.length()) + 1)
+									.trim();
 							final Matcher m = patternMedia.matcher(line);
 							if (m.matches()) {
 								lastChat = null;
@@ -407,6 +414,18 @@ public class PdfService {
 					wordCloud.user = user;
 					wordCloud.text = new StringBuilder();
 					this.wordClouds.add(wordCloud);
+				}
+				Matcher m = this.patternUrl.matcher(s);
+				int i = 0;
+				while (m.find()) {
+					s = s.replaceAll(m.group(i), "").trim();
+					i++;
+				}
+				m = this.patternEmail.matcher(s);
+				i = 0;
+				while (m.find()) {
+					s = s.replaceAll(m.group(i), "").trim();
+					i++;
 				}
 				wordCloud.text.append(s).append(" ");
 			} else
@@ -607,13 +626,17 @@ public class PdfService {
 				this.document.add(summary);
 			}
 			if (this.aiSummary != null && this.aiSummary.image != null) {
-				final String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
+				String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
 				IOUtils.write(this.aiSummary.image,
 						new FileOutputStream(this.dir.resolve(mediaId).toAbsolutePath().toFile()));
+				mediaId = this.scaleImage(mediaId);
 				final Table image = new Table(1);
 				image.setWidth(UnitValue.createPercentValue(100f));
-				image.addCell(this.createCell(text, true));
+				image.addCell(this.createCell(mediaId, true));
 				image.setMarginTop(15);
+				image.setKeepTogether(true);
+				image.getCell(0, 0).setPaddingLeft(80);
+				image.getCell(0, 0).setPaddingRight(80);
 				this.document.add(image);
 			}
 		}
@@ -657,26 +680,15 @@ public class PdfService {
 					final Paragraph paragraph = new Paragraph("media://" + mediaId);
 					cell.add(paragraph);
 				} else {
-					final double max = 800;
-					final int w = originalImage.getWidth(), h = originalImage.getHeight();
 					final boolean internalMedia = mediaId.matches(ExtractService.filename
 							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png");
-					if (!internalMedia && (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max)) {
-						final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
-						final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
-								BufferedImage.TYPE_4BYTE_ABGR);
-						final Graphics2D g = image.createGraphics();
-						g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0, w, h, null);
-						image.flush();
-						g.dispose();
-						mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.png";
-						ImageIO.write(image, "png", this.dir.resolve(mediaId).toAbsolutePath().toFile());
-					}
+					if (!internalMedia)
+						mediaId = this.scaleImage(mediaId);
 					final Image image = new Image(ImageDataFactory
 							.create(this.dir.resolve(mediaId).toAbsolutePath().toFile().getAbsolutePath()));
 					if (!internalMedia) {
 						image.setAutoScale(true);
-						if (h > 320)
+						if (originalImage.getHeight() > 320)
 							cell.setMinHeight(320);
 						cell.setMaxHeight(550);
 						cell.setMaxWidth(550);
@@ -689,6 +701,25 @@ public class PdfService {
 			}
 		}
 
+		private String scaleImage(String mediaId) throws IOException {
+			final BufferedImage originalImage = ImageIO
+					.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
+			final double max = 800;
+			final int w = originalImage.getWidth(), h = originalImage.getHeight();
+			if (mediaId.toLowerCase().endsWith(".webp") || w > max || h > max) {
+				final double factor = w > h ? (w > max ? max / w : 1) : (h > max ? max / h : 1);
+				final BufferedImage image = new BufferedImage((int) (factor * w), (int) (factor * h),
+						BufferedImage.TYPE_4BYTE_ABGR);
+				final Graphics2D g = image.createGraphics();
+				g.drawImage(originalImage, 0, 0, image.getWidth(), image.getHeight(), 0, 0, w, h, null);
+				image.flush();
+				g.dispose();
+				mediaId = mediaId.substring(0, mediaId.lastIndexOf('.')) + "_scaled.png";
+				ImageIO.write(image, "png", this.dir.resolve(mediaId).toAbsolutePath().toFile());
+			}
+			return mediaId;
+		}
+
 		private void fillText(final Cell cell, String text, final TextAlignment alignment) {
 			final Paragraph paragraph = new Paragraph();
 			final List<String> emojis = EmojiParser.extractEmojis(text);
@@ -699,12 +730,15 @@ public class PdfService {
 					text = text.substring(text.indexOf(emoji));
 					hasText = true;
 				}
-				final String id = Utilities.getEmojiId(text);
+				String id = Utilities.getEmojiId(text);
 				if (id == null)
+					id = Utilities.getEmojiId(emoji);
+				int cut = emoji.length();
+				if (id == null) {
 					PdfService.this.adminService
 							.createTicket(
-									new Ticket(Ticket.ERROR + "emoji not found: " + emoji + " " + id + "\n" + text));
-				else {
+									new Ticket(Ticket.ERROR + "emoji not found: " + emoji + "\n" + text));
+				} else {
 					try {
 						final Image image = new Image(
 								ImageDataFactory.create(
@@ -715,8 +749,9 @@ public class PdfService {
 					} catch (final IOException e) {
 						throw new RuntimeException(e);
 					}
+					cut = Math.max(id.split("_").length, emoji.length());
 				}
-				text = text.substring(emoji.length());
+				text = text.length() > cut ? text.substring(cut) : "";
 			}
 			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
 				if (emojis.size() == 0 && this.fillLinkPreview(cell, text))
