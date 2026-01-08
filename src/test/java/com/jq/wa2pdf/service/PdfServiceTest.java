@@ -73,7 +73,7 @@ public class PdfServiceTest {
 
 	private void assertCreation(final String id, final String period) throws Exception {
 		try {
-			for (int i = 0; i < 2000; i++) {
+			for (int i = 0; i < 20; i++) {
 				Thread.sleep(500L);
 				final Path path = this.pdfService.get(id, period);
 				if (path != null) {

@@ -568,19 +568,34 @@ public class PdfService {
 				cell.setPadding(0);
 				cell.setWidth(UnitValue.createPercentValue(100f));
 				cellTable.addCell(cell);
-				String name = names.remove(0);
+				final String name = names.remove(0);
+				cell = this.createCell(name.replace("abc", "Julia").replace("def", "Romeo"), TextAlignment.CENTER);
+				cell.setPaddingTop(0);
+				cell.setStrokeWidth(2);
+				cellTable.addCell(cell);
 				if (this.aiSummary != null) {
 					final String n = name;
-					if (this.aiSummary.adjectives.containsKey(n))
-						name += "\n" + this.aiSummary.adjectives.get(n).stream()
-								.collect(Collectors.joining("\u00a0 \u00a0"));
-					if (this.aiSummary.emojis.containsKey(n))
-						name += "\n" + this.aiSummary.emojis.get(n).stream()
-								.collect(Collectors.joining("\u00a0 \u00a0"));
+					if (this.aiSummary.adjectives.containsKey(n)) {
+						cell = this.createCell(this.aiSummary.adjectives.get(n).stream()
+								.collect(Collectors.joining("\u00a0 \u00a0")), TextAlignment.CENTER);
+						cell.setPaddingTop(0);
+						cellTable.addCell(cell);
+					}
+					if (this.aiSummary.emojis.containsKey(n)) {
+						cell = this.createCell(this.aiSummary.emojis.get(n).stream()
+								.collect(Collectors.joining("\u00a0 \u00a0")), TextAlignment.CENTER);
+						final Paragraph paragraph = (Paragraph) cell.getChildren().get(0);
+						for (final IElement e : paragraph.getChildren()) {
+							if (e instanceof Image) {
+								final Image image = (Image) e;
+								image.setHeight(36);
+								image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
+								image.setMarginBottom(0);
+							}
+						}
+						cellTable.addCell(cell);
+					}
 				}
-				cell = this.createCell(name, TextAlignment.CENTER);
-				cell.setPaddingTop(0);
-				cellTable.addCell(cell);
 				cell = new Cell();
 				cell.setBorder(Border.NO_BORDER);
 				cell.setPadding(0);
