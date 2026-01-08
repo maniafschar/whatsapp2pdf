@@ -47,6 +47,8 @@ import com.itextpdf.kernel.pdf.PdfDocumentInfo;
 import com.itextpdf.kernel.pdf.PdfOutline;
 import com.itextpdf.kernel.pdf.PdfPage;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.annot.PdfLinkAnnotation;
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEvent;
 import com.itextpdf.kernel.pdf.event.AbstractPdfDocumentEventHandler;
@@ -72,7 +74,6 @@ import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
 import com.jq.wa2pdf.util.Utilities;
-import com.vdurmont.emoji.EmojiParser;
 
 @Component
 public class PdfService {
@@ -289,17 +290,16 @@ public class PdfService {
 						final Text text = (Text) ((Paragraph) element).getChildren().get(0);
 						if (text.getText().startsWith("media://")) {
 							final String mediaId = text.getText().substring(8);
-							final PdfFileSpec pdfFileSpec = PdfFileSpec.createEmbeddedFileSpec(
-									this.document.getPdfDocument(),
-									IOUtils.toByteArray(
-											ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL()),
-									"", null);
-							this.document.getPdfDocument().addFileAttachment(mediaId, pdfFileSpec);
-							System.out.println(text.getText());
-							// table.setAction(PdfAction.createRendition("abc.mp4", pdfFileSpec,
-							// "video/mp4",
-							// PdfAnnotation.makeAnnotation(null)));
-							// text.setText("click");
+							final String path = ExtractService.getTempDir(this.id).resolve(mediaId).toFile()
+									.getAbsolutePath();
+							final PdfFileSpec fileSpec = PdfFileSpec.createEmbeddedFileSpec(
+									this.document.getPdfDocument(), path, null, "My Video", null);
+							final Rectangle annotationRect = new Rectangle(100, 400, 200, 200);
+							final PdfLinkAnnotation linkAnnotation = new PdfLinkAnnotation(annotationRect);
+							final PdfAction renditionAction = PdfAction.createRendition(path, fileSpec,
+									"video/mp4", linkAnnotation);
+							linkAnnotation.setAction(renditionAction);
+							table.setAction(renditionAction);
 						}
 					}
 				}
@@ -447,7 +447,7 @@ public class PdfService {
 			header.addCell(new Paragraph(this.createText("https://wa2pdf.com", fontMessage)));
 			header.getCell(0, 0).setPadding(0);
 			header.getCell(0, 0).setFontColor(this.colorDate);
-			header.getCell(0, 0).setPaddingTop(36);
+			header.getCell(0, 0).setPaddingTop(33);
 			header.getCell(0, 0).setBorder(Border.NO_BORDER);
 			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
 			this.document.add(header);
@@ -722,42 +722,48 @@ public class PdfService {
 
 		private void fillText(final Cell cell, String text, final TextAlignment alignment) {
 			final Paragraph paragraph = new Paragraph();
-			final List<String> emojis = EmojiParser.extractEmojis(text);
+			boolean hasEmoji = false;
 			boolean hasText = false;
-			for (final String emoji : emojis) {
-				if (text.indexOf(emoji) > 0) {
-					paragraph.add(this.createText(text.substring(0, text.indexOf(emoji)), fontMessage));
-					text = text.substring(text.indexOf(emoji));
-					hasText = true;
-				}
-				String id = Utilities.getEmojiId(text);
-				if (id == null)
-					id = Utilities.getEmojiId(emoji);
-				int cut = emoji.length();
+			String s = "";
+			while (text.length() > 0) {
+				final String id = Utilities.getEmojiId(text);
 				if (id == null) {
-					PdfService.this.adminService
-							.createTicket(
-									new Ticket(Ticket.ERROR + "emoji not found: " + emoji + "\n" + text));
+					s += text.substring(0, 1);
+					if (text.length() < 2) {
+						if (s.length() > 0)
+							paragraph.add(this.createText(s, fontMessage));
+						text = "";
+					} else
+						text = text.substring(1);
 				} else {
+					if (s.length() > 0) {
+						paragraph.add(this.createText(s, fontMessage));
+						hasText = true;
+						s = "";
+					}
 					try {
-						final Image image = new Image(
-								ImageDataFactory.create(
-										IOUtils.toByteArray(PdfService.class.getResource("/emoji/" + id + ".png"))));
+						final Image image = new Image(ImageDataFactory
+								.create(IOUtils.toByteArray(PdfService.class.getResource("/emoji/" + id + ".png"))));
 						image.setHeight(15f);
 						image.setMarginBottom(-2f);
 						paragraph.add(image);
+						hasEmoji = true;
 					} catch (final IOException e) {
 						throw new RuntimeException(e);
 					}
-					cut = Math.max(id.split("_").length, emoji.length());
+					final String[] ids = id.split("_");
+					final int lastCodePoint = Integer.parseInt(ids[ids.length - 1], 16);
+					for (int i = 0; i < text.length(); i++) {
+						if (text.codePointAt(0) == lastCodePoint)
+							break;
+						text = text.substring(1);
+					}
+					text = text.substring(lastCodePoint > 65536 ? 2 : 1);
 				}
-				text = text.length() > cut ? text.substring(cut) : "";
 			}
-			if (text.length() > 4 || text.length() > 0 && text.codePointAt(text.length() - 1) != 65039) {
-				if (emojis.size() == 0 && this.fillLinkPreview(cell, text))
-					cell.setPadding(0);
-				paragraph.add(this.createText(text, fontMessage));
-			} else if (!hasText && !paragraph.getChildren().isEmpty()
+			if (!hasEmoji && this.fillLinkPreview(cell, text))
+				cell.setPadding(0);
+			if (!hasText && !paragraph.getChildren().isEmpty()
 					&& paragraph.getChildren().get(0) instanceof Image) {
 				for (final IElement e : paragraph.getChildren()) {
 					if (e instanceof Image) {
