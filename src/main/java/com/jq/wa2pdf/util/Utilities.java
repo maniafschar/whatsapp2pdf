@@ -48,6 +48,8 @@ public class Utilities {
 		for (int i = 0; i < emoji.length(); i++) {
 			if (emoji.codePointAt(i) < 56576 || emoji.codePointAt(i) > 57343)
 				id += "_" + Integer.toHexString(emoji.codePointAt(i));
+			if (emoji.codePointAt(i) > 65536)
+				i++;
 		}
 		if (id.length() > 0)
 			id = id.substring(1);

@@ -74,6 +74,7 @@ import com.jq.wa2pdf.service.ExtractService.Statistics;
 import com.jq.wa2pdf.service.WordCloudService.Token;
 import com.jq.wa2pdf.util.DateHandler;
 import com.jq.wa2pdf.util.Utilities;
+import com.vdurmont.emoji.EmojiManager;
 
 @Component
 public class PdfService {
@@ -729,6 +730,14 @@ public class PdfService {
 				final String id = Utilities.getEmojiId(text);
 				if (id == null) {
 					s += text.substring(0, 1);
+					if (EmojiManager.isEmoji(s)) {
+						String code = "";
+						for (int i = 0; i < s.length(); i++)
+							code += '_' + s.codePointAt(i);
+						PdfService.this.adminService
+								.createTicket(
+										new Ticket(Ticket.ERROR + "emoji not found: " + code.substring(1)));
+					}
 					if (text.length() < 2) {
 						if (s.length() > 0)
 							paragraph.add(this.createText(s, fontMessage));
