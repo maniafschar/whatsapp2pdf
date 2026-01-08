@@ -33,7 +33,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 1 WhatsApp con abc.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 01 WhatsApp con abc.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -55,7 +55,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 2 de WhatsApp con .zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 02 de WhatsApp con .zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -81,7 +81,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 3 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 03 WhatsApp - 9.14_D_CI_8_Pete_87_Germany_.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -102,7 +102,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 4 WhatsApp - def.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 04 WhatsApp - def.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -123,7 +123,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 5 WhatsApp - Schafkopf.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 05 WhatsApp - Schafkopf.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -167,7 +167,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 6 WhatsApp with +81 234543 3463.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 06 WhatsApp with +81 234543 3463.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
@@ -189,7 +189,7 @@ public class ExtractServiceTest {
 
 		// when
 		final Attributes attributes = this.extractService.analyse(
-				this.getClass().getResourceAsStream("/zip/Chat 7 WhatsApp with Hab.zip"), null,
+				this.getClass().getResourceAsStream("/zip/Chat 07 WhatsApp with Hab.zip"), null,
 				UUID.randomUUID().toString());
 
 		// then
