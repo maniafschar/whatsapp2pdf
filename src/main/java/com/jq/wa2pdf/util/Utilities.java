@@ -2,6 +2,11 @@ package com.jq.wa2pdf.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Utilities {
 	public static String stackTraceToString(final Throwable ex) {
@@ -35,6 +40,27 @@ public class Utilities {
 		}
 		result = result.trim();
 		return result.length() == 0 ? "" + s.hashCode() : result;
+	}
+
+	public static List<String> createAdjectives(final boolean emojis) {
+		final List<String> source = emojis ? Arrays.asList("🏋️", "🍾", "🤯", "❤️‍🔥", "💕", "🥳", "😔", "😇", "😎",
+				"🥸", "🦍", "🐦", "🐘", "🦊", "🦅")
+				: Arrays.asList("affectionate", "passionate", "intense", "funny", "sexy",
+						"loving", "clingy", "vulnerable", "thoughtful", "poetic", "caring", "inquisitive",
+						"communicative", "recovering", "observant", "planning");
+		final List<String> list = new ArrayList<>();
+		final Set<Integer> used = new HashSet<>();
+		for (int i = 0; i < 3; i++) {
+			while (true) {
+				final int i2 = (int) (Math.random() * source.size());
+				if (!used.contains(i2)) {
+					used.add(i2);
+					list.add(source.get(i2));
+					break;
+				}
+			}
+		}
+		return list;
 	}
 
 	public static String getEmojiId(String emoji) {

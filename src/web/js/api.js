@@ -26,11 +26,12 @@ class api {
 	}
 
 	static preview(event, period) {
-		if (event.target.parentElement.parentElement.previousElementSibling.classList.value == 'download') {
-			event.target.parentElement.parentElement.previousElementSibling.click();
+		var mainTR = event.target.parentElement.parentElement.previousElementSibling;
+		if (mainTR.classList.value == 'download') {
+			mainTR.click();
 			return;
 		}
-		if (event.target.parentElement.parentElement.previousElementSibling.classList.value)
+		if (mainTR.classList.value && !mainTR.classList.contains('selected'))
 			return
 		event.preventDefault();
 		event.stopPropagation();

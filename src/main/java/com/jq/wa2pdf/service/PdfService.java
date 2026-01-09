@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -586,15 +585,7 @@ public class PdfService {
 					if (this.aiSummary.emojis.containsKey(n)) {
 						cell = this.createCell(this.aiSummary.emojis.get(n).stream()
 								.collect(Collectors.joining("\u00a0 \u00a0")), TextAlignment.CENTER);
-						final Paragraph paragraph = (Paragraph) cell.getChildren().get(0);
-						for (final IElement e : paragraph.getChildren()) {
-							if (e instanceof Image) {
-								final Image image = (Image) e;
-								image.setHeight(36);
-								image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
-								image.setMarginBottom(0);
-							}
-						}
+						this.resizeEmojis((Paragraph) cell.getChildren().get(0));
 						cellTable.addCell(cell);
 					}
 				}
@@ -613,22 +604,6 @@ public class PdfService {
 			this.document.add(empty);
 		}
 
-		private List<String> createAdjectives(final List<String> adjectives) {
-			final List<String> list = new ArrayList<>();
-			final Set<Integer> used = new HashSet<>();
-			for (int i = 0; i < 3; i++) {
-				while (true) {
-					final int i2 = (int) (Math.random() * adjectives.size());
-					if (!used.contains(i2)) {
-						used.add(i2);
-						list.add(adjectives.get(i2));
-						break;
-					}
-				}
-			}
-			return list;
-		}
-
 		private void addAISummary() throws IOException {
 			if (this.type == Type.Preview) {
 				this.aiSummary = new AiSummary();
@@ -638,14 +613,9 @@ public class PdfService {
 						.replace("{user1}", this.wordClouds.size() > 0 ? this.wordClouds.get(0).user : "Romeo")
 						.replace("{user2}", this.wordClouds.size() > 1 ? this.wordClouds.get(1).user : "Julia");
 				this.aiSummary.image = IOUtils.toByteArray(this.getClass().getResourceAsStream("/image/aiExample.png"));
-				final List<String> adjectives = Arrays.asList("affectionate", "passionate", "intense", "funny", "sexy",
-						"loving", "clingy", "vulnerable", "thoughtful", "poetic", "caring", "inquisitive",
-						"communicative", "recovering", "observant", "planning");
-				final List<String> emojis = Arrays.asList("🏋️", "🍾", "🤯", "❤️‍🔥", "💕", "🥳", "😔", "😇", "😎",
-						"🥸", "🦍", "🐦", "🐘", "🦊", "🦅");
 				this.wordClouds.stream().forEach(e -> {
-					this.aiSummary.adjectives.put(e.user, this.createAdjectives(adjectives));
-					this.aiSummary.emojis.put(e.user, this.createAdjectives(emojis));
+					this.aiSummary.adjectives.put(e.user, Utilities.createAdjectives(false));
+					this.aiSummary.emojis.put(e.user, Utilities.createAdjectives(true));
 				});
 			} else if (this.type == Type.Summary) {
 				final Set<String> users = new HashSet<>();
@@ -811,19 +781,21 @@ public class PdfService {
 			}
 			if (!hasEmoji && this.fillLinkPreview(cell, text))
 				cell.setPadding(0);
-			if (!hasText && !paragraph.getChildren().isEmpty()
-					&& paragraph.getChildren().get(0) instanceof Image) {
-				for (final IElement e : paragraph.getChildren()) {
-					if (e instanceof Image) {
-						final Image image = (Image) e;
-						image.setHeight(36);
-						image.setWidth(36f * image.getImageWidth() / image.getImageHeight());
-						image.setMarginBottom(0);
-					}
-				}
-			}
+			if (!hasText && !paragraph.getChildren().isEmpty() && paragraph.getChildren().get(0) instanceof Image)
+				this.resizeEmojis(paragraph);
 			paragraph.setTextAlignment(alignment);
 			cell.add(paragraph);
+		}
+
+		private void resizeEmojis(final Paragraph paragraph) {
+			for (final IElement e : paragraph.getChildren()) {
+				if (e instanceof Image) {
+					final Image image = (Image) e;
+					image.setHeight(32);
+					image.setWidth(32f * image.getImageWidth() / image.getImageHeight());
+					image.setMarginBottom(0);
+				}
+			}
 		}
 
 		private boolean fillLinkPreview(final Cell cell, final String text) {
