@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -143,9 +144,7 @@ public class PdfService {
 		private final String id;
 		private final Type type;
 		private final StringBuilder text = new StringBuilder();
-		private final Pattern patternEmail = Pattern.compile(
-				"((\\.+)(?=.*@)|(\\+.*(?=@)))",
-				Pattern.CASE_INSENSITIVE);
+		private final Pattern patternEmail = Pattern.compile("((\\.+)(?=.*@)|(\\+.*(?=@)))", Pattern.CASE_INSENSITIVE);
 		private final Pattern patternUrl = Pattern.compile(
 				"((https?|ftp|gopher|telnet|file|Unsure|http):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)",
 				Pattern.CASE_INSENSITIVE);
@@ -201,14 +200,28 @@ public class PdfService {
 						}
 					});
 			this.parseChats();
+			this.addHeader();
+			this.addAISummary();
+			this.addWordCloud();
 			this.addMetaData();
 			this.addChart();
-			this.addAISummery();
-			this.addWordCloud();
 			this.writeContent();
 			this.document.flush();
 			this.document.close();
 			Files.move(this.dir.resolve(filename + ".tmp"), this.dir.resolve(filename + ".pdf"));
+		}
+
+		private void addHeader() {
+			final Table header = new Table(1);
+			header.setWidth(UnitValue.createPercentValue(100f));
+			header.setHeight(UnitValue.createPointValue(80));
+			header.addCell(new Paragraph(this.createText("https://wa2pdf.com", fontMessage)));
+			header.getCell(0, 0).setPadding(0);
+			header.getCell(0, 0).setFontColor(this.colorDate);
+			header.getCell(0, 0).setPaddingTop(33);
+			header.getCell(0, 0).setBorder(Border.NO_BORDER);
+			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
+			this.document.add(header);
 		}
 
 		private void parseChats() throws IOException {
@@ -218,7 +231,6 @@ public class PdfService {
 				final Pattern patternStart = Pattern.compile(PdfService.this.extractService.getPatternStart(null));
 				final Pattern patternMonth = Pattern.compile(
 						PdfService.this.extractService.getPatternStart(this.period.replace("\\d", "\\d{1,2}")));
-				final Set<String> users = new HashSet<>();
 				boolean foundMonth = false;
 				String line, lastChat = null, user = null, date = null, separator = null;
 				int i = 0;
@@ -240,7 +252,6 @@ public class PdfService {
 							user = Utilities.extractUser(line, separator);
 							date = DateHandler.replaceStrangeWhitespace(line);
 							date = date.substring(0, date.indexOf(separator)).trim();
-							users.add(user);
 							line = line.substring(line.indexOf(":", line.indexOf(separator) + separator.length()) + 1)
 									.trim();
 							final Matcher m = patternMedia.matcher(line);
@@ -281,6 +292,7 @@ public class PdfService {
 
 		private void writeContent() throws IOException {
 			int i = 0;
+			this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
 			final PdfOutline root = this.document.getPdfDocument().getOutlines(true);
 			for (final Table table : this.content) {
 				if (table.getNumberOfRows() == 2 && table.getNumberOfColumns() == 2) {
@@ -442,17 +454,6 @@ public class PdfService {
 		}
 
 		private void addMetaData() throws IOException {
-			final Table header = new Table(1);
-			header.setWidth(UnitValue.createPercentValue(100f));
-			header.setHeight(UnitValue.createPointValue(80));
-			header.addCell(new Paragraph(this.createText("https://wa2pdf.com", fontMessage)));
-			header.getCell(0, 0).setPadding(0);
-			header.getCell(0, 0).setFontColor(this.colorDate);
-			header.getCell(0, 0).setPaddingTop(33);
-			header.getCell(0, 0).setBorder(Border.NO_BORDER);
-			((Paragraph) header.getCell(0, 0).getChildren().get(0)).setTextAlignment(TextAlignment.RIGHT);
-			this.document.add(header);
-
 			final PdfDocumentInfo catalog = this.document.getPdfDocument().getDocumentInfo();
 			catalog.setTitle("PDF of exported WhatsApp Conversation");
 			catalog.setSubject(PdfService.this.extractService.getFilename(this.id));
@@ -467,6 +468,7 @@ public class PdfService {
 			table.addCell(this.createCell("Chats", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(this.createCell("Words", TextAlignment.RIGHT, 0, 0, 0, 0));
 			table.addCell(this.createCell("Letters", TextAlignment.RIGHT, 0, 0, 0, 0));
+			table.setMarginTop(15);
 			final List<Statistics> totalSumUp = new ArrayList<>();
 			for (int i = 0; i < this.total.size(); i++) {
 				final Statistics statistics = this.total.get(i);
@@ -604,56 +606,76 @@ public class PdfService {
 				table.addCell(cell);
 			}
 			this.document.add(table);
-			if (PDF.this.document.getPdfDocument().getNumberOfPages() == 1)
-				this.document.add(new AreaBreak(AreaBreakType.NEXT_PAGE));
-			else {
-				final Table empty = new Table(1);
-				empty.setWidth(UnitValue.createPercentValue(100f));
-				empty.setHeight(UnitValue.createPointValue(20));
-				empty.addCell(this.createCell(""));
-				this.document.add(empty);
-			}
+			final Table empty = new Table(1);
+			empty.setWidth(UnitValue.createPercentValue(100f));
+			empty.setHeight(UnitValue.createPointValue(20));
+			empty.addCell(this.createCell(""));
+			this.document.add(empty);
 		}
 
-		private void addAISummery() throws IOException {
-			final String text;
-			if (this.type == Type.Preview)
-				text = "The none preview version of this PDF shows you a summary of the chat, which reveals interesting insights.";
-			else if (this.type == Type.Summary) {
+		private List<String> createAdjectives(final List<String> adjectives) {
+			final List<String> list = new ArrayList<>();
+			final Set<Integer> used = new HashSet<>();
+			for (int i = 0; i < 3; i++) {
+				while (true) {
+					final int i2 = (int) (Math.random() * adjectives.size());
+					if (!used.contains(i2)) {
+						used.add(i2);
+						list.add(adjectives.get(i2));
+						break;
+					}
+				}
+			}
+			return list;
+		}
+
+		private void addAISummary() throws IOException {
+			if (this.type == Type.Preview) {
+				this.aiSummary = new AiSummary();
+				this.aiSummary.text = ("This is an example of a AI summary, including the generaated image:\n\n"
+						+ "The WhatsApp chat between {user1} and {user2} spans several days and is filled with a complex mix of flirtatious banter, discussions about work, personal struggles, and the lingering feelings of a past or complicated relationship.\n\n"
+						+ "{user1} initiates the conversation with cheerful greetings, but quickly expresses feeling unwell and uncertain about his situation at work and his impending departure. {user2} responds with concern and playful teasing, sometimes direct and suggestive, sometimes offering support. {user1} shares his anxieties about his general state of mind. {user2}, while sometimes teasing {user1} about his dramatic expressions, also offers reassurance and support, though she's overwhelmed by \"this whole nonsense\".")
+						.replace("{user1}", this.wordClouds.size() > 0 ? this.wordClouds.get(0).user : "Romeo")
+						.replace("{user2}", this.wordClouds.size() > 1 ? this.wordClouds.get(1).user : "Julia");
+				this.aiSummary.image = IOUtils.toByteArray(this.getClass().getResourceAsStream("/image/aiExample.png"));
+				final List<String> adjectives = Arrays.asList("affectionate", "passionate", "intense", "funny", "sexy",
+						"loving", "clingy", "vulnerable", "thoughtful", "poetic", "caring", "inquisitive",
+						"communicative", "recovering", "observant", "planning");
+				final List<String> emojis = Arrays.asList("🏋️", "🍾", "🤯", "❤️‍🔥", "💕", "🥳", "😔", "😇", "😎",
+						"🥸", "🦍", "🐦", "🐘", "🦊", "🦅");
+				this.wordClouds.stream().forEach(e -> {
+					this.aiSummary.adjectives.put(e.user, this.createAdjectives(adjectives));
+					this.aiSummary.emojis.put(e.user, this.createAdjectives(emojis));
+				});
+			} else if (this.type == Type.Summary) {
 				final Set<String> users = new HashSet<>();
 				this.total.stream().forEach(e -> users.add(e.user));
-				final AiSummary summary = PdfService.this.aiService.summerize(this.text.toString(), users);
-				if (summary == null)
-					text = null;
-				else {
-					text = summary.text;
-					this.aiSummary = summary;
-				}
-			} else
-				text = null;
-			if (text != null && !text.isBlank()) {
-				final Table summary = new Table(1);
-				final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
-				cell.setBackgroundColor(this.colorDate, 0.2f);
-				summary.addCell(cell);
-				summary.setWidth(UnitValue.createPercentValue(100f));
-				summary.addCell(this.createCell(text));
-				summary.setMarginTop(15);
-				this.document.add(summary);
+				this.aiSummary = PdfService.this.aiService.summerize(this.text.toString(), users);
 			}
-			if (this.aiSummary != null && this.aiSummary.image != null) {
-				String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
-				IOUtils.write(this.aiSummary.image,
-						new FileOutputStream(this.dir.resolve(mediaId).toAbsolutePath().toFile()));
-				mediaId = this.scaleImage(mediaId);
-				final Table image = new Table(1);
-				image.setWidth(UnitValue.createPercentValue(100f));
-				image.addCell(this.createCell(mediaId, true));
-				image.setMarginTop(15);
-				image.setKeepTogether(true);
-				image.getCell(0, 0).setPaddingLeft(80);
-				image.getCell(0, 0).setPaddingRight(80);
-				this.document.add(image);
+			if (this.aiSummary != null) {
+				if (this.aiSummary.text != null && !this.aiSummary.text.isBlank()) {
+					final Table summary = new Table(1);
+					final Cell cell = this.createCell("Summary", TextAlignment.CENTER);
+					cell.setBackgroundColor(this.colorDate, 0.2f);
+					summary.addCell(cell);
+					summary.setWidth(UnitValue.createPercentValue(100f));
+					summary.addCell(this.createCell(this.aiSummary.text));
+					this.document.add(summary);
+				}
+				if (this.aiSummary.image != null) {
+					String mediaId = ExtractService.filename + UUID.randomUUID().toString() + ".png";
+					IOUtils.write(this.aiSummary.image,
+							new FileOutputStream(this.dir.resolve(mediaId).toAbsolutePath().toFile()));
+					mediaId = this.scaleImage(mediaId);
+					final Table image = new Table(1);
+					image.setWidth(UnitValue.createPercentValue(100f));
+					image.addCell(this.createCell(mediaId, true));
+					image.setMarginTop(15);
+					image.setKeepTogether(true);
+					image.getCell(0, 0).setPaddingLeft(80);
+					image.getCell(0, 0).setPaddingRight(80);
+					this.document.add(image);
+				}
 			}
 		}
 

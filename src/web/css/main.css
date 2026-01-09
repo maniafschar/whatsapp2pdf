@@ -205,39 +205,19 @@ table th {
 	background-color: var(--borderColor);
 }
 
-table tr.selected {
+table tr.selected,
+period table tr.selected+tr {
 	background-color: rgba(255, 100, 50, 0.1);
 }
 
-table tr.spinner {
+table tr.spinner,
+period table tr.spinner+tr {
 	background-color: rgba(255, 150, 50, 0.2);
 }
 
-table tr.spinner td:first-child::before {
-	content: '⌛ preparing...';
-	position: absolute;
-	right: -15.5em;
-	width: 15em;
-	text-align: left;
-	font-weight: bold;
-	color: rgba(255, 150, 50, 0.6);
-	line-height: 1;
-}
-
-table tr.download {
+table tr.download,
+period table tr.download+tr {
 	background-color: rgba(255, 150, 50, 0.6);
-}
-
-table tr.download td:first-child::before {
-	content: '✓ click to download';
-	position: absolute;
-	right: -15.5em;
-	width: 15em;
-	text-align: left;
-	font-weight: bold;
-	color: rgba(200, 100, 0, 1);
-	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.2);
-	line-height: 1;
 }
 
 table td button {
@@ -288,10 +268,7 @@ tabBody element {
 }
 
 tabBody img {
-	padding: 1em;
-	background: rgba(255, 255, 255, 0.3);
-	border-radius: 1em;
-	margin-top: 0.5em;
+	border-radius: 0.5em;
 	max-width: 98%;
 }
 

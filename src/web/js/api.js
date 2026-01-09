@@ -26,6 +26,12 @@ class api {
 	}
 
 	static preview(event, period) {
+		if (event.target.parentElement.parentElement.previousElementSibling.classList.value == 'download') {
+			event.target.parentElement.parentElement.previousElementSibling.click();
+			return;
+		}
+		if (event.target.parentElement.parentElement.previousElementSibling.classList.value)
+			return
 		event.preventDefault();
 		event.stopPropagation();
 		api.showProgressBar();
@@ -133,9 +139,9 @@ class api {
 		document.querySelector('attributes button[onclick*="delete"]').style.display = '';
 		document.querySelector('attributes id').innerText = data.id;
 		ui.showTab(1);
-		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th><th></th></tr>';
+		var s = '<table><tr><th>Period</th><th>Chats</th><th>Words</th><th>Letters</th></tr>';
 		for (var i = 0; i < data.periods.length; i++)
-			s += '<tr value="' + data.periods[i].period + '"><td>' + data.periods[i].period.replace('-\\d', '').replace('\\d/', '').replace('\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td><td><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
+			s += '<tr value="' + data.periods[i].period + '"><td>' + data.periods[i].period.replace('-\\d', '').replace('\\d/', '').replace('\\d.', '') + '</td><td>' + data.periods[i].chats.toLocaleString() + '</td><td>' + data.periods[i].words.toLocaleString() + '</td><td>' + data.periods[i].letters.toLocaleString() + '</td></tr><tr><td colspan="4"><button onclick="api.preview(event, &quot;' + data.periods[i].period.replaceAll('\\', '\\\\') + '&quot;)">Preview</button></td></tr>';
 		document.getElementsByTagName('attributes')[0].querySelector('period').innerHTML = s + '</table><summary>add AI generated summary<br/><span>(data will be sent to Google Gemini)</span></summary>';
 		document.getElementsByTagName('attributes')[0].querySelectorAll('period tr').forEach(tr => {
 			tr.addEventListener('click', () => {
@@ -146,6 +152,7 @@ class api {
 					link.setAttribute('target', '_blank');
 					link.click();
 					tr.classList.remove('download');
+					tr.nextElementSibling.querySelector('button').innerText = 'Preview';
 					if (document.querySelectorAll('period .spinner,period .download').length == 0)
 						document.querySelector('attributes button[onclick*="delete"]').style.display = '';
 					api.feedbackStatus = '';
@@ -153,7 +160,7 @@ class api {
 						document.querySelector('period').classList.remove('downloadHint');
 				} else if (tr.classList.contains('selected'))
 					tr.classList.remove('selected');
-				else if (!tr.classList.contains('spinner'))
+				else if (!tr.classList.contains('spinner') && !tr.children[0].getAttribute('colspan'))
 					tr.classList.add('selected');
 			});
 		});
@@ -184,6 +191,7 @@ class api {
 			var tr = document.querySelector('period tr[value="' + periods[i].getAttribute('value').replaceAll('\\', '\\\\') + '"]');
 			tr.classList.remove('selected');
 			tr.classList.add('spinner');
+			tr.nextElementSibling.querySelector('button').innerText = '⌛ preparing...';
 			api.download(periods[i].getAttribute('value'));
 		}
 	}
@@ -200,6 +208,7 @@ class api {
 						var tr = document.querySelector('period tr[value="' + period.replaceAll('\\', '\\\\') + '"]');
 						tr.classList.remove('spinner');
 						tr.classList.add('download');
+						tr.nextElementSibling.querySelector('button').innerText = 'Download';
 						document.querySelector('period').classList.add('downloadHint');
 					} else {
 						var link = document.createElement('a');
