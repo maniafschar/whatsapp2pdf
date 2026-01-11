@@ -114,8 +114,9 @@ public class AiService {
 				.responseModalities(Arrays.asList("IMAGE")).build();
 		final GenerateContentResponse generateContentResponse = Client.builder().apiKey(this.geminiKey)
 				.build().models.generateContent("gemini-2.5-flash-image", promptImage + "\n" + text, config);
-		if (generateContentResponse != null) {
-			for (final Part part : generateContentResponse.parts()) {
+		final ImmutableList<Part> parts = generateContentResponse.parts();
+		if (parts != null) {
+			for (final Part part : parts) {
 				if (part.inlineData().isPresent()) {
 					final var blob = part.inlineData().get();
 					if (blob.data().isPresent())
@@ -123,6 +124,8 @@ public class AiService {
 				}
 			}
 		}
+		this.adminService.createTicket(new Ticket(
+				Ticket.ERROR + "AI image not created: " + generateContentResponse.finishReason().knownEnum()));
 		return null;
 	}
 
