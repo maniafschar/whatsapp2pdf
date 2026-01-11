@@ -156,7 +156,8 @@ public class PdfService {
 			this.id = id;
 			this.type = type;
 			fontMessage = PdfFontFactory.createFont(
-					IOUtils.toByteArray(this.getClass().getResourceAsStream("/font/RobotoSlab-VariableFont_wght.ttf")),
+					IOUtils.toByteArray(
+							this.getClass().getResourceAsStream("/font/NotoSans-VariableFont_wdth,wght.ttf")),
 					EmbeddingStrategy.FORCE_EMBEDDED);
 		}
 
