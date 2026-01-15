@@ -256,6 +256,8 @@ class api {
 
 	static ajax(param) {
 		var xhr = new XMLHttpRequest();
+		if (!param.method)
+			param.method = 'GET';
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
 				if (!param.noProgressBar)
@@ -276,7 +278,7 @@ class api {
 						var xhrError = new XMLHttpRequest();
 						xhrError.open('POST', api.url + '/rest/api/ticket', true);
 						xhrError.setRequestHeader('Content-Type', 'application/json');
-						xhrError.send(JSON.stringify({ note: param.method + ' ' + param.url + ' -> ' + xhr.status + ' ' + xhr.responseURL + '\n' + xhr.response }));
+						xhrError.send(JSON.stringify({ note: param.method + ' ' + param.url + ' -> ' + xhr.status + ' ' + xhr.responseURL + ' | ' + xhr.response }));
 					}
 					if (param.error) {
 						xhr.param = param;
@@ -286,7 +288,7 @@ class api {
 				}
 			}
 		};
-		xhr.open(param.method ? param.method : 'GET', param.url, true);
+		xhr.open(param.method, param.url, true);
 		if (typeof param.body == 'string')
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		else if (param.body && !(param.body instanceof FormData)) {
