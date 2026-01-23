@@ -71,6 +71,9 @@ module.exports = (env) => {
 						var file = 'dist/js/main.js';
 						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
 							.replace('{placeholderServer}', env.server));
+						file = 'dist/admin/js/main.js';
+						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
+							.replace('{placeholderServer}', env.server));
 					})
 				}
 			}

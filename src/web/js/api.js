@@ -1,11 +1,11 @@
 export { api };
 
 class api {
-	static url = '{placeholderServer}';
+	static url = '{placeholderServer}/rest/api/';
 
 	static analyse(data, success, error) {
 		api.ajax({
-			url: api.url + '/rest/api/pdf/analyse',
+			url: api.url + 'pdf/analyse',
 			method: 'POST',
 			body: data,
 			success: success,
@@ -16,7 +16,7 @@ class api {
 	static preview(id, period, user, success, error) {
 		api.ajax({
 			noProgressBar: true,
-			url: api.url + '/rest/api/pdf/preview/' + id + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(user),
+			url: api.url + 'pdf/preview/' + id + '?period=' + encodeURIComponent(period) + '&user=' + encodeURIComponent(user),
 			method: 'POST',
 			success: success,
 			error: error
@@ -27,7 +27,7 @@ class api {
 		document.dispatchEvent(new CustomEvent('progressbar', { detail: { type: 'open' } }));
 		api.ajax({
 			noProgressBar: true,
-			url: api.url + '/rest/api/pdf/buy/' + id + '?' + period + 'user=' + encodeURIComponent(user) + '&summary=' + summary,
+			url: api.url + 'pdf/buy/' + id + '?' + period + 'user=' + encodeURIComponent(user) + '&summary=' + summary,
 			method: 'POST',
 			success: success,
 			error: error
@@ -36,7 +36,7 @@ class api {
 
 	static delete(id, success) {
 		api.ajax({
-			url: api.url + '/rest/api/pdf/' + id,
+			url: api.url + 'pdf/' + id,
 			method: 'DELETE',
 			success: success
 		});
@@ -44,7 +44,7 @@ class api {
 
 	static saveFeedback(id, body, success, error) {
 		api.ajax({
-			url: api.url + '/rest/api/feedback/' + id,
+			url: api.url + 'feedback/' + id,
 			method: 'PUT',
 			body: body,
 			success: success,
@@ -55,14 +55,14 @@ class api {
 	static feedback(success) {
 		api.ajax({
 			noProgressBar: true,
-			url: api.url + '/rest/api/feedback/list',
+			url: api.url + 'feedback/list',
 			success: success
 		});
 	}
 
 	static feedbackConfirm(data, success, error) {
 		api.ajax({
-			url: api.url + '/rest/api/feedback/confirm',
+			url: api.url + 'feedback/confirm',
 			method: 'PUT',
 			body: data,
 			success: success,
@@ -92,7 +92,7 @@ class api {
 				} else {
 					if (xhr.status < 500) {
 						var xhrError = new XMLHttpRequest();
-						xhrError.open('POST', api.url + '/rest/api/ticket', true);
+						xhrError.open('POST', api.url + 'ticket', true);
 						xhrError.setRequestHeader('Content-Type', 'application/json');
 						xhrError.send(JSON.stringify({ note: param.method + ' ' + param.url + ' -> ' + xhr.status + ' ' + xhr.responseURL + ' | ' + xhr.response }));
 					}

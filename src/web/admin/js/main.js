@@ -5,7 +5,7 @@ import { SortableTable } from "../../js/element/SortableTable";
 export { api };
 
 class api {
-	static url = 'https://schafkopf.studio/rest/sc/';
+	static url = '{placeholderServer}/rest/sc/';
 
 	static init() {
 		if (document.querySelector('login input').value) {
