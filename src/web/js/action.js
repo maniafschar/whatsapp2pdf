@@ -7,7 +7,7 @@ import { ProgressBar } from "./element/ProgressBar";
 export { action };
 
 class action {
-	static feedbackStatus = 'You need to <a onclick="ui.showTab(1)">create</a> at least one document, to give feedback.';
+	static feedbackStatus = 'You need to create at least one document, to give feedback.';
 
 	static init() {
 		window.onresize();
