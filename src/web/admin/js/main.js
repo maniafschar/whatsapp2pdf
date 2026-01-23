@@ -137,7 +137,7 @@ class api {
 			}
 		};
 		xhr.open(param.method ? param.method : 'GET', param.url, true);
-		xhr.setRequestHeader('contactId', window.localStorage.getItem('credentials'));
+		xhr.setRequestHeader('user', window.localStorage.getItem('credentials'));
 		if (typeof param.body == 'string')
 			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		else if (param.body && !(param.body instanceof FormData)) {
