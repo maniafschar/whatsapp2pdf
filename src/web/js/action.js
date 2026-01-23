@@ -312,15 +312,15 @@ window.onresize = function () {
 	var mobile = parseFloat(getComputedStyle(document.body).fontSize) * 50 < window.innerWidth ? 0 : 5;
 	var diagonal = Math.sqrt(Math.pow(window.innerWidth, 2) + Math.pow(window.innerHeight, 2));
 	document.body.style.fontSize = (Math.min(10 + diagonal / 160, 26) + mobile) + 'px';
-	var imageWidth = 1536, imageHeight = 1024;
+	var imageWidth = 1024, imageHeight = 1024;
 	var imageStyle = document.querySelector('body element.intro>img').style;
 	if (window.innerHeight / imageHeight * imageWidth > window.innerWidth) {
 		imageStyle.height = window.innerHeight;
-		imageStyle.width = null;
-		imageStyle.marginTop = null;
+		imageStyle.width = 'fit-content';
+		imageStyle.marginTop = 0;
 	} else {
 		imageStyle.width = window.innerWidth;
-		imageStyle.height = null;
-		imageStyle.marginTop = window.innerHeight - window.innerWidth / imageWidth * imageHeight;
+		imageStyle.height = 'fit-content';
+		imageStyle.marginTop = (window.innerHeight - window.innerWidth / imageWidth * imageHeight) / 2;
 	}
 }
