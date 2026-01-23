@@ -1,3 +1,6 @@
+import { DialogPopup } from "../../js/element/DialogPopup";
+import { ProgressBar } from "../../js/element/ProgressBar";
+
 export { api };
 
 class api {
@@ -34,9 +37,7 @@ class api {
 		api.ajax({
 			url: api.url + 'build/' + type,
 			method: 'POST',
-			success: xhr => {
-				ui.popupOpen('<pre>' + ui.sanitizeText(xhr) + '</pre>');
-			}
+			success: xhr => document.dispatchEvent(new CustomEvent('popup', { detail: { body: '<pre>' + ui.sanitizeText(xhr) + '</pre>' } }))
 		});
 	}
 
@@ -50,7 +51,7 @@ class api {
 					e.parentElement.outerHTML = '';
 					document.querySelector('ticket').dispatchEvent(new CustomEvent('changed'));
 				}
-				ui.popupClose();
+				document.dispatchEvent(new CustomEvent('popup'));
 			}
 		});
 	}
@@ -71,15 +72,13 @@ class api {
 		var xhr = new XMLHttpRequest();
 		xhr.onreadystatechange = function () {
 			if (xhr.readyState == 4) {
-				var e = document.getElementsByTagName('progressbar')[0].style;
-				e.opacity = null;
-				setTimeout(function () { e.display = null; }, 400);
+				document.dispatchEvent(new CustomEvent('progressbar'));
 				var errorHandler = function () {
 					if (param.error) {
 						xhr.param = param;
 						param.error(xhr);
 					} else
-						ui.popupOpen('<pre>' + JSON.stringify(xhr) + '</pre>');
+						document.dispatchEvent(new CustomEvent('popup', { detail: { body: '<pre>' + JSON.stringify(xhr) + '</pre>' } }));
 				};
 				if (xhr.status >= 200 && xhr.status < 300) {
 					if (param.success) {
@@ -104,9 +103,7 @@ class api {
 			xhr.setRequestHeader('Content-Type', 'application/json');
 			param.body = JSON.stringify(param.body);
 		}
-		var e = document.getElementsByTagName('progressbar')[0].style;
-		e.display = 'block';
-		setTimeout(function () { if (xhr.readyState != 4) e.opacity = 1; }, 100);
+		setTimeout(function () { if (xhr.readyState != 4) document.dispatchEvent(new CustomEvent('progressbar', { detail: { type: 'open' } })) }, 100);
 		xhr.send(param.body);
 	}
 }
@@ -206,10 +203,6 @@ class ui {
 	static multiline = false;
 
 	static openDetails(event) {
-		if (event.target.getAttribute('i') == document.querySelector('popup content').getAttribute('i')) {
-			ui.popupClose();
-			return;
-		}
 		var id = event.target.getAttribute('i').split('-');
 		var data;
 		for (var i = 0; i < ui.data[id[0]].list.length; i++) {
@@ -229,26 +222,7 @@ class ui {
 		}
 		if (id[0] == '1')
 			s += '<buttons><button onclick="api.deleteTicket(event, ' + id[1] + ')">delete</button></buttons>';
-		document.querySelector('popup content').setAttribute('i', event.target.getAttribute('i'));
-		ui.popupOpen(s);
-	}
-
-	static popupOpen(s, right) {
-		if (document.querySelector('popup content').innerHTML == s) {
-			ui.popupClose();
-			return;
-		}
-		document.querySelector('popup content').innerHTML = s;
-		var e = document.querySelector('popup').style;
-		e.transform = 'scale(1)';
-		e.left = right ? 'initial' : '';
-		e.right = right ? '1em' : '';
-	}
-
-	static popupClose() {
-		document.getElementsByTagName('popup')[0].style.transform = '';
-		document.querySelector('popup content').removeAttribute('i');
-		setTimeout(function () { document.querySelector('popup content').innerHTML = ''; }, 500);
+		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s } }));
 	}
 
 	static filter(event, field) {
@@ -293,7 +267,7 @@ class ui {
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
 			s += '<filter onclick="ui.filter(event,' + field + ')"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
-		ui.popupOpen(s, true);
+		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s, align: 'right' } }));
 	}
 
 	static sanitizeText(s) {
@@ -412,6 +386,9 @@ class ui {
 			ui.renderTable(ui.data[++i % ui.data.length]);
 	}
 }
+
+customElements.define('dialog-popup', DialogPopup);
+customElements.define('progress-bar', ProgressBar);
 
 window.api = api;
 window.ui = ui;
