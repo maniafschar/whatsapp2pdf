@@ -31,7 +31,7 @@ module.exports = (env) => {
 		}
 	},
 	{
-		entry: './src/web/js/start.js',
+		entry: './src/web/js/action.js',
 		mode: 'production',
 		output: {
 			globalObject: 'this',

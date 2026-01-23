@@ -1,0 +1,13 @@
+{
+  "devDependencies": {
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.3"
+  },
+  "dependencies": {
+    "@babel/core": "^7.28.6",
+    "@babel/plugin-transform-runtime": "^7.28.5",
+    "@babel/preset-env": "^7.28.6",
+    "@babel/runtime": "^7.28.6",
+    "babel-loader": "^10.0.0"
+  }
+}

@@ -35,16 +35,18 @@ body {
 	margin: 0;
 	padding: 0;
 	overflow-x: hidden;
+	overflow-y: auto;
 	text-align: center;
 	background: linear-gradient(135deg, #fff, #fffaf7 10%, #fff3ea 20%, #f5f3f0 33%, #ddf3ff 66%, #d0f1c9) 50% fixed;
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 body>container {
-	display: flex;
+	display: block;
 	flex-direction: column;
 	height: 100%;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 	opacity: 0;
 	transition: .4s ease-out;
 }
@@ -52,20 +54,36 @@ body>container {
 body>container>element {
 	display: block;
 	position: relative;
+	border: solid 1em transparent;
 }
 
-body header {
-	display: inline-block;
+body>container>element.intro {
+	display: flex;
+	justify-content: center;
+	padding: 0;
+	border: none;
+}
+
+body>container>element.intro img.text {
+	position: absolute;
 	width: 100%;
-	max-width: 50em;
-	position: relative;
-	overflow-x: hidden;
-	border-radius: 0 0 1em 1em;
-	background: url("/image/heartBG.jpg");
-	background-size: auto 100%;
+	margin-top: 1em;
+	max-width: 24em;
+	filter: drop-shadow(0.05em 0.05em 0.2em rgba(100, 50, 0, 0.9));
 }
 
-body header span,
+body>container>element.intro description {
+	position: absolute;
+	bottom: 0;
+	color: white;
+	padding: 0.5em;
+	background: rgba(0, 0, 0, 0.2);
+	margin: 1em;
+	border-radius: 1em;
+	font-size: 1.5em;
+	text-shadow: 0.1em 0.1em 0.5em rgba(0, 0, 0, 0.5);
+}
+
 tabBody upload span {
 	position: relative;
 	display: inline-block;
@@ -111,10 +129,6 @@ error {
 header error {
 	color: rgb(0, 255, 0);
 	text-shadow: 0 0 0.2em rgba(0, 0, 0, 0.6);
-}
-
-popup error {
-	color: red;
 }
 
 attributes {
@@ -290,64 +304,6 @@ a {
 	cursor: pointer;
 }
 
-popup {
-	transform: scale(0);
-	position: fixed;
-	width: 30em;
-	max-width: 90%;
-	background-color: blanchedalmond;
-	top: 3em;
-	left: 0;
-	right: 0;
-	margin: 0 auto;
-	z-index: 2;
-	border-radius: 1em 0 1em 1em;
-	filter: drop-shadow(0 0 0.5em rgba(0, 0, 0, 0.3));
-	transition: all ease-out .4s;
-	min-width: 5em;
-}
-
-popup close {
-	position: absolute;
-	top: -2.5em;
-	right: 0;
-	z-index: 2;
-	width: 5.5em;
-	height: 3.5em;
-	cursor: pointer;
-	display: block;
-}
-
-popup::before {
-	content: 'x';
-	position: absolute;
-	top: -1.5em;
-	right: 0;
-	padding: 0.25em 1em;
-	background-color: blanchedalmond;
-	border-radius: 0.5em 0.5em 0 0;
-	color: rgba(0, 0, 0, 0.1);
-	font-weight: bold;
-	font-size: 1.2em;
-}
-
-popup content {
-	position: relative;
-	display: block;
-	padding: 1em;
-	max-height: 82vh;
-	max-width: 50em;
-}
-
-popup content message {
-	line-height: 1.8;
-}
-
-popup content data {
-	position: relative;
-	display: none;
-}
-
 textarea,
 input {
 	appearance: none;
@@ -417,86 +373,4 @@ rating top {
 
 rating note {
 	margin: 0.5em 0 2em 0;
-}
-
-progressbar {
-	position: fixed;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	background-color: rgba(0, 0, 0, 0.4);
-	display: none;
-	opacity: 0;
-	transition: all .4s ease-out;
-}
-
-progressbar loader {
-	position: absolute;
-	top: calc(50% - 6em);
-	left: calc(50% - 6em);
-	width: 12em;
-	height: 12em;
-	border-radius: 50%;
-	perspective: 800px;
-}
-
-progressbar loader div {
-	position: absolute;
-	box-sizing: border-box;
-	width: 100%;
-	height: 100%;
-	border-radius: 50%;
-}
-
-progressbar loader .one {
-	left: 0%;
-	top: 0%;
-	animation: rotate-one 1s linear infinite;
-	border-bottom: 3px solid #b55;
-}
-
-progressbar loader .two {
-	right: 0%;
-	top: 0%;
-	animation: rotate-two 1s linear infinite;
-	border-right: 3px solid #8d8;
-}
-
-progressbar loader .three {
-	right: 0%;
-	bottom: 0%;
-	animation: rotate-three 1s linear infinite;
-	border-top: 3px solid #aaf;
-}
-
-@keyframes rotate-one {
-	0% {
-		transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
-	}
-
-	100% {
-		transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
-	}
-}
-
-@keyframes rotate-two {
-	0% {
-		transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
-	}
-
-	100% {
-		transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
-	}
-}
-
-@keyframes rotate-three {
-	0% {
-		transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
-	}
-
-	100% {
-		transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
-	}
-
 }

@@ -47,7 +47,7 @@ public class Application {
 		this.driver.get(url);
 		final Feedback feedback = new Feedback();
 		feedback.setNote("abc");
-		feedback.setRating((short) 88);
+		feedback.setRating((short) 66);
 		feedback.setName("mani");
 		feedback.setEmail("mani.afschar@jq-consulting.de");
 		feedback.setPin("123456");

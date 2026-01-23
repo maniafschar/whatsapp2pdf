@@ -40,296 +40,245 @@
 	<script defer type="text/javascript" src="js/main.js"></script>
 </head>
 
-<body onload="ui.init()">
+<body onload="action.init()">
 	<container>
-		<element>
-			<header>
-				<h1>For Lovers only!</h1>
-				<br />
-				<span>Convert your WhatsApp chat to a PDF gift. Click to start...</span>
-				<input type="file" accept=".zip" />
-				<error></error>
-			</header>
+		<element class="intro">
+			<img src="/image/start.png" />
+			<img src="/image/text.png" class="text" />
+			<description>
+				Surprise your sweatheart with an extraordinary summary of your WhatsApp conversation.
+			</description>
 		</element>
-		<element style="height: 100%; margin-top: 1em;">
-			<tabHeader>
-				<tab onclick="ui.showTab(0)" class="selected">Description</tab>
-				<tab onclick="ui.showTab(1)">Create</tab>
-				<tab onclick="ui.showTab(2)">Feedback</tab>
-				<tab onclick="ui.showTab(3)">Legal</tab><br />
-			</tabHeader>
-			<tabBody>
-				<container>
-					<element style="padding-bottom: 5em;">
-						Export your beloved chat to create a nice PDF with AI summary including a generated image
-						expressing the feelings of the paticipants, mood emojis, easy navigation, charts giving special
-						insights, word clouds, etc.
-						<br /><br />
-						<img src="image/description1.png" />
-						<br /><br />
-						Try it, it's currently for free and we do not collect any data! As soon as you delete your data,
-						nothing is left on our server. You have full control.
-						<br /><br />
-						<button onclick="ui.showTab(1)">Get started</button>
-					</element>
-					<element style="left: 25%;">
-						<upload>
-							<span>Upload a WhatsApp chat...</span>
-							<input type="file" accept=".zip" />
-							<div>
-								<br />
-								The ingeniously simple way to export your WhatsApp chat, including AI summary, mood
-								emojis, images, videos, emojis, and more as a PDF.
-								<br /><br />
-								Works on Android, iPhone, iPad, tablets, PC, etc.
-							</div>
-						</upload>
-						<attributes>
-							<id></id>
-							<div>Choose the viewers perspective</div>
-							<user></user>
-							<div>Choose the period to export as PDF</div>
-							<period></period>
-							<br />
-							<button onclick="api.buy()">Create selected</button>
-							<button onclick="api.delete()">Delete uploaded data</button>
-						</attributes>
-					</element>
-					<element style="left: 50%;">
-						<button onclick="ui.feedback()" style="position: absolute; right: 0;">Add
-							Feedback</button>
-						<feedbacks></feedbacks>
-					</element>
-					<element style="left: 75%; padding-bottom: 6em;">
-						<b>Imprint</b><br />
-						JNet Quality Consulting GmbH<br />
-						Whistlerweg 27b<br />
-						81479 Munich<br />
-						Germany<br />
-						E-Mail: support@wa2pdf.com<br />
-						Internet: https://wa2pdf.com<br /><br />
-						Managing Director: Mani Afschar Yazdi<br />
-						Registration court: District Court Munich<br />
-						Registration number: HRB 135182<br /><br />
-						©
-						<script type="text/javascript">document.write('2025-' + new Date().getFullYear())</script> JNet
-						Quality
-						Consulting
-						GmbH<br />
-						All rights reserved<br /><br /><br />
-						<b>General Terms and Conditions</b><br />
-						Last updated: 1.7.2025
-						<div style="text-align: left; padding-top: 1em;">
-							Welcome to wa2pdf.com, an online service that enables users to generate a downloadable PDF
-							from their WhatsApp chat. By accessing or using our website and services, you agree to be
-							bound by the following Terms and Conditions. If you do not agree, please do not use the
-							Service.
-							<ol>
-								<li><b>Service Description</b>
-									<br />
-									Our service allows users to upload or paste their WhatsApp chat data and receive a
-									formatted PDF file containing the content. The service is provided "as is" without
-									warranties of any kind.
-								</li>
-								<li><b>User Responsibilities</b>
-									<br />
-									By using our service, you agree:
-									<ul>
-										<li>That you are the rightful owner of the chat data or have permission from the
-											rightful owner(s) to process and convert the data.</li>
-										<li>Not to upload any content that is illegal, infringing, abusive, or violates
-											any third-party rights.</li>
-										<li>To ensure that no personal data is uploaded without the informed consent of
-											all involved parties, in accordance with privacy laws (e.g. GDPR).</li>
-									</ul>
-								</li>
-								<li><b>Privacy and Data Handling</b>
-									<br />
-									We take privacy seriously. Your data is processed temporarily and is not stored
-									longer than necessary to generate the PDF. We do not read, analyze, or share your
-									content with third parties. For more details, please refer to our <a
-										href="#privacy">Privacy Policy</a>.
-								</li>
-								<li><b>Intellectual Property</b>
-									<br />
-									All software, code, branding, and design used in this service remain the
-									intellectual property of JNet Quality Consulting GmbH. Users retain ownership of
-									the content they upload.
-								</li>
-								<li><b>Prohibited Use</b>
-									<br />
-									You may not:
-									<ul>
-										<li>Use the service for illegal activities.</li>
-										<li>Attempt to hack, reverse engineer, or disrupt the platform.</li>
-										<li>Use the platform in any way that may harm others or violate applicable laws.
-										</li>
-									</ul>
-								</li>
-								<li><b>Limitation of Liability</b>
-									<br />
-									We provide the service on an “as-is” and “as-available” basis. We are not liable
-									for:
-									<ul>
-										<li>Any loss of data.</li>
-										<li>Any errors in the output (PDF format, content layout, etc.).</li>
-										<li>Any consequences resulting from the use of the generated document.</li>
-									</ul>
-								</li>
-								<li><b>Modifications to Service</b>
-									<br />
-									We reserve the right to modify or discontinue the service (or any part thereof) at
-									any time, with or without notice.
-								</li>
-								<li><b>Termination</b>
-									<br />
-									We may suspend or terminate your access to the service if you violate these terms or
-									use the platform inappropriately.
-								</li>
-								<li><b>Jurisdiction and Governing Law</b>
-									<br />
-									These terms are governed by the laws of Germany. Any legal disputes shall be
-									resolved in the courts of Munich/Germany.
-								</li>
-								<li><b>Contact</b>
-									<br />
-									If you have any questions about these Terms, please contact us at:
-									<ul>
-										<li>support@wa2pdf.com</li>
-										<li>https://wa2pdf.com</li>
-									</ul>
-								</li>
-							</ol>
-						</div>
-						<br /><br />
-						<b id="privacy">Privacy Policy</b><br />
-						Last updated: 1.7.2025
-						<div style="text-align: left; padding-top: 1em;">
-							At wa2pdf.com, we are committed to protecting your privacy.
-							This Privacy Policy explains how we collect, use, and protect your personal data when you
-							use our service that converts WhatsApp chats into downloadable PDF files.
-							<ol>
-								<li><b>Data We Collect</b><br />
-									We do not collect or permanently store any personal data or chat content
-									submitted via our service.<br />
-									However, we may collect limited technical data:
-									<ul>
-										<li>Browser type and version</li>
-										<li>IP address (for security/logging purposes)</li>
-										<li>Date and time of access</li>
-										<li>Usage statistics (anonymized)</li>
-									</ul>
-									We do <b>not</b> require registration or user accounts.
-								</li>
-								<li><b>Chat Content Handling</b><br />
-									When you upload or paste WhatsApp chat data:
-									<ul>
-										<li>The data is processed <b>temporarily</b> to generate the PDF.</li>
-										<li>We do not store, read, or analyze the contents of your chat.</li>
-										<li>The generated PDF and any temporary files are deleted automatically after
-											processing.</li>
-									</ul>
-									<b>We do not retain any message content or metadata</b> after you finished creating
-									your PDFs.
-								</li>
-								<li><b>Cookies and Analytics</b><br />
-									We do not use coockies.
-								</li>
-								<li><b>Legal Basis for Processing (GDPR)</b><br />
-									If you are in the European Economic Area (EEA), our legal basis for processing your
-									data is:
-									<ul>
-										<li><b>Consent</b>: You voluntarily submit data to generate your PDF.</li>
-										<li><b>Legitimate interest</b>: To ensure the functionality, security, and
-											improvement of the service.</li>
-									</ul>
-								</li>
-								<li><b>Third Parties</b><br />
-									We do <b>not</b> share your chat content with any third parties, except you wish
-									to generate an AI summary of your chat. The summary is generated by Google Gemini
-									API. By genarating the summary you confirm to Google Privacy Policy:
-									<a href="https://policies.google.com/privacy"
-										target="_blank">https://policies.google.com/privacy</a>
-									<br />
-									Some technical and statistical data may be processed by:
-									<ul>
-										<li>Hosting providers</li>
-									</ul>
-									All partners, if any, are required to be GDPR-compliant.
-								</li>
-								<li><b>Your Rights (GDPR/DSGVO)</b><br />
-									If you are an EU resident, you have the right to:
-									<ul>
-										<li>Access, correct, or delete your personal data</li>
-										<li>Withdraw consent</li>
-										<li>Lodge a complaint with your local data protection authority</li>
-									</ul>
-									Since we do not create user accounts or store your chat content, such
-									requests typically do not apply to submitted content.
-								</li>
-								<li><b>Data Security</b><br />
-									We take industry-standard security measures to protect your data, including:
-									<ul>
-										<li>HTTPS encryption</li>
-										<li>Automatic deletion of uploaded files after processing</li>
-										<li>No persistent storage of chat content</li>
-									</ul>
-									However, no method of transmission over the Internet is 100% secure.
-								</li>
-								<li><b>Children’s Privacy</b><br />
-									This service is not intended for children under the age of 13 (or equivalent minimum
-									age in your jurisdiction). We do not knowingly collect data from minors.
-								</li>
-								<li><b>Changes to This Policy</b><br />
-									We may update this Privacy Policy from time to time. Changes will be posted on this
-									page with the updated date.
-								</li>
-								<li><b>Contact Us</b><br />
-									For any questions regarding this Privacy Policy or your data:
-									<ul>
-										<li>support@wa2pdf.com</li>
-										<li>https://wa2pdf.com</li>
-									</ul>
-								</li>
-							</ol>
-						</div>
-					</element>
-				</container>
-			</tabBody>
+
+		<element style="background: rgba(255, 210, 50, 0.1);">
+			<upload>
+				<span>Upload a WhatsApp chat...</span>
+				<input type="file" accept=".zip" />
+				<div>
+					<br />
+					The ingeniously simple way to export your WhatsApp chat, including AI summary, mood
+					emojis, images, videos, emojis, and more as a PDF.
+					<br /><br />
+					Works on Android, iPhone, iPad, tablets, PC, etc.
+				</div>
+			</upload>
+			<attributes>
+				<id></id>
+				<div>Choose the viewers perspective</div>
+				<user></user>
+				<div>Choose the period to export as PDF</div>
+				<period></period>
+				<br />
+				<button onclick="action.buy()">Create selected</button>
+				<button onclick="action.delete()">Delete uploaded data</button>
+			</attributes>
+		</element>
+
+		<element style="background: rgba(255, 20, 10, 0.1);">
+			<button onclick="action.feedback()" style="position: absolute; right: 0;">Add
+				Feedback</button>
+			<feedbacks></feedbacks>
+		</element>
+
+		<element style="background: rgba(20, 100, 250, 0.1);">
+			<b>Imprint</b><br />
+			JNet Quality Consulting GmbH<br />
+			Whistlerweg 27b<br />
+			81479 Munich<br />
+			Germany<br />
+			E-Mail: support@wa2pdf.com<br />
+			Internet: https://wa2pdf.com<br /><br />
+			Managing Director: Mani Afschar Yazdi<br />
+			Registration court: District Court Munich<br />
+			Registration number: HRB 135182<br /><br />
+			©
+			<script type="text/javascript">document.write('2025-' + new Date().getFullYear())</script> JNet
+			Quality
+			Consulting
+			GmbH<br />
+			All rights reserved<br /><br /><br />
+			<b>General Terms and Conditions</b><br />
+			Last updated: 1.7.2025
+			<div style="text-align: left; padding-top: 1em;">
+				Welcome to wa2pdf.com, an online service that enables users to generate a downloadable PDF
+				from their WhatsApp chat. By accessing or using our website and services, you agree to be
+				bound by the following Terms and Conditions. If you do not agree, please do not use the
+				Service.
+				<ol>
+					<li><b>Service Description</b>
+						<br />
+						Our service allows users to upload or paste their WhatsApp chat data and receive a
+						formatted PDF file containing the content. The service is provided "as is" without
+						warranties of any kind.
+					</li>
+					<li><b>User Responsibilities</b>
+						<br />
+						By using our service, you agree:
+						<ul>
+							<li>That you are the rightful owner of the chat data or have permission from the
+								rightful owner(s) to process and convert the data.</li>
+							<li>Not to upload any content that is illegal, infringing, abusive, or violates
+								any third-party rights.</li>
+							<li>To ensure that no personal data is uploaded without the informed consent of
+								all involved parties, in accordance with privacy laws (e.g. GDPR).</li>
+						</ul>
+					</li>
+					<li><b>Privacy and Data Handling</b>
+						<br />
+						We take privacy seriously. Your data is processed temporarily and is not stored
+						longer than necessary to generate the PDF. We do not read, analyze, or share your
+						content with third parties. For more details, please refer to our <a href="#privacy">Privacy
+							Policy</a>.
+					</li>
+					<li><b>Intellectual Property</b>
+						<br />
+						All software, code, branding, and design used in this service remain the
+						intellectual property of JNet Quality Consulting GmbH. Users retain ownership of
+						the content they upload.
+					</li>
+					<li><b>Prohibited Use</b>
+						<br />
+						You may not:
+						<ul>
+							<li>Use the service for illegal activities.</li>
+							<li>Attempt to hack, reverse engineer, or disrupt the platform.</li>
+							<li>Use the platform in any way that may harm others or violate applicable laws.
+							</li>
+						</ul>
+					</li>
+					<li><b>Limitation of Liability</b>
+						<br />
+						We provide the service on an “as-is” and “as-available” basis. We are not liable
+						for:
+						<ul>
+							<li>Any loss of data.</li>
+							<li>Any errors in the output (PDF format, content layout, etc.).</li>
+							<li>Any consequences resulting from the use of the generated document.</li>
+						</ul>
+					</li>
+					<li><b>Modifications to Service</b>
+						<br />
+						We reserve the right to modify or discontinue the service (or any part thereof) at
+						any time, with or without notice.
+					</li>
+					<li><b>Termination</b>
+						<br />
+						We may suspend or terminate your access to the service if you violate these terms or
+						use the platform inappropriately.
+					</li>
+					<li><b>Jurisdiction and Governing Law</b>
+						<br />
+						These terms are governed by the laws of Germany. Any legal disputes shall be
+						resolved in the courts of Munich/Germany.
+					</li>
+					<li><b>Contact</b>
+						<br />
+						If you have any questions about these Terms, please contact us at:
+						<ul>
+							<li>support@wa2pdf.com</li>
+							<li>https://wa2pdf.com</li>
+						</ul>
+					</li>
+				</ol>
+			</div>
+			<br /><br />
+			<b id="privacy">Privacy Policy</b><br />
+			Last updated: 1.7.2025
+			<div style="text-align: left; padding-top: 1em;">
+				At wa2pdf.com, we are committed to protecting your privacy.
+				This Privacy Policy explains how we collect, use, and protect your personal data when you
+				use our service that converts WhatsApp chats into downloadable PDF files.
+				<ol>
+					<li><b>Data We Collect</b><br />
+						We do not collect or permanently store any personal data or chat content
+						submitted via our service.<br />
+						However, we may collect limited technical data:
+						<ul>
+							<li>Browser type and version</li>
+							<li>IP address (for security/logging purposes)</li>
+							<li>Date and time of access</li>
+							<li>Usage statistics (anonymized)</li>
+						</ul>
+						We do <b>not</b> require registration or user accounts.
+					</li>
+					<li><b>Chat Content Handling</b><br />
+						When you upload or paste WhatsApp chat data:
+						<ul>
+							<li>The data is processed <b>temporarily</b> to generate the PDF.</li>
+							<li>We do not store, read, or analyze the contents of your chat.</li>
+							<li>The generated PDF and any temporary files are deleted automatically after
+								processing.</li>
+						</ul>
+						<b>We do not retain any message content or metadata</b> after you finished creating
+						your PDFs.
+					</li>
+					<li><b>Cookies and Analytics</b><br />
+						We do not use coockies.
+					</li>
+					<li><b>Legal Basis for Processing (GDPR)</b><br />
+						If you are in the European Economic Area (EEA), our legal basis for processing your
+						data is:
+						<ul>
+							<li><b>Consent</b>: You voluntarily submit data to generate your PDF.</li>
+							<li><b>Legitimate interest</b>: To ensure the functionality, security, and
+								improvement of the service.</li>
+						</ul>
+					</li>
+					<li><b>Third Parties</b><br />
+						We do <b>not</b> share your chat content with any third parties, except you wish
+						to generate an AI summary of your chat. The summary is generated by Google Gemini
+						API. By genarating the summary you confirm to Google Privacy Policy:
+						<a href="https://policies.google.com/privacy"
+							target="_blank">https://policies.google.com/privacy</a>
+						<br />
+						Some technical and statistical data may be processed by:
+						<ul>
+							<li>Hosting providers</li>
+						</ul>
+						All partners, if any, are required to be GDPR-compliant.
+					</li>
+					<li><b>Your Rights (GDPR/DSGVO)</b><br />
+						If you are an EU resident, you have the right to:
+						<ul>
+							<li>Access, correct, or delete your personal data</li>
+							<li>Withdraw consent</li>
+							<li>Lodge a complaint with your local data protection authority</li>
+						</ul>
+						Since we do not create user accounts or store your chat content, such
+						requests typically do not apply to submitted content.
+					</li>
+					<li><b>Data Security</b><br />
+						We take industry-standard security measures to protect your data, including:
+						<ul>
+							<li>HTTPS encryption</li>
+							<li>Automatic deletion of uploaded files after processing</li>
+							<li>No persistent storage of chat content</li>
+						</ul>
+						However, no method of transmission over the Internet is 100% secure.
+					</li>
+					<li><b>Children’s Privacy</b><br />
+						This service is not intended for children under the age of 13 (or equivalent minimum
+						age in your jurisdiction). We do not knowingly collect data from minors.
+					</li>
+					<li><b>Changes to This Policy</b><br />
+						We may update this Privacy Policy from time to time. Changes will be posted on this
+						page with the updated date.
+					</li>
+					<li><b>Contact Us</b><br />
+						For any questions regarding this Privacy Policy or your data:
+						<ul>
+							<li>support@wa2pdf.com</li>
+							<li>https://wa2pdf.com</li>
+						</ul>
+					</li>
+				</ol>
+			</div>
 		</element>
 	</container>
 
-	<popup>
-		<close onclick="ui.feedbackClose()"></close>
-		<content>
-			<message></message>
-			<data>
-				<br />
-				<input type="hidden" name="id"></input>
-				<input type="hidden" name="pin"></input>
-				<input-rating ui="dialog"></input-rating>
-				<label>Feedback<textarea name="note"></textarea></label>
-				<label>Name<input name="name"></input></label>
-				<label>Email<input name="email"></input></label>
-				<label style="display: none;">Image
-					<imageupload>
-						<span>Click to upload...</span>
-						<input type="file" id="chatFile" accept=".zip" style="max-width: 30em;" />
-					</imageupload>
-				</label>
-				<error></error>
-				<button onclick="api.saveFeedback()">Save</button>
-			</data>
-		</content>
-	</popup>
+	<dialog-popup></dialog-popup>
 
-	<progressbar>
-		<loader>
-			<div class="one"></div>
-			<div class="two"></div>
-			<div class="three"></div>
-		</loader>
-	</progressbar>
+	<progress-bar></progress-bar>
 </body>
 
 </html>
