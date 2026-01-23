@@ -269,11 +269,11 @@ next::after {
 		if (value) {
 			e.innerText = cell || cell == 0 ? cell : value;
 			e.setAttribute('value', value);
-			ui.classAdd(e, 'filled');
+			e.classList.add('filled');
 		} else {
 			e.innerText = field;
 			e.setAttribute('value', '');
-			ui.classRemove(e, 'filled');
+			e.classList.remove('filled');
 		}
 		var s = this.get('year').getAttribute('value');
 		s += '-' + this.get('month').getAttribute('value');
