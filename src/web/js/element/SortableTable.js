@@ -214,9 +214,9 @@ a {
 	}
 
 	deleteRow(index) {
-		var e = this._root.querySelector('td[i="' + index + '"]');
+		var e = this._root.querySelector('tr[i="' + index + '"]');
 		if (e) {
-			e.parentElement.textContent = '';
+			e.textContent = '';
 			this.dispatchEvent(new CustomEvent('changed'));
 		}
 	}
