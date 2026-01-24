@@ -64,7 +64,7 @@ class api {
 					return d;
 				});
 				ticket.renderTable();
-				document.addEventListener('deleteEntry', event => api.deleteTicket(document.querySelector('ticket sortable-table').list[event.detail.index].id));
+				document.addEventListener('deleteEntry', event => api.deleteTicket(document.querySelector('ticket sortable-table').list[event.detail.index].id, event.detail.index));
 
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 				document.querySelector('tabHeader').addEventListener('changed', () =>
@@ -85,12 +85,12 @@ class api {
 		});
 	}
 
-	static deleteTicket(id) {
+	static deleteTicket(id, index) {
 		api.ajax({
 			url: api.url + 'ticket/' + id,
 			method: 'DELETE',
 			success: () => {
-				document.querySelector('ticket sortable-table').deleteRow(id);
+				document.querySelector('ticket sortable-table').deleteRow(index);
 				document.dispatchEvent(new CustomEvent('popup'));
 			}
 		});

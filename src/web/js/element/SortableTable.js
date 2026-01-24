@@ -213,8 +213,8 @@ a {
 		return this._root.querySelector('table');
 	}
 
-	deleteRow(id) {
-		var e = this._root.querySelector('td[i="' + id + '"]');
+	deleteRow(index) {
+		var e = this._root.querySelector('td[i="' + index + '"]');
 		if (e) {
 			e.parentElement.textContent = '';
 			this.dispatchEvent(new CustomEvent('changed'));
