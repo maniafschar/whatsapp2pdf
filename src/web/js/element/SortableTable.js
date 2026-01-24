@@ -268,7 +268,7 @@ a {
 				s += '<label>' + keys[i] + '</label><value>' + sanitizeText(row[keys[i]]) + '</value>';
 		}
 		if (this.deleteButton)
-			s += '<buttons><button onclick="document.dispatchEvent(new CustomEvent(&quot;deleteEntry&quot;, { detail: { id: ' + id + ' } }))">delete</button></buttons>';
+			s += '<buttons><button onclick="document.dispatchEvent(new CustomEvent(&quot;deleteEntry&quot;, { detail: { index: ' + tr.getAttribute('i') + ' } }))">delete</button></buttons>';
 		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s } }));
 	}
 
