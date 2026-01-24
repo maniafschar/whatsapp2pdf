@@ -23,14 +23,14 @@ class api {
 		});
 	}
 
-	static buy(id, user, periods, summary, success, error) {
+	static buy(id, periodArray, user, summary, success, error) {
 		document.dispatchEvent(new CustomEvent('progressbar', { detail: { type: 'open' } }));
-		var period = '';
-		for (var i = 0; i < periods.length; i++)
-			period += 'periods=' + encodeURIComponent(periods[i]) + '&';
+		var periods = '';
+		for (var i = 0; i < periodArray.length; i++)
+			periods += 'periods=' + encodeURIComponent(periodArray[i]) + '&';
 		api.ajax({
 			noProgressBar: true,
-			url: api.url + 'pdf/buy/' + id + '?' + period + 'user=' + encodeURIComponent(user) + '&summary=' + summary,
+			url: api.url + 'pdf/buy/' + id + '?' + periods + 'user=' + encodeURIComponent(user) + '&summary=' + summary,
 			method: 'POST',
 			success: success,
 			error: error
