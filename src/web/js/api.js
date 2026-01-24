@@ -23,8 +23,11 @@ class api {
 		});
 	}
 
-	static buy(id, user, period, summary, success, error) {
+	static buy(id, user, periods, summary, success, error) {
 		document.dispatchEvent(new CustomEvent('progressbar', { detail: { type: 'open' } }));
+		var period = '';
+		for (var i = 0; i < periods.length; i++)
+			period += 'periods=' + encodeURIComponent(periods[i]) + '&';
 		api.ajax({
 			noProgressBar: true,
 			url: api.url + 'pdf/buy/' + id + '?' + period + 'user=' + encodeURIComponent(user) + '&summary=' + summary,

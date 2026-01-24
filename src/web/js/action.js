@@ -100,15 +100,14 @@ class action {
 
 	static buy() {
 		document.querySelector('period').classList.remove('error');
-		var period = '';
 		var periods = document.querySelectorAll('period tr.selected');
 		if (periods.length < 1) {
 			document.querySelector('period').classList.add('error');
 			return;
 		}
+		var period = [];
 		for (var i = 0; i < periods.length; i++)
-			period += 'periods=' + encodeURIComponent(periods[i].getAttribute('value')) + '&';
-		document.dispatchEvent(new CustomEvent('progressbar', { detail: { type: 'open' } }));
+			period.push(periods[i].getAttribute('value'));
 		api.buy(
 			document.querySelector('id').innerText,
 			period,
@@ -192,7 +191,7 @@ class action {
 				document.querySelector('period').classList.remove('error');
 				if (tr.classList.contains('download')) {
 					var link = document.createElement('a');
-					link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true?period=' + encodeURIComponent(tr.getAttribute('value')));
+					link.setAttribute('href', api.url + 'pdf/' + document.querySelector('id').innerText + '/true?period=' + encodeURIComponent(tr.getAttribute('value')));
 					link.setAttribute('target', '_blank');
 					link.click();
 					tr.classList.remove('download');
@@ -244,7 +243,7 @@ class action {
 		var download = function () {
 			api.ajax({
 				noProgressBar: true,
-				url: api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/false' + (period ? '?period=' + encodeURIComponent(period) : ''),
+				url: api.url + 'pdf/' + document.querySelector('id').innerText + '/false' + (period ? '?period=' + encodeURIComponent(period) : ''),
 				method: 'GET',
 				success: () => {
 					document.dispatchEvent(new CustomEvent('progressbar'));
@@ -256,7 +255,7 @@ class action {
 						document.querySelector('period').classList.add('downloadHint');
 					} else {
 						var link = document.createElement('a');
-						link.setAttribute('href', api.url + '/rest/api/pdf/' + document.querySelector('id').innerText + '/true');
+						link.setAttribute('href', api.url + 'pdf/' + document.querySelector('id').innerText + '/true');
 						link.setAttribute('target', '_blank');
 						link.click();
 					}
