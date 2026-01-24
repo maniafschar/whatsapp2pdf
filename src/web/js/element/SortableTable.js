@@ -1,3 +1,4 @@
+import { Object } from "core-js";
 
 export { SortableTable };
 
@@ -7,6 +8,7 @@ class SortableTable extends HTMLElement {
 	sort = null;
 	columns = [];
 	convert = null;
+	openDetail = null;
 	deleteButton = false;
 	id = new Date().getTime() + Math.random();
 
@@ -22,29 +24,31 @@ class SortableTable extends HTMLElement {
 	position: relative;
 }
 
+*::-webkit-scrollbar {
+	display: none;
+}
+
 table {
 	border-collapse: collapse;
 	width: 100%;
 	overflow: hidden;
 	position: relative;
 	display: block;
-	height: 100%;
 	font-size: 1em;
 	z-index: 3;
+	height: 100%;
 }
 
 thead,
 tbody {
 	display: block;
 	overflow-x: hidden;
-	overflow-y: auto;
-	width: 100%;
 	position: relative;
 }
-
+	
 tbody {
+	overflow-y: auto;
 	height: calc(100% - 2em);
-	padding-bottom: 1em;
 }
 
 tr {
@@ -54,6 +58,10 @@ tr {
 	white-space: nowrap;
 }
 
+tr.selected {
+	background-color: rgba(255, 100, 50, 0.1);
+}
+	
 td,
 th {
 	vertical-align: top;
@@ -71,11 +79,11 @@ th {
 
 th {
 	font-weight: bold;
-	background: rgb(255, 250, 200);
+	background: rgba(170, 170, 255, 0.15);
 }
 
-tr:nth-child(even) {
-	background-color: rgba(255, 255, 255, 0.4);
+tbody tr:last-child {
+	margin-bottom: 0.5em;
 }
 
 th.asc::before {
@@ -110,8 +118,14 @@ a {
 		this.convert = convert;
 	}
 
+	setOpenDetail(openDetail) {
+		this.openDetail = openDetail;
+	}
+
 	renderTable() {
 		var data = this.convert ? this.convert(this.list) : this.list;
+		for (var i = 0; i < data.length; i++)
+			data[i].i = i;
 		var table = this._root.querySelector('table');
 		table.textContent = '';
 		var thead = table.appendChild(document.createElement('thead'));
@@ -132,6 +146,8 @@ a {
 		for (var i = 0; i < this.columns.length; i++) {
 			var th = tr.appendChild(document.createElement('th'));
 			th.innerText = this.columns[i].label;
+			if (this.columns[i].style)
+				th.setAttribute('style', this.columns[i].style);
 			if (widths[i] == 0)
 				th.style.display = 'none';
 			else
@@ -162,24 +178,28 @@ a {
 		for (var i = 0; i < data.length; i++) {
 			if (!isFiltered(this.filter, data[i])) {
 				tr = tbody.appendChild(document.createElement('tr'));
+				tr.setAttribute('i', data[i].i);
 				for (var i2 = 0; i2 < this.columns.length; i2++) {
 					var td = tr.appendChild(document.createElement('td'));
-					if (this.columns[i2].label == 'ip' && data[i][i2]) {
-						var a = td.appendChild(document.createElement('a'));
-						a.setAttribute('href', 'https://whatismyipaddress.com/ip/' + data[i][i2]);
-						a.setAttribute('target', 'sc_ip');
-						a.innerHTML = data[i][i2];
-					} else
-						td.innerHTML = data[i][i2];
+					if (this.columns[i2].style)
+						td.setAttribute('style', this.columns[i2].style);
+					var s = typeof data[i][i2] == 'object' ? data[i][i2].text : data[i][i2];
+					if (s)
+						td.innerHTML = s;
+					else
+						td.innerHTML = '&nbsp;';
+					if (data[i][i2].attributes) {
+						var keys = Object.keys(data[i][i2].attributes);
+						for (var i3 = 0; i3 < keys.length; i3++)
+							td.setAttribute(keys[i3], data[i][i2].attributes[keys[i3]]);
+					}
 					if (widths[i2] == 0)
 						td.style.display = 'none';
 					else
 						td.style.width = widths[i2] + '%';
-					if (this.columns[i2].detail) {
-						td.setAttribute('onclick', 'this.getRootNode().host.openDetails(event)');
-						td.setAttribute('i', data[i][0]);
+					td.setAttribute('onclick', 'this.getRootNode().host.openDetails(event)');
+					if (this.columns[i2].detail)
 						td.setAttribute('class', 'clickable');
-					}
 				}
 			}
 		}
@@ -187,6 +207,10 @@ a {
 		if (this.sort)
 			this._root.querySelectorAll('tr th')[parseInt(this.sort.split('-')[0])].classList.add(this.sort.indexOf('-asc') > 0 ? 'asc' : 'desc');
 		this.dispatchEvent(new CustomEvent('changed', { detail: { numberOfRows: this._root.querySelectorAll('tbody tr').length } }));
+	}
+
+	table() {
+		return this._root.querySelector('table');
 	}
 
 	deleteRow(id) {
@@ -215,19 +239,33 @@ a {
 	}
 
 	openDetails(event) {
-		var id = event.target.getAttribute('i');
-		var data;
-		for (var i = 0; i < this.list.length; i++) {
-			if (this.list[i].id == id) {
-				data = this.list[i];
-				break;
-			}
+		this._root.querySelectorAll('tr.selected')?.forEach(tr => tr.classList.remove('selected'));
+		var tr = event.target;
+		while (tr && tr.nodeName != 'TR')
+			tr = tr.parentElement;
+		tr?.classList.add('selected');
+		if (event.target.getAttribute('onopen')) {
+			var s = event.target.getAttribute('onopen').split('.');
+			window[s[0]][s[1]](event);
+			return;
 		}
-		var keys = Object.keys(data);
+		if (this.openDetail) {
+			this.openDetail(event);
+			return;
+		}
+		var i = [...event.target.parentElement.children].indexOf(event.target);
+		if (this.columns[i].onopen) {
+			var s = this.columns[i].onopen.split('.');
+			window[s[0]][s[1]](event);
+			return;
+		}
+		var row = this.list[tr.getAttribute('i')];
+		var keys = Object.keys(row);
 		var s = '';
+		var sanitizeText = s => s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
 		for (var i = 0; i < keys.length; i++) {
-			if (data[keys[i]])
-				s += '<label>' + keys[i] + '</label><value>' + ui.sanitizeText(data[keys[i]]) + '</value>';
+			if (row[keys[i]])
+				s += '<label>' + keys[i] + '</label><value>' + sanitizeText(row[keys[i]]) + '</value>';
 		}
 		if (this.deleteButton)
 			s += '<buttons><button onclick="document.dispatchEvent(new CustomEvent(&quot;deleteEntry&quot;, { detail: { id: ' + id + ' } }))">delete</button></buttons>';

@@ -25,7 +25,7 @@ class api {
 				log.columns.push({ label: 'id', sort: true, width: 5, excludeNarrow: true });
 				log.columns.push({ label: 'createdAt', width: 10, detail: true });
 				log.columns.push({ label: 'status', width: 5, filter: true });
-				log.columns.push({ label: 'ip', width: 10, filter: true });
+				log.columns.push({ label: 'ip', width: 10, filter: true, onopen: 'ui.openIp' });
 				log.columns.push({ label: 'time', width: 10, sort: true });
 				log.columns.push({ label: 'uri', width: 25, filter: true });
 				log.columns.push({ label: 'referer', width: 35, excludeNarrow: true });
@@ -67,8 +67,8 @@ class api {
 				document.addEventListener('deleteEntry', event => api.deleteTicket(event.detail.id));
 
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
-				document.querySelector('tabHeader').addEventListener('changed', event =>
-					document.querySelector('msg').innerText = (event.detail.index == 0 ? log : ticket)._root.querySelectorAll('tbody tr').length + ' entries');
+				document.querySelector('tabHeader').addEventListener('changed', () =>
+					document.querySelector('msg').innerText = (document.querySelector('tabHeader tab').classList.contains('selected') ? log : ticket).table().querySelectorAll('tbody tr').length + ' entries');
 				log.addEventListener('changed', () => document.querySelector('tabHeader').dispatchEvent(new CustomEvent('changed', { detail: { index: 0 } })));
 				ticket.addEventListener('changed', () => document.querySelector('tabHeader').dispatchEvent(new CustomEvent('changed', { detail: { index: 1 } })));
 				document.querySelector('tabHeader').dispatchEvent(new CustomEvent('changed', { detail: { index: 0 } }));
@@ -160,6 +160,12 @@ class ui {
 		return !ui.multiline && s.indexOf('<br/>') > -1 ? s.substring(0, s.indexOf('<br/>')) : s;
 	}
 
+	static openIp(event) {
+		var ip = document.querySelector('sortable-table').list[event.target.parentElement.getAttribute('i')].ip;
+		if (ip)
+			window.open('https://whatismyipaddress.com/ip/' + ip, 'sc_ip');
+	}
+
 	static formatTime(s) {
 		var d = new Date(s.replace('+00:00', ''));
 		d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds()))
@@ -177,8 +183,8 @@ class ui {
 
 	static toggleMultiline() {
 		ui.multiline = !ui.multiline;
-		document.querySelector('log').appendChild(document.createElement('sortable-table')).renderTable();
-		document.querySelector('ticket').appendChild(document.createElement('sortable-table')).renderTable();
+		document.querySelector('log sortable-table').renderTable();
+		document.querySelector('ticket sortable-table').renderTable();
 	}
 
 	static parents(e, nodeName) {

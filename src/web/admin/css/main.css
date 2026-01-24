@@ -58,7 +58,7 @@ body>container>element input {
 	right: 1em;
 	top: 0;
 	border-radius: 1em 1em 0 0;
-	background: rgb(255, 255, 240);
+	background: rgba(170, 170, 255, 0.075);
 }
 
 body>container>element>buttons {
@@ -87,11 +87,6 @@ button {
 	font-size: 0.8em;
 }
 
-a {
-	text-decoration: none;
-	color: darkblue;
-}
-
 msg {
 	font-size: 0.7em;
 	cursor: pointer;
@@ -113,74 +108,6 @@ login {
 login input {
 	width: 100%;
 	margin-bottom: 1em;
-}
-
-table {
-	border-collapse: collapse;
-	width: 100%;
-	overflow: hidden;
-	position: relative;
-	display: block;
-	height: 100%;
-	font-size: 1em;
-	z-index: 3;
-}
-
-thead,
-tbody {
-	display: block;
-	overflow-x: hidden;
-	overflow-y: auto;
-	width: 100%;
-	position: relative;
-}
-
-tbody {
-	height: calc(100% - 2em);
-	padding-bottom: 1em;
-}
-
-tr {
-	width: 100%;
-	position: relative;
-	display: block;
-	white-space: nowrap;
-}
-
-td,
-th {
-	vertical-align: top;
-	text-align: left;
-	padding: 0.5em 0.75em;
-	position: relative;
-	white-space: nowrap;
-	font-size: 1em;
-	overflow: auto;
-	max-height: 3.8em;
-	-webkit-text-size-adjust: 100%;
-	box-sizing: border-box;
-	display: inline-block;
-}
-
-th {
-	font-weight: bold;
-	background: rgb(255, 250, 200);
-}
-
-tr:nth-child(even) {
-	background-color: rgba(255, 255, 255, 0.4);
-}
-
-th.asc::before {
-	content: '↓';
-	margin-right: 0.2em;
-	color: grey;
-}
-
-th.desc::before {
-	content: '↑';
-	margin-right: 0.2em;
-	color: grey;
 }
 
 tabHeader {
@@ -231,11 +158,7 @@ tab {
 }
 
 tab.selected {
-	background: rgb(255, 250, 200);
-}
-
-.clickable {
-	cursor: pointer;
+	background: rgba(170, 170, 255, 0.15);
 }
 
 log,
