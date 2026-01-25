@@ -1,7 +1,15 @@
 const path = require('path');
-const express = require('express');
+
+const babelConfig = {
+	presets: ['@babel/preset-env'],
+	plugins: ['@babel/plugin-transform-runtime']
+};
 
 module.exports = (env) => {
+	if (!env.server) {
+		throw new Error('Server not set!\ne.g. npx webpack --env server=http://localhost:9000');
+	}
+
 	return [{
 		entry: './src/web/admin/js/main.js',
 		mode: 'production',
@@ -21,10 +29,7 @@ module.exports = (env) => {
 					exclude: /(node_modules|bower_components)/,
 					use: {
 						loader: 'babel-loader',
-						options: {
-							presets: ['@babel/preset-env'],
-							plugins: ['@babel/plugin-transform-runtime']
-						}
+						options: babelConfig
 					}
 				}
 			]
@@ -54,6 +59,7 @@ module.exports = (env) => {
 			hot: false,
 			liveReload: false,
 			setupMiddlewares: (middlewares, devServer) => {
+				const express = require('express');
 				devServer.app.use('/', express.static(path.resolve(__dirname, 'dist')));
 				return middlewares;
 			},
@@ -65,15 +71,12 @@ module.exports = (env) => {
 			{
 				apply: compiler => {
 					compiler.hooks.afterEmit.tap('params', () => {
-						if (!env.server)
-							throw 'Server not set!\ne.g. npx webpack --env server=http://localhost:9000';
-						var fs = require('fs');
-						var file = 'dist/js/main.js';
-						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
-							.replace('{placeholderServer}', env.server));
-						file = 'dist/admin/js/main.js';
-						fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
-							.replace('{placeholderServer}', env.server));
+						const fs = require('fs');
+						const files = ['dist/js/main.js', 'dist/admin/js/main.js'];
+						files.forEach(file => {
+							fs.writeFileSync(file, fs.readFileSync(file, 'utf8')
+								.replace('{placeholderServer}', env.server));
+						});
 					})
 				}
 			}
@@ -85,10 +88,7 @@ module.exports = (env) => {
 					exclude: /(node_modules|bower_components)/,
 					use: {
 						loader: 'babel-loader',
-						options: {
-							presets: ['@babel/preset-env'],
-							plugins: ['@babel/plugin-transform-runtime']
-						}
+						options: babelConfig
 					}
 				}
 			]
