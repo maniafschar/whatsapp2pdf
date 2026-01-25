@@ -58,6 +58,10 @@ tr {
 	white-space: nowrap;
 }
 
+tbody tr {
+	cursor: pointer;
+}
+
 tr.selected {
 	background-color: rgba(255, 100, 50, 0.1);
 }
@@ -98,9 +102,12 @@ th.desc::before {
 	color: grey;
 }
 
-
 .clickable {
 	cursor: pointer;
+}
+
+.unclickable {
+	cursor: default;
 }
 
 a {
@@ -198,8 +205,8 @@ a {
 					else
 						td.style.width = widths[i2] + '%';
 					td.setAttribute('onclick', 'this.getRootNode().host.openDetails(event)');
-					if (this.columns[i2].detail)
-						td.setAttribute('class', 'clickable');
+					if (this.columns[i2].noaction)
+						td.setAttribute('class', 'unclickable');
 				}
 			}
 		}
