@@ -130,7 +130,7 @@ a {
 	}
 
 	renderTable() {
-		var data = this.convert ? this.convert(this.list) : this.list;
+		var data = this.convert ? this.convert(this.list) : [...this.list];
 		for (var i = 0; i < data.length; i++)
 			data[i].i = i;
 		var table = this._root.querySelector('table');
@@ -170,7 +170,22 @@ a {
 		if (this.sort) {
 			var column = parseInt(this.sort.substring(0, this.sort.indexOf('-')));
 			var factor = this.sort.indexOf('-asc') > 0 ? 1 : -1;
-			data = data.sort((a, b) => (typeof a[column] == 'string' ? a[column].localeCompare(b[column]) : a[column] - b[column]) * factor);
+			data = data.sort((a, b) => {
+				var compare;
+				if (typeof a[column] == 'string')
+					compare = a[column].localeCompare(b[column]);
+				else if (a[column].attributes?.value)
+					compare = parseFloat(a[column].attributes.value) - (b[column].attributes?.value ? parseFloat(b[column].attributes.value) : -1.7976931348623156e+308);
+				else if (b[column].attributes?.value)
+					compare = -1.7976931348623156e+308 - parseFloat(b[column].attributes.value);
+				else if (a[column].text)
+					compare = a[column].text.localeCompare(b[column].text);
+				else
+					compare = a[column] - b[column];
+				return compare * factor;
+			});
+			while (!data[0][column]?.text)
+				data.push(data.splice(0, 1)[0]);
 		}
 		var isFiltered = function (filter, row) {
 			if (filter) {
