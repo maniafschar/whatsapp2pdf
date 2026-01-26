@@ -184,7 +184,7 @@ a {
 					compare = a[column] - b[column];
 				return compare * factor;
 			});
-			while (!data[0][column]?.text)
+			while (typeof data[0][column] == 'object' && !data[0][column].text || typeof data[0][column] == 'string' && !data[0][column])
 				data.push(data.splice(0, 1)[0]);
 		}
 		var isFiltered = function (filter, row) {
