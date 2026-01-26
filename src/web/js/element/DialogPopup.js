@@ -244,6 +244,7 @@ pre {
 	}
 
 	close(popup) {
+		popup.addEventListener('transitionend', () => popup.querySelector('content').textContent = '', { capture: false, passive: true, once: true });
 		popup.style.transform = '';
 		popup.removeAttribute('i');
 	}
