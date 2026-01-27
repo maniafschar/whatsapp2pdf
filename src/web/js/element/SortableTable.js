@@ -282,7 +282,7 @@ a {
 			return;
 		}
 		var row = this.list[tr.getAttribute('i')];
-		var keys = Object.keys(row);
+		var keys = Object.keys(row).sort();
 		var s = '';
 		var sanitizeText = s => s && s.replace ? s.replace(/\n/g, '<br/>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;') : s ? s : '';
 		for (var i = 0; i < keys.length; i++) {
