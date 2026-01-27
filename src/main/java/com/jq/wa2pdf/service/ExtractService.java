@@ -167,7 +167,7 @@ public class ExtractService {
 	String getPatternStart(final String date) {
 		return "^\u200E?((\\[{date}])|({date} -)) ([^:].*?):.*"
 				.replace("{date}",
-						(date == null ? "(\\d{1,2}[.|/] ?\\d{1,2}[.|/] ?\\d{2,4}|\\d{4}-\\d{2}-\\d{2})" : date)
+						(date == null ? "(\\d{1,4}[.|/|-] ?\\d{1,2}[.|/|-] ?\\d{2,4})" : date)
 								+ ",? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
 	}
 
