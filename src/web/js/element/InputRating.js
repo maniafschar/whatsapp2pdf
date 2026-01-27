@@ -45,7 +45,7 @@ ratingSelection full {
 	left: 0;
 	overflow: hidden;
 	top: 0;
-	color: var(--bg2stop);
+	color: rgb(210, 225, 20);
 }
 
 ratingSelection span {

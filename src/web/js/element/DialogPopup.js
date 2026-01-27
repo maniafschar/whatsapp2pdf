@@ -167,6 +167,7 @@ filter {
 	cursor: pointer;
 	padding: 0.5em;
 	height: 1em;
+	min-width: 10em;
 }
 
 filter entry,
@@ -179,11 +180,12 @@ filter count {
 }
 
 filter entry {
-	width: 90%;
+	min-width: 80%;
 	float: left;
 }
 
 filter count {
+	width: fit-content;
 	float: right;
 	text-align: right;
 }
