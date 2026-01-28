@@ -64,7 +64,10 @@ class api {
 					return d;
 				});
 				ticket.renderTable();
-				document.addEventListener('deleteEntry', event => api.deleteTicket(document.querySelector('ticket sortable-table').list[event.detail.index].id, event.detail.index));
+				document.addEventListener('table', event => {
+					if (event.detail.type == 'delete')
+						api.deleteTicket(document.querySelector('ticket sortable-table').list[event.detail.index].id, event.detail.index);
+				});
 
 				document.querySelector('input[name="searchLogs"]').value = xhr.search;
 				document.querySelector('tabHeader').addEventListener('changed', () =>

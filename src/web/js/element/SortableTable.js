@@ -115,8 +115,8 @@ a {
 	color: darkblue;
 }`;
 		this._root.appendChild(document.createElement('table'));
-		document.addEventListener('tableFilter', event => {
-			if (this.id == event.detail.id)
+		document.addEventListener('table', event => {
+			if (this.id == event.detail.id && event.detail.type == 'filter')
 				this.filterTable(event.detail);
 		});
 	}
@@ -231,6 +231,11 @@ a {
 		this.dispatchEvent(new CustomEvent('changed', { detail: { numberOfRows: this._root.querySelectorAll('tbody tr').length } }));
 	}
 
+
+	style(style) {
+		return this._root.appendChild(document.createElement('style')).textContent = style;
+	}
+
 	table() {
 		return this._root.querySelector('table');
 	}
@@ -290,7 +295,7 @@ a {
 				s += '<label>' + keys[i] + '</label><value>' + sanitizeText(row[keys[i]]) + '</value>';
 		}
 		if (this.deleteButton)
-			s += '<buttons><button onclick="document.dispatchEvent(new CustomEvent(&quot;deleteEntry&quot;, { detail: { index: ' + tr.getAttribute('i') + ' } }))">delete</button></buttons>';
+			s += '<buttons><button onclick="document.dispatchEvent(new CustomEvent(&quot;table&quot;, { detail: { type: &quot;delete&quot;, index: ' + tr.getAttribute('i') + ', id: ' + this.id + ' } }))">delete</button></buttons>';
 		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s } }));
 	}
 
@@ -312,7 +317,7 @@ a {
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
 		for (var i = 0; i < sorted.length; i++)
-			s += '<filter onclick="document.dispatchEvent(new CustomEvent(&quot;tableFilter&quot;, { detail: { token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot;, id: ' + this.id + ' } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
+			s += '<filter onclick="document.dispatchEvent(new CustomEvent(&quot;table&quot;, { detail: { type: &quot;filter&quot;, token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot;, id: ' + this.id + ' } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s, align: 'right' } }));
 	}
 
