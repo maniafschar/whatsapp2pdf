@@ -777,7 +777,7 @@ public class PdfService {
 							break;
 						text = text.substring(1);
 					}
-					text = text.substring(lastCodePoint > 65536 && text.length() > 1 ? 2 : 1);
+					text = text.substring(lastCodePoint > 65536 && text.length() > 1 ? 2 : Math.min(text.length(), 1));
 				}
 			}
 			if (!hasEmoji && this.fillLinkPreview(cell, text))
