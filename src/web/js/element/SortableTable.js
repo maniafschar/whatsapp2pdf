@@ -368,10 +368,8 @@ filter count {
 			}
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
-		for (var i = 0; i < sorted.length; i++) {
-			if (processed[sorted[i]] > 1)
-				s += '<filter onclick="this.getRootNode().host.dispatchEvent(new CustomEvent(&quot;filter&quot;, { detail: { token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot; } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
-		}
+		for (var i = 0; i < sorted.length; i++)
+			s += '<filter onclick="this.getRootNode().host.dispatchEvent(new CustomEvent(&quot;filter&quot;, { detail: { token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot; } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
 		this._root.querySelector('filters').innerHTML = s;
 		setTimeout(() => this._root.querySelector('filters').style.transform = 'scale(1)', 10);
 	}
