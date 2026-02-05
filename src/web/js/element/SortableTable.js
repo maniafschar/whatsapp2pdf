@@ -65,7 +65,7 @@ tbody tr {
 tbody tr.selected {
 	background-color: rgba(255, 100, 50, 0.1) !important;
 }
-	
+
 td,
 th {
 	vertical-align: top;
@@ -117,12 +117,57 @@ th.desc::before {
 a {
 	text-decoration: none;
 	color: darkblue;
+}
+
+filters {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	max-width: 50vw;
+	z-index: 4;
+	background: khaki;
+	border-radius: 1em 0 0 0;
+	box-shadow: 0 0 0.5em rgba(0, 0, 0, 0.2);
+	display: block;
+	transform: scale(0);
+	transition: all .4s ease-out;
+	transform-origin: bottom right;
+	max-height: 60%;
+	overflow-y: auto;
+}
+
+filter {
+	position: relative;
+	display: block;
+	cursor: pointer;
+	padding: 0.5em;
+	height: 1em;
+	min-width: 10em;
+}
+
+filter entry,
+filter count {
+	position: relative;
+	display: inline;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+filter entry {
+	max-width: calc(100% - 2em);
+	float: left;
+	text-align: left;
+}
+
+filter count {
+	width: fit-content;
+	float: right;
+	text-align: right;
 }`;
+		this._root.appendChild(document.createElement('filters'));
 		this._root.appendChild(document.createElement('table'));
-		document.addEventListener('table', event => {
-			if (this.id == event.detail.id && event.detail.type == 'filter')
-				this.filterTable(event.detail);
-		});
+		this.addEventListener('filter', event => this.filterTable(event.detail));
 	}
 
 	setConvert(convert) {
@@ -303,6 +348,10 @@ a {
 	}
 
 	openFilter(event) {
+		if (this._root.querySelector('filters').style.transform?.indexOf('1') > 0) {
+			setTimeout(() => this._root.querySelector('filters').style.transform = '', 10);
+			return;
+		}
 		this.filter = null;
 		var field = this.columnIndex(event.target.innerText, this._root);
 		var s = '';
@@ -319,9 +368,12 @@ a {
 			}
 		}
 		var sorted = Object.keys(processed).sort((a, b) => processed[b] - processed[a] == 0 ? (a > b ? 1 : -1) : processed[b] - processed[a]);
-		for (var i = 0; i < sorted.length; i++)
-			s += '<filter onclick="document.dispatchEvent(new CustomEvent(&quot;table&quot;, { detail: { type: &quot;filter&quot;, token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot;, id: ' + this.id + ' } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
-		document.dispatchEvent(new CustomEvent('popup', { detail: { body: s, align: 'right' } }));
+		for (var i = 0; i < sorted.length; i++) {
+			if (processed[sorted[i]] > 1)
+				s += '<filter onclick="this.getRootNode().host.dispatchEvent(new CustomEvent(&quot;filter&quot;, { detail: { token: &quot;' + field + '-' + encodeURIComponent(sorted[i]) + '&quot; } }))"><entry>' + sorted[i] + '</entry><count>' + processed[sorted[i]] + '</count></filter>';
+		}
+		this._root.querySelector('filters').innerHTML = s;
+		setTimeout(() => this._root.querySelector('filters').style.transform = 'scale(1)', 10);
 	}
 
 	sortColumn(event) {

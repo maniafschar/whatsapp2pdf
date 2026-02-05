@@ -161,35 +161,6 @@ a {
 	cursor: pointer;
 }
 
-filter {
-	position: relative;
-	display: block;
-	cursor: pointer;
-	padding: 0.5em;
-	height: 1em;
-	min-width: 10em;
-}
-
-filter entry,
-filter count {
-	position: relative;
-	display: inline;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-filter entry {
-	min-width: 80%;
-	float: left;
-}
-
-filter count {
-	width: fit-content;
-	float: right;
-	text-align: right;
-}
-
 button {
 	background: rgba(255, 255, 255, 0.4);
 	border: solid 1px rgba(0, 0, 0, 0.05);
