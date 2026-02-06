@@ -14,33 +14,31 @@
 </head>
 
 <body onload="api.init()">
-	<container>
-		<element>
-			<buttons>
-				<button onclick="api.build('client')">Build Client</button>
-				<button onclick="api.build('server')">Build All</button>
-				<button onclick="api.build('status')">Status</button>
-				<msg onclick="ui.toggleMultiline()"></msg>
-			</buttons>
-		</element>
-		<element>
-			<tabHeader>
-				<tab onclick="ui.showTab(event)" class="selected">Log</tab>
-				<tab onclick="ui.showTab(event)">Ticket</tab>
-			</tabHeader>
-			<tabBody>
-				<container>
-					<element>
-						<log></log>
-						<input onkeyup="api.log(event)" name="searchLogs" />
-					</element>
-					<element style="left: 50%;">
-						<ticket></ticket>
-					</element>
-				</container>
-			</tabBody>
-		</element>
-	</container>
+	<element class="head">
+		<buttons>
+			<button onclick="api.build('client')">Build Client</button>
+			<button onclick="api.build('server')">Build All</button>
+			<button onclick="api.build('status')">Status</button>
+			<msg onclick="ui.toggleMultiline()"></msg>
+		</buttons>
+	</element>
+	<element class="main">
+		<tabHeader>
+			<tab onclick="ui.showTab(event)" class="selected">Log</tab>
+			<tab onclick="ui.showTab(event)">Ticket</tab>
+		</tabHeader>
+		<tabBody>
+			<container>
+				<element>
+					<log></log>
+					<input onkeyup="api.log(event)" name="searchLogs" />
+				</element>
+				<element style="left: 50%;">
+					<ticket></ticket>
+				</element>
+			</container>
+		</tabBody>
+	</element>
 	<login style="display:none;">
 		<input />
 		<button onclick="api.init()">Einloggen</button>

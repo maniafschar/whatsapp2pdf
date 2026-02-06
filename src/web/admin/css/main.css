@@ -31,28 +31,26 @@ body {
 	font-family: Comfortaa, Verdana, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-body>container {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	overflow: hidden;
-}
-
-body>container>element {
+body>element {
 	display: block;
-	position: relative;
+	position: absolute;
 }
 
-body>container>element:nth-child(1) {
-	flex-grow: 0;
+body>element.head {
+	left: 0;
+	top: 0;
+	right: 0;
 	height: 3em;
 }
 
-body>container>element:nth-child(2) {
-	flex-grow: 2;
+body>element.main {
+	top: 3em;
+	left: 0;
+	right: 0;
+	bottom: 0;
 }
 
-body>container>element input {
+body>element input {
 	position: absolute;
 	left: 1em;
 	right: 1em;
@@ -61,7 +59,7 @@ body>container>element input {
 	background: rgba(170, 170, 255, 0.075);
 }
 
-body>container>element>buttons {
+body>element>buttons {
 	position: relative;
 	width: 100%;
 	padding: 0.5em;
