@@ -38,7 +38,7 @@ class api {
 						row.push(list[i].logStatus);
 						row.push(list[i].ip);
 						row.push(list[i].time);
-						row.push(list[i].method + ' ' + list[i].uri + (list[i].query ? '?' + list[i].query : '') + ui.trim(ui.sanitizeText(list[i].body ? '<br/>' + list[i].body : '')));
+						row.push(list[i].method + ' ' + list[i].uri + ui.trim(ui.sanitizeText(list[i].body ? '<br/>' + list[i].body : '')));
 						row.push(list[i].referer);
 						d.push(row);
 					}
