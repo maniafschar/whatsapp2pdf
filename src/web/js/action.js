@@ -175,7 +175,7 @@ class action {
 
 	static postAnalyse(data) {
 		if (!data) {
-			document.dispatchEvent(new CustomEvent('popup', { detail: { body: 'PDF creation failed. Is it a WhatsApp exported chat file?' } }))
+			document.dispatchEvent(new CustomEvent('popup', { detail: { body: 'PDF creation failed. Is it a WhatsApp exported chat file?' } }));
 			return;
 		}
 		document.getElementsByTagName('attributes')[0].style.display = 'block';
