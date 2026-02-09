@@ -33,7 +33,7 @@ public class DateHandler {
 		else if (period.contains("."))
 			period = period.replace("\\d.", "").replace(".", "_");
 		else if (period.contains("-"))
-			period = period.substring(0, period.lastIndexOf('-')).replace("-", "_");
+			period = period.replace("\\d-", "").replace("-\\d", "").replace("-", "_");
 		return "_" + period;
 	}
 
@@ -56,11 +56,12 @@ public class DateHandler {
 		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
 
-	public static String dateFormatWithoutYear(final String format) {
+	public static String dateFormatWithoutYear(String format) {
+		format = format.replace("yyyy", "yy");
 		if (format.contains("/"))
-			return format.replace("/yyyy", "").replace("/yy", "");
+			return format.replace("/yy", "");
 		if (format.contains("."))
-			return format.replace(".yyyy", "").replace(".yy", "");
-		return format.replace("yyyy-", "").replace("yy-", "");
+			return format.replace(".yy", "");
+		return format.replace("yy-", "").replace("-yy", "");
 	}
 }
