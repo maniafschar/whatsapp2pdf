@@ -22,7 +22,7 @@ public class DateHandler {
 		String month = "" + (gc.get(Calendar.MONTH) + 1);
 		if (month.length() < 2 && date.replace(year, "").contains("0" + month))
 			month = "0" + month;
-		return dateFormat.replace("d", "\\d").replace("M", month).replace("yyyy", year).replace("yy", year);
+		return dateFormat.replace("d", "\\d").replace("M", month).replace(year.length() == 2 ? "yy" : "yyyy", year);
 	}
 
 	public static String periodSuffix(String period) {
