@@ -1,22 +1,28 @@
 package com.jq.wa2pdf.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 public class DateHandler {
-	public static String replaceStrangeWhitespace(final String date) {
-		return date.replace(". ", ".");
+	public static String replaceStrangeWhitespace(String date) {
+		date = date.replace(". ", ".");
+		date = date.split(" ")[0];
+		return date.replaceAll("[^0-9/\\-\\.]", "");
 	}
 
-	public static String replaceDay(String date, final String dateFormat) {
+	public static String replaceDay(String date, final String dateFormat) throws ParseException {
 		date = replaceStrangeWhitespace(date);
-		date = date.substring(0, date.indexOf(' ')).replace(",", "");
-		if (dateFormat.startsWith("M/d/"))
-			return date.split("/")[0] + "/\\d/" + date.split("/")[2];
-		if (dateFormat.contains("/"))
-			return "\\d/" + date.split("/")[1] + "/" + date.split("/")[2];
-		if (dateFormat.contains("."))
-			return "\\d" + date.substring(date.indexOf('.'));
-		if (dateFormat.contains("-"))
-			return date.substring(0, date.lastIndexOf('-') + 1) + "\\d";
-		throw new IllegalArgumentException("Unknown date format: " + date);
+		final GregorianCalendar gc = new GregorianCalendar();
+		gc.setTime(new SimpleDateFormat(dateFormat).parse(date));
+		String year = "" + gc.get(Calendar.YEAR);
+		if (!dateFormat.contains("yyyy"))
+			year = year.substring(year.length() - 2);
+		String month = "" + (gc.get(Calendar.MONTH) + 1);
+		if (month.length() < 2 && date.replace(year, "").contains("0" + month))
+			month = "0" + month;
+		return dateFormat.replace("d", "\\d").replace("M", month).replace("yyyy", year).replace("yy", year);
 	}
 
 	public static String periodSuffix(String period) {
@@ -41,8 +47,12 @@ public class DateHandler {
 			return "d/M/" + (date.split("/")[2].length() > 2 ? "yyyy" : "yy");
 		if (date.contains("."))
 			return "d.M." + (replaceStrangeWhitespace(date).split("\\.")[2].length() > 2 ? "yyyy" : "yy");
-		if (date.contains("-"))
-			return (date.split("-")[0].length() > 2 ? "yyyy" : "yy") + "-M-d";
+		if (date.contains("-")) {
+			final String[] dates = date.split("-");
+			if (dates.length > 1 && dates[2].length() > 2)
+				return "d-M-yyyy";
+			return (dates[0].length() > 2 ? "yyyy" : "yy") + "-M-d";
+		}
 		throw new IllegalArgumentException("Unknown date format: " + date);
 	}
 

@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -171,7 +172,8 @@ public class ExtractService {
 								+ ",? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
 	}
 
-	public Attributes analyse(final InputStream in, final String filename, final String id) throws IOException {
+	public Attributes analyse(final InputStream in, final String filename, final String id)
+			throws IOException, ParseException {
 		this.unzip(in, filename, id);
 		final Pattern start = Pattern.compile(this.getPatternStart(null));
 		final Attributes attributes = new Attributes(id);
