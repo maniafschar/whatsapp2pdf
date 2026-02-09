@@ -60,7 +60,7 @@ public class ApplicationApi {
 		try {
 			return this.extractService.analyse(file.getInputStream(), file.getOriginalFilename(),
 					"" + System.currentTimeMillis() + Math.random());
-		} catch (final IOException e) {
+		} catch (final IOException | ParseException e) {
 			return null;
 		}
 	}
