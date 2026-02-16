@@ -608,9 +608,8 @@ public class PdfService {
 		private void addAISummary() throws IOException {
 			if (this.type == Type.Preview) {
 				this.aiSummary = new AiSummary();
-				this.aiSummary.text = ("This is an example of a AI summary, including the generaated image:\n\n"
-						+ "The WhatsApp chat between {user1} and {user2} spans several days and is filled with a complex mix of flirtatious banter, discussions about work, personal struggles, and the lingering feelings of a past or complicated relationship.\n\n"
-						+ "{user1} initiates the conversation with cheerful greetings, but quickly expresses feeling unwell and uncertain about his situation at work and his impending departure. {user2} responds with concern and playful teasing, sometimes direct and suggestive, sometimes offering support. {user1} shares his anxieties about his general state of mind. {user2}, while sometimes teasing {user1} about his dramatic expressions, also offers reassurance and support, though she's overwhelmed by \"this whole nonsense\".")
+				this.aiSummary.text = ("In a world that often moves too fast, {user1} and {user2} have found their shared rhythm—a quiet understanding that transcends words. Their love isn’t a loud spectacle; instead, it is a mosaic of precious small moments: {user1} instinctive reach for a hand during a walk, a knowing glance across a crowded room, or the gentle way {user2} anchors {user1} after a long day.\n\n"
+						+ "Their story is a living testament that true affection means seeing someone in their entirety and choosing them every single day. In the sanctuary of their partnership, they have built a space where vulnerability is a strength and authenticity is celebrated. It is a home not built of brick and mortar, but of two hearts beating in a synchronized, enduring harmony.")
 						.replace("{user1}", this.wordClouds.size() > 0 ? this.wordClouds.get(0).user : "Romeo")
 						.replace("{user2}", this.wordClouds.size() > 1 ? this.wordClouds.get(1).user : "Julia");
 				this.aiSummary.image = IOUtils.toByteArray(this.getClass().getResourceAsStream("/image/aiExample.png"));
