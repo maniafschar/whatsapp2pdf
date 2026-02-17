@@ -6,14 +6,18 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class DateHandler {
-	public static String replaceStrangeWhitespace(String date) {
-		date = date.replace(". ", ".");
+	public static String replaceStrangeWhitespace(final String date) {
+		return date.replace(". ", ".");
+	}
+
+	private static String extractDate(String date) {
+		date = replaceStrangeWhitespace(date);
 		date = date.split(" ")[0];
 		return date.replaceAll("[^0-9/\\-\\.]", "");
 	}
 
 	public static String replaceDay(String date, final String dateFormat) throws ParseException {
-		date = replaceStrangeWhitespace(date);
+		date = extractDate(date);
 		final GregorianCalendar gc = new GregorianCalendar();
 		gc.setTime(new SimpleDateFormat(dateFormat).parse(date));
 		String year = "" + gc.get(Calendar.YEAR);
@@ -46,7 +50,7 @@ public class DateHandler {
 		if (date.contains("/"))
 			return "d/M/" + (date.split("/")[2].length() > 2 ? "yyyy" : "yy");
 		if (date.contains("."))
-			return "d.M." + (replaceStrangeWhitespace(date).split("\\.")[2].length() > 2 ? "yyyy" : "yy");
+			return "d.M." + (extractDate(date).split("\\.")[2].length() > 2 ? "yyyy" : "yy");
 		if (date.contains("-")) {
 			final String[] dates = date.split("-");
 			if (dates.length > 1 && dates[2].length() > 2)
