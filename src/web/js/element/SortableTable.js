@@ -257,7 +257,7 @@ filter count {
 					if (this.columns[i2].style)
 						td.setAttribute('style', this.columns[i2].style);
 					td.innerHTML = (typeof data[i][i2] == 'object' ? data[i][i2].text : data[i][i2]) || '&nbsp;';
-					if (data[i][i2].attributes) {
+					if (data[i][i2]?.attributes) {
 						var keys = Object.keys(data[i][i2].attributes);
 						for (var i3 = 0; i3 < keys.length; i3++)
 							td.setAttribute(keys[i3], data[i][i2].attributes[keys[i3]]);
