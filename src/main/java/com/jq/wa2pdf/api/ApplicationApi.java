@@ -41,7 +41,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("api")
 public class ApplicationApi {
-	public static final int STATUS_PROCESSING_PDF = 566;
+	public static final int STATUS_PROCESSING_PDF = HttpStatus.NOT_EXTENDED.value();
 
 	@Autowired
 	private PdfService pdfService;
@@ -59,7 +59,7 @@ public class ApplicationApi {
 	public Attributes analyse(@RequestParam("file") final MultipartFile file) {
 		try {
 			return this.extractService.analyse(file.getInputStream(), file.getOriginalFilename(),
-					"" + System.currentTimeMillis() + Math.random());
+					("" + System.currentTimeMillis() + Math.random()).replace('.', 'T'));
 		} catch (final IOException | ParseException e) {
 			return null;
 		}

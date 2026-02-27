@@ -262,7 +262,7 @@ class action {
 				},
 				error: xhr => {
 					var error = xhr.responseText || 'Unknown error';
-					if (error.indexOf('"status":566,') > -1)
+					if (xhr.status == 510)
 						setTimeout(function () { download(period); }, 1000);
 					else {
 						if (xhr.status < 500)
