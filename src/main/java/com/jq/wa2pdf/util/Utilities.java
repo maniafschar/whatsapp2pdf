@@ -2,11 +2,26 @@ package com.jq.wa2pdf.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.jq.wa2pdf.entity.Ticket;
+import com.jq.wa2pdf.service.AdminService;
+
+import ezvcard.Ezvcard;
+import ezvcard.property.Address;
+import ezvcard.property.Agent;
+import ezvcard.property.BinaryProperty;
+import ezvcard.property.ListProperty;
+import ezvcard.property.SimpleProperty;
+import ezvcard.property.StructuredName;
+import ezvcard.property.VCardProperty;
 
 public class Utilities {
 	public static String stackTraceToString(final Throwable ex) {
@@ -88,5 +103,54 @@ public class Utilities {
 		if (Utilities.class.getResourceAsStream("/emoji/" + id + "_fe0f.png") != null)
 			id += "_fe0f";
 		return Utilities.class.getResourceAsStream("/emoji/" + id + ".png") == null ? null : id;
+	}
+
+	public static String formatVCard(final String vCard, final AdminService adminService) {
+		final Collection<VCardProperty> properties = Ezvcard.parse(vCard).first().getProperties();
+		final StringBuilder sb = new StringBuilder();
+		properties.forEach(property -> {
+			sb.append("\n");
+			String value = null;
+			if (property instanceof SimpleProperty)
+				value = ((SimpleProperty<?>) property).getValue().toString();
+			else if (property instanceof ListProperty)
+				value = ((ListProperty<?>) property).getValues().stream().map(e -> e.toString())
+						.collect(Collectors.joining(", "));
+			else if (property instanceof Agent)
+				value = ((Agent) property).getUrl(); // nested vCard not supported, ignore rest of it
+			else if (property instanceof StructuredName) {
+				final StructuredName name = (StructuredName) property;
+				value = name.getPrefixes() == null ? "" : name.getPrefixes().stream().collect(Collectors.joining(" "));
+				value += name.getGiven() == null ? "" : " " + name.getGiven();
+				value += name.getFamily() == null ? "" : " " + name.getFamily();
+				value = name.getSuffixes() == null ? ""
+						: " " + name.getSuffixes().stream().collect(Collectors.joining(" "));
+			} else if (property instanceof Address) {
+				final Address address = (Address) property;
+				value = address.getPoBox() == null ? "" : address.getPoBox();
+				value += address.getExtendedAddress() == null ? "" : "\n" + address.getExtendedAddress();
+				value += address.getStreetAddress() == null ? "" : "\n" + address.getStreetAddress();
+				value += address.getPostalCode() == null ? "" : "\n" + address.getPostalCode();
+				value += address.getLocality() == null ? ""
+						: (address.getPostalCode() == null ? "\n" : " ") + address.getLocality();
+				value += address.getRegion() == null ? "" : "\n" + address.getRegion();
+				value += address.getCountry() == null ? "" : "\n" + address.getCountry();
+			} else if (property instanceof BinaryProperty) {
+				if (((BinaryProperty<?>) property).getUrl() != null)
+					value = ((BinaryProperty<?>) property).getUrl();
+			} else {
+				try {
+					value = property.getClass().getDeclaredMethod("getText").invoke(property).toString();
+				} catch (final NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+					adminService.createTicket(new Ticket(Ticket.ERROR + "vCard " + property));
+				}
+			}
+			if (value != null) {
+				sb.append(value);
+				if (property.getParameters().getType() != null)
+					sb.append(" · " + property.getParameters().getType());
+			}
+		});
+		return sb.toString().replace("\n\n", "\n").trim();
 	}
 }

@@ -59,7 +59,8 @@ public class PdfServiceTest {
 			"Chat 16 WhatsApp DateFormat dd-MM-yyyy",
 			"Chat 17 WhatsApp Dangling Char",
 			"Chat 18 WhatsApp Email Regex"
-	// "Chat 18 WhatsApp Arabic"
+	// "Chat 19 WhatsApp Arabic",
+	// "Chat 20 WhatsApp Arabic"
 	})
 	void pdf(final String filename) throws Exception {
 		// given

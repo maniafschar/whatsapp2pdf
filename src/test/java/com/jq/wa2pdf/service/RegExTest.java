@@ -102,4 +102,18 @@ public class RegExTest {
 		assertNotNull(emoji);
 		assertEquals(1, emoji.getAliases().size());
 	}
+
+	@Test
+	public void arabic() {
+		// given
+		final String line = "٢٠٢٢/٢/٥، ٩:٣٠ ص - محمد بلغيث بوابة العالم للملاح";
+		final Pattern p = Pattern.compile(
+				"\"(\\d{1,4}[.|/|-] ?\\d{1,2}[.|/|-] ?\\d{2,4}),? \\d{1,2}(:|.)\\d{1,2}((:|.)\\d{1,2})?(|.[AaPp]\\.?.?[Mm]\\.?)");
+
+		// when
+		final boolean found = p.matcher(line).find();
+
+		// then
+		assertFalse(found);
+	}
 }

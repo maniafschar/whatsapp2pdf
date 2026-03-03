@@ -679,8 +679,15 @@ public class PdfService {
 				final BufferedImage originalImage = ImageIO
 						.read(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL());
 				if (originalImage == null) {
-					final Paragraph paragraph = new Paragraph("media://" + mediaId);
-					cell.add(paragraph);
+					String text;
+					if (mediaId.toLowerCase().endsWith(".vcf"))
+						text = Utilities.formatVCard(
+								IOUtils.toString(ExtractService.getTempDir(this.id).resolve(mediaId).toUri().toURL(),
+										StandardCharsets.UTF_8),
+								PdfService.this.adminService);
+					else
+						text = "media://" + mediaId;
+					cell.add(new Paragraph(text));
 				} else {
 					final boolean internalMedia = mediaId.matches(ExtractService.filename
 							+ "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\\.png");
