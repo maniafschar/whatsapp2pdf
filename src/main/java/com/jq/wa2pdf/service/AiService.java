@@ -178,8 +178,7 @@ public class AiService {
 			response.text = new ObjectMapper().readTree(s).get("choices").get(0).get("text").asText().trim();
 			return response;
 		} catch (final Exception ex) {
-			ex.printStackTrace();
-			this.adminService.createTicket(new Ticket(Ticket.ERROR + Utilities.stackTraceToString(ex)));
+			this.adminService.createTicket(new Ticket(Ticket.ERROR + Utilities.stackTrace2string(ex)));
 			return null;
 		}
 	}

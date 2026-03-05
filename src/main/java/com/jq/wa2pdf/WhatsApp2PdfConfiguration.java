@@ -49,7 +49,7 @@ public class WhatsApp2PdfConfiguration implements AsyncConfigurer {
 								method.toGenericString() + "\n" + (obj == null ? ""
 										: Arrays.asList(obj).stream().map(e -> e == null ? "[null]" : e.toString())
 												.collect(Collectors.joining(", ")) + "\n")
-								+ Utilities.stackTraceToString(ex)));
+								+ Utilities.stackTrace2string(ex)));
 			}
 		};
 	}

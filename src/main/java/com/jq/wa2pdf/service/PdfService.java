@@ -735,7 +735,7 @@ public class PdfService {
 			boolean hasText = false;
 			String s = "";
 			while (text.length() > 0) {
-				final String id = Utilities.getEmojiId(text);
+				final String id = Utilities.emojiId(text);
 				if (id == null) {
 					s += text.substring(0, 1);
 					if (EmojiManager.isEmoji(s)) {
@@ -838,7 +838,7 @@ public class PdfService {
 					// no preview available, continue
 				} catch (final Exception ex) {
 					PdfService.this.adminService.createTicket(new Ticket(Ticket.ERROR + "fillLinkPreview\n" +
-							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTraceToString(ex)));
+							text + "\n" + (uri == null ? "" : uri + "\n") + Utilities.stackTrace2string(ex)));
 				}
 			}
 			return false;

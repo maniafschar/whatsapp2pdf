@@ -53,7 +53,7 @@ public class UlilitiesTest {
 		// given
 
 		// when
-		final String id = Utilities.getEmojiId(emoji.split(" ")[0]);
+		final String id = Utilities.emojiId(emoji.split(" ")[0]);
 
 		// then
 		assertEquals(emoji.split(" ")[1], id);

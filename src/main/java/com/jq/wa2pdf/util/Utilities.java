@@ -24,7 +24,7 @@ import ezvcard.property.StructuredName;
 import ezvcard.property.VCardProperty;
 
 public class Utilities {
-	public static String stackTraceToString(final Throwable ex) {
+	public static String stackTrace2string(final Throwable ex) {
 		if (ex == null)
 			return "";
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -78,7 +78,7 @@ public class Utilities {
 		return list;
 	}
 
-	public static String getEmojiId(String emoji) {
+	public static String emojiId(String emoji) {
 		for (int i = 0; i < emoji.length(); i++) {
 			if (Character.isWhitespace(emoji.charAt(i))) {
 				emoji = emoji.substring(0, i);
@@ -142,7 +142,8 @@ public class Utilities {
 				try {
 					value = property.getClass().getDeclaredMethod("getText").invoke(property).toString();
 				} catch (final NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-					adminService.createTicket(new Ticket(Ticket.ERROR + "vCard " + property));
+					adminService.createTicket(
+							new Ticket(Ticket.ERROR + "vCard " + property + "\n" + stackTrace2string(ex)));
 				}
 			}
 			if (value != null) {
